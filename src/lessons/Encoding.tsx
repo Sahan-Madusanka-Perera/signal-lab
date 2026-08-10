@@ -238,7 +238,7 @@ function EncodingLab() {
           />
         </Scope>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
           <div>
             <p className="mb-2 text-xs font-medium text-ink-2">Bit stream — click a bit to flip it</p>
             <BitTrain bits={bits} onToggle={(i) => setBits((b) => b.map((v, j) => (j === i ? 1 - v : v)))} />
@@ -302,7 +302,7 @@ function EncodingLab() {
         )}
       </Panel>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
         <Callout kind="exam" title="How to draw Manchester in the exam">
           Split every bit cell in half. For a <strong>1</strong>, the voltage goes <strong>low then high</strong>;
           for a <strong>0</strong>, it goes <strong>high then low</strong>. There is a transition in the middle of
@@ -332,7 +332,7 @@ function RateSection() {
       title="How fast the signal elements change"
       lead="Bit rate and signal element rate are not the same number. Bit rate counts bits per second; the signal element rate — the baud rate — counts how many times per second the signal is allowed to change. Manchester buys its reliability by needing two signal elements for every one bit."
     >
-      <div className="grid gap-4 lg:grid-cols-[1fr_1.15fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_1.15fr]">
         <Panel title="Set a bit rate" subtitle="Then read off what each scheme demands of the medium.">
           <Slider
             label="Bit rate"
@@ -501,7 +501,7 @@ function SyncSection() {
           />
         </Scope>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
           <div>
             <Slider
               label="Receiver clock rate"
@@ -559,7 +559,7 @@ function SyncSection() {
         </p>
       </Panel>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
         <Callout kind="note" title="How real receivers stay in step">
           Either a separate clock line is sent alongside the data — expensive, because it doubles the wiring — or
           the clock is <strong>recovered from the data itself</strong>. That only works if the signal changes
@@ -653,7 +653,7 @@ function KeyingSection() {
           />
         </Scope>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
           {(Object.keys(KEYING) as Keying[]).map((k) => (
             <button
               key={k}
@@ -872,7 +872,7 @@ function ParitySection() {
         </div>
       </Panel>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
         <Panel title="What parity can and cannot do">
           <ul className="grid gap-2 text-sm">
             {[

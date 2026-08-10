@@ -43,7 +43,7 @@ function GuidedVsUnguided() {
       title="Two families of medium"
       lead="Every transmission medium either confines the signal to a physical path or lets it spread out into the surroundings. That single distinction — guided or unguided — decides most of what follows: who can overhear it, how far it reaches, and how badly it degrades."
     >
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
         <Panel title="Guided media — wires" subtitle="The signal is steered along a physical conductor or fibre.">
           <Scope height={116} caption="The wave is confined: it can only go where the cable goes.">
             <ScopeCanvas
@@ -247,7 +247,7 @@ function MediaCatalogue() {
       lead="Pick one to see what it carries, how much it can carry, and what it costs you."
     >
       <Panel bodyClassName="p-0">
-        <div className="grid lg:grid-cols-[236px_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[236px_minmax(0,1fr)]">
           <ul className="border-b border-line lg:border-r lg:border-b-0" role="tablist" aria-label="Transmission media">
             {MEDIA.map((m) => (
               <li key={m.id}>
@@ -284,12 +284,12 @@ function MediaCatalogue() {
             </div>
             <p className="mt-1 max-w-[64ch] text-sm text-ink-2">{open.carries}</p>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <Readout label="Typical bandwidth" value={<span className="text-sm">{open.bandwidth}</span>} />
               <Readout label="Typical reach" value={<span className="text-sm">{open.distance}</span>} />
             </div>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-2xs font-semibold text-ok">Strengths</p>
                 <ul className="mt-1.5 grid gap-1.5">
@@ -402,7 +402,7 @@ function SortingDrill() {
           )}
         </div>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
           {(["guided", "unguided"] as const).map((box) => (
             <div key={box} className="rounded-lg border border-line bg-surface-2 p-3">
               <p
@@ -534,7 +534,7 @@ function ImpairmentLab() {
           </div>
         }
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_248px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_248px]">
           <div className="min-w-0">
             <Scope height={132} caption="Transmitted">
               <ScopeCanvas
@@ -666,7 +666,7 @@ function ImpairmentLab() {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-x-8 gap-y-4 border-t border-line pt-4 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-4 border-t border-line pt-4 sm:grid-cols-2">
           <Slider
             label="Bandwidth of the medium"
             value={bandwidth}
@@ -692,7 +692,7 @@ function ImpairmentLab() {
         </div>
       </Panel>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
         <Callout kind="exam" title="Latency and bandwidth are not the same thing">
           <strong>Bandwidth</strong> is a range of frequencies, measured in hertz — how much can be in flight at
           once. <strong>Latency</strong> is a delay, measured in milliseconds — how long one unit takes to arrive.
@@ -816,7 +816,7 @@ function PointToPoint() {
             }}
           />
         </Scope>
-        <ul className="mt-3 grid gap-1.5 text-sm text-ink-2 sm:grid-cols-2">
+        <ul className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-1.5 text-sm text-ink-2 sm:grid-cols-2">
           {[
             "The full bandwidth of the cable belongs to the two devices.",
             "No contention: neither device has to wait for the other to finish.",

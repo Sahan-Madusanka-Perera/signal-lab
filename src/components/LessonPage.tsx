@@ -48,7 +48,7 @@ export function LessonPage({ meta, children }: { meta: LessonMeta; children: Rea
                 </svg>
                 Syllabus outcomes for this level
               </summary>
-              <div className="mt-3 grid gap-4 rounded-xl border border-line bg-surface p-4 sm:grid-cols-2">
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-4 rounded-xl border border-line bg-surface p-4 sm:grid-cols-2">
                 <div>
                   <p className="text-2xs font-semibold text-ink-3">Learning outcomes</p>
                   <ul className="mt-1.5 grid gap-1.5">

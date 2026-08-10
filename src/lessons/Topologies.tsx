@@ -128,7 +128,7 @@ function GrowthSection() {
         title="All-to-all growth"
         subtitle="Every host needs a port for every other host, and every pair needs its own cable."
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
           <Scope height={300}>
             <ScopeCanvas
               label={`${n} devices fully connected need ${links} cables and ${ports} ports on each device`}
@@ -295,7 +295,7 @@ function TopologyExplorer() {
           </div>
         }
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_270px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_270px]">
           <Scope height={320}>
             <ScopeCanvas
               label={`A ${info.name} topology connecting ${n} devices, with a message travelling from device 1 to device 4`}
@@ -736,7 +736,7 @@ function CollisionSection() {
           />
         </Scope>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
           <div>
             <p className="mb-2 text-xs font-medium text-ink-2">Make a device transmit</p>
             <div className="flex flex-wrap gap-1.5">
@@ -821,7 +821,7 @@ function HubVsSwitch() {
           />
         }
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_230px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_230px]">
           <Scope height={300}>
             <ScopeCanvas
               label={`PC1 sends a frame to PC${target + 1} through a ${device}`}

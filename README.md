@@ -1,8 +1,9 @@
 # SignalLab
 
-An interactive, visual-aided learning site for **Competency 6** of the Sri Lankan
-GCE Advanced Level ICT syllabus — *"Explores the data communication and computer
-networking technologies to share information effectively."*
+An interactive, visual-aided learning site covering **all nine competency levels
+of Competency 6** of the Sri Lankan GCE Advanced Level ICT syllabus — *"Explores
+the data communication and computer networking technologies to share information
+effectively."*
 
 Every waveform, topology and schematic on the site is computed live from the same
 equations students are asked to use in the paper. There are no pre-rendered
@@ -17,6 +18,10 @@ diagrams.
 | **6.3** | Encoding digital data | NRZ-L / NRZ-I / Manchester / differential Manchester encoder with a clock lane, baud-vs-bit-rate comparison, clock-drift simulator that produces real bit errors, ASK / FSK / PSK lab, parity workbench |
 | **6.4** | PSTN and modems | Switched-circuit and voice-band diagrams, end-to-end modem schematic with a live signal tap at every stage, AM / FM / PM modulation lab, PCM sampling and quantisation |
 | **6.5** | Connecting many devices | All-to-all cable-growth demo, bus / star / ring / mesh explorer with packet animation, bus collision simulator with carrier sense, hub-vs-switch frame forwarding |
+| **6.6** | Media Access Control | MAC address anatomy down to the nibble, scale drawing of an Ethernet frame, ALOHA / slotted ALOHA / CSMA-CD event simulator with live throughput against the theoretical curves, broadcast-vs-unicast delivery |
+| **6.7** | Joining networks into the Internet | Gateway animation, IPv4 octet explorer with binary, class identifier, subnet calculator with a 32-bit network/host ruler, block splitting, private-address checker, DHCP DORA walkthrough, packet switching with link failure and congestion loss |
+| **6.8** | Transport protocols | Port demultiplexing animation, TCP-vs-UDP trait comparison, and a delivery race that runs both protocols over the same lossy link |
+| **6.9** | Applications on the Internet | DNS hierarchy tree with path tracing, step-by-step recursive resolution, annotated HTTP request and response, and the whole page load traced back through every level |
 
 Each level ends with a set of checkpoint questions. Answers are stored in
 `localStorage` only — there is no account and nothing is uploaded.
@@ -45,9 +50,12 @@ library.
 ```
 src/
   lib/
-    signal.ts       every equation — waves, line codes, keying, modulation,
+    signal.ts       6.1–6.5 equations — waves, line codes, keying, modulation,
                     PCM, impairments, parity, topology maths. Pure functions,
                     so one number drives the trace, the readout and the quiz.
+    network.ts      6.6–6.9 — MAC address parsing, a discrete event simulation
+                    of ALOHA / slotted ALOHA / CSMA-CD, IPv4 and CIDR maths,
+                    subnet splitting, DHCP and DNS reference data.
     plot.ts         Plot: data-space drawing over Canvas2D (grid, traces,
                     step waveforms, measurement arrows, direct labels)
     canvas.ts       useCanvas — DPR-correct sizing, ResizeObserver, optional
@@ -57,8 +65,9 @@ src/
     progress.tsx    localStorage-backed checkpoint progress
     curriculum.ts   syllabus metadata: outcomes and contents, quoted
   components/       Panel, Slider, Segmented, Toggle, BitTrain, Quiz, Shell,
-                    LessonPage — one component vocabulary across all five levels
-  lessons/          one file per competency level
+                    LessonPage — one component vocabulary across all nine levels
+  lessons/          one file per competency level, each lazily loaded so a
+                    student downloads only the level they are reading
 ```
 
 ### Colour
@@ -83,7 +92,17 @@ through `usePalette()`, so a theme switch can't leave a plot on stale colours.
 node scripts/audit.mjs   # needs the dev server running
 ```
 
-Sweeps every route × both themes × 1440/768/390 px and reports horizontal
-overflow, WCAG AA text-contrast failures (OKLCH-aware, alpha-composited),
-unlabelled canvases, unnamed buttons, heading structure, and console errors.
-Requires `npx playwright install chromium` once.
+Sweeps all ten routes × both themes × 1440/768/390 px — sixty combinations —
+and reports horizontal overflow, WCAG AA text-contrast failures (OKLCH-aware and
+alpha-composited), unlabelled canvases, unnamed buttons, heading structure, and
+console errors. Requires `npx playwright install chromium` once.
+
+Two layout rules the audit exists to catch, both learned the hard way:
+
+- A grid track that declares its columns only at a breakpoint falls back to an
+  implicit `auto` track on mobile, whose minimum is *min-content* — so a wide
+  scrollable table inside it pushes the whole page sideways. Every such grid
+  carries an explicit `grid-cols-[minmax(0,1fr)]` base.
+- Canvas cannot parse `var(--s1)`. A colour it cannot parse is silently ignored,
+  leaving the previous fill in place — usually black. Canvas code takes colours
+  from `usePalette()`, never from a CSS custom property name.

@@ -51,7 +51,7 @@ function WhatIsASignal() {
         </>
       }
     >
-      <div className="grid gap-4 lg:grid-cols-[1.15fr_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.15fr_1fr]">
         <Panel
           title="The communication model"
           subtitle="Three parts, and the only one that carries anything physical is the middle one."
@@ -205,7 +205,7 @@ function WaveLab() {
           />
         }
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_236px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_236px]">
           <div className="min-w-0">
             <Scope height={300}>
               <ScopeCanvas
@@ -351,7 +351,7 @@ function WaveLab() {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-4 border-t border-line pt-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div>
             <p className="mb-1.5 text-xs font-medium text-ink-2">
               Medium — sets the propagation speed v, and so the wavelength
@@ -382,7 +382,7 @@ function WaveLab() {
         </div>
       </Panel>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
         <Callout kind="exam" title="The distinction examiners look for">
           <strong>Period</strong> is measured along a <em>time</em> axis at one point on the wire — it is how
           long one cycle takes. <strong>Wavelength</strong> is measured along a <em>distance</em> axis at one
@@ -421,7 +421,7 @@ function PhaseSection() {
           </Button>
         }
       >
-        <div className="grid gap-4 md:grid-cols-[190px_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[190px_minmax(0,1fr)]">
           <Scope height={190} caption="Phasors: each dot's height is the wave's value right now.">
             <ScopeCanvas
               label={`Two rotating phasors separated by ${delta} degrees`}
@@ -522,7 +522,7 @@ function PhaseSection() {
               />
             </Scope>
 
-            <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
               <Slider
                 label="Phase difference (B relative to A)"
                 value={delta}
@@ -685,12 +685,12 @@ function PropagationSection() {
       title="Propagation speed ties the properties together"
       lead="A signal does not arrive instantly. It travels through the medium at a fixed speed, and that speed depends on the medium — not on how loud or how fast the signal is. One equation links the three quantities, and every numerical problem in this level is a rearrangement of it."
     >
-      <div className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_1.1fr]">
         <div className="grid content-start gap-4">
           <Formula note="v is the propagation speed in metres per second, f is frequency in hertz, and λ is wavelength in metres.">
             v = f × λ
           </Formula>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-3">
             <Formula>λ = v / f</Formula>
             <Formula>f = v / λ</Formula>
             <Formula>T = 1 / f</Formula>

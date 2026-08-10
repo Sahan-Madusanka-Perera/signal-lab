@@ -155,7 +155,8 @@ export function Segmented<T extends string>({
       role="radiogroup"
       aria-label={label}
       className={clsx(
-        "inline-flex items-center gap-0.5 rounded-lg border border-line bg-surface-2 p-0.5",
+        // Wraps rather than overflowing when a control has many or long options.
+        "inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-lg border border-line bg-surface-2 p-0.5",
         className,
       )}
     >

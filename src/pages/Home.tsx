@@ -21,9 +21,9 @@ export function Home() {
               Data communication, drawn out.
             </h1>
             <p className="mt-3 max-w-[64ch] text-lg text-ink-2">
-              Five competency levels, each built around instruments you can actually move. Drag a slider and the
-              waveform answers — because a signal is far easier to understand when you can bend it yourself
-              than when it is a static diagram in a textbook.
+              The whole of Competency 6, from a voltage on a wire to a web page in a browser — built around
+              instruments you can actually move. Drag a slider and the waveform answers, because a network is
+              far easier to understand when you can bend it yourself than when it is a diagram in a textbook.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -62,7 +62,7 @@ export function Home() {
                 <li key={l.id}>
                   <Link
                     to={`/lesson/${l.id}`}
-                    className="group grid items-center gap-4 rounded-xl border border-line bg-surface p-4 transition-[border-color,background-color,transform] duration-200 ease-[var(--ease-out-quart)] hover:-translate-y-px hover:border-line-strong hover:bg-surface-2 sm:grid-cols-[auto_minmax(0,1fr)_170px]"
+                    className="group grid grid-cols-[minmax(0,1fr)] items-center gap-4 rounded-xl border border-line bg-surface p-4 transition-[border-color,background-color,transform] duration-200 ease-[var(--ease-out-quart)] hover:-translate-y-px hover:border-line-strong hover:bg-surface-2 sm:grid-cols-[auto_minmax(0,1fr)_170px]"
                   >
                     <div className="flex items-center gap-3 sm:block">
                       <span className="tnum font-mono text-sm font-semibold text-brand">{l.code}</span>
@@ -112,7 +112,7 @@ export function Home() {
           </ul>
         </section>
 
-        <section className="mt-10 grid gap-3 border-t border-line pt-8 sm:grid-cols-3">
+        <section className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-3 border-t border-line pt-8 sm:grid-cols-3">
           {[
             {
               t: "Everything is live",
@@ -138,7 +138,7 @@ export function Home() {
   );
 }
 
-/** A small distinct trace per lesson, so the list reads as five different topics. */
+/** A small distinct glyph per lesson, so the list reads as nine different topics. */
 function drawThumb(
   plot: import("../lib/plot").Plot,
   palette: import("../lib/theme").Palette,
@@ -173,7 +173,7 @@ function drawThumb(
       d[i] = Math.sin(TAU * 9 * u) * (0.45 + 0.5 * Math.sin(TAU * 1 * u));
     }
     plot.trace(d, c, { width: 1.4, glow: 6 });
-  } else {
+  } else if (index === 4) {
     // Star topology glyph
     const cx = plot.w / 2;
     const cy = plot.h / 2;
@@ -199,6 +199,121 @@ function drawThumb(
     ctx.beginPath();
     ctx.arc(cx, cy, 3.4, 0, TAU);
     ctx.fill();
+    ctx.restore();
+  } else if (index === 5) {
+    // 6.6 — frames queued on a shared medium
+    const ctx = plot.ctx;
+    const y = plot.h / 2;
+    ctx.save();
+    ctx.strokeStyle = palette.gridMajor;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(6, y);
+    ctx.lineTo(plot.w - 6, y);
+    ctx.stroke();
+    ctx.fillStyle = c;
+    [0.1, 0.36, 0.68].forEach((f, i) => {
+      const x = 6 + f * (plot.w - 12);
+      ctx.globalAlpha = i === 1 ? 0.45 : 1;
+      ctx.beginPath();
+      ctx.roundRect(x, y - 5, 18, 10, 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  } else if (index === 6) {
+    // 6.7 — a routed path through a small mesh
+    const ctx = plot.ctx;
+    const pts = [
+      [0.1, 0.5],
+      [0.36, 0.22],
+      [0.36, 0.78],
+      [0.64, 0.5],
+      [0.9, 0.5],
+    ].map(([fx, fy]) => [6 + fx * (plot.w - 12), 6 + fy * (plot.h - 12)] as const);
+    ctx.save();
+    ctx.strokeStyle = palette.gridMajor;
+    ctx.lineWidth = 1.1;
+    [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4]].forEach(([a, b]) => {
+      ctx.beginPath();
+      ctx.moveTo(pts[a][0], pts[a][1]);
+      ctx.lineTo(pts[b][0], pts[b][1]);
+      ctx.stroke();
+    });
+    // The chosen route, drawn over the full topology.
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    [0, 1, 3, 4].forEach((idx, i) => {
+      const [x, y] = pts[idx];
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.fillStyle = c;
+    pts.forEach(([x, y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 2.2, 0, TAU);
+      ctx.fill();
+    });
+    ctx.restore();
+  } else if (index === 7) {
+    // 6.8 — one stream fanning out to several ports
+    const ctx = plot.ctx;
+    const y = plot.h / 2;
+    const mid = plot.w * 0.44;
+    ctx.save();
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(6, y);
+    ctx.lineTo(mid, y);
+    ctx.stroke();
+    ctx.lineWidth = 1.2;
+    [0.18, 0.5, 0.82].forEach((f) => {
+      ctx.beginPath();
+      ctx.moveTo(mid, y);
+      ctx.lineTo(plot.w - 8, 6 + f * (plot.h - 12));
+      ctx.stroke();
+    });
+    ctx.fillStyle = c;
+    [0.18, 0.5, 0.82].forEach((f) => {
+      ctx.beginPath();
+      ctx.arc(plot.w - 8, 6 + f * (plot.h - 12), 2.2, 0, TAU);
+      ctx.fill();
+    });
+    ctx.restore();
+  } else {
+    // 6.9 — the DNS tree
+    const ctx = plot.ctx;
+    const top = 8;
+    const bottom = plot.h - 8;
+    const midY = (top + bottom) / 2;
+    const rootX = plot.w / 2;
+    const kids = [0.2, 0.5, 0.8].map((f) => 6 + f * (plot.w - 12));
+    ctx.save();
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.3;
+    kids.forEach((kx) => {
+      ctx.beginPath();
+      ctx.moveTo(rootX, top + 3);
+      ctx.lineTo(kx, midY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(kx, midY);
+      ctx.lineTo(kx, bottom - 3);
+      ctx.stroke();
+    });
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(rootX, top + 3, 2.6, 0, TAU);
+    ctx.fill();
+    kids.forEach((kx) => {
+      [midY, bottom - 3].forEach((ky) => {
+        ctx.beginPath();
+        ctx.arc(kx, ky, 2.2, 0, TAU);
+        ctx.fill();
+      });
+    });
     ctx.restore();
   }
 }

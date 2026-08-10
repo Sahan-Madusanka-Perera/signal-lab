@@ -54,7 +54,7 @@ function PstnSection() {
       title="A network built for one job: carrying a voice"
       lead="The Public Switched Telephone Network was designed decades before home computers existed. When you dial, the exchanges switch a circuit through to the far end and hold it open for the whole call. That circuit carries one thing well — an analog signal in the narrow band of frequencies that human speech occupies."
     >
-      <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.1fr_1fr]">
         <Panel title="A switched circuit" subtitle="Dialling reserves a path; the path stays yours until you hang up.">
           <Scope height={148}>
             <ScopeCanvas
@@ -259,7 +259,7 @@ function LinkSection() {
           </div>
         }
       >
-        <ol className="grid gap-3 lg:grid-cols-5">
+        <ol className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-5">
           {stages.map((s, i) => (
             <li key={s.id} className="relative min-w-0">
               <div
@@ -331,7 +331,7 @@ function LinkSection() {
           ))}
         </ol>
 
-        <div className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 border-t border-line pt-4 sm:grid-cols-2">
           <div>
             <p className="text-xs font-semibold text-ink">Modulation, at modem A</p>
             <p className="mt-1 max-w-[46ch] text-sm text-ink-2">
@@ -402,10 +402,10 @@ function ModulationLab() {
           </div>
         }
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_236px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_236px]">
           <div className="min-w-0">
             {showParts && (
-              <div className="mb-2 grid gap-2 sm:grid-cols-2">
+              <div className="mb-2 grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-2">
                 <Scope height={92} caption="Message (modulating signal)">
                   <ScopeCanvas
                     label="The low-frequency message signal"
@@ -572,7 +572,7 @@ function PcmSection() {
         subtitle="Orange stems are the samples taken; the stepped trace is what the receiver reconstructs from them."
         actions={<Toggle checked={showRecon} onChange={setShowRecon} label="Show reconstruction" accent="var(--s2)" />}
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_236px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_236px]">
           <div className="min-w-0">
             <Scope height={272}>
               <ScopeCanvas
@@ -690,7 +690,7 @@ function PcmSection() {
         </div>
       </Panel>
 
-      <div className="grid items-start gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="Why 8000 samples a second?">
           <p className="max-w-[62ch] text-sm text-ink-2">
             The telephone voice band tops out near 3400 Hz. To capture a signal faithfully you must sample at more

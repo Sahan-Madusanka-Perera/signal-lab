@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 
 const OUT =
   "/private/tmp/claude-501/-Users-sahanperera-Documents-Projects-Networking-Visual-Aided-Learning/4ab44738-563e-4f14-a510-6e0bb7de085a/scratchpad/shots";
-const ROUTES = ["/", "/lesson/signals", "/lesson/media", "/lesson/encoding", "/lesson/pstn", "/lesson/topologies"];
+const ROUTES = ["/", "/lesson/signals", "/lesson/media", "/lesson/encoding", "/lesson/pstn", "/lesson/topologies", "/lesson/mac", "/lesson/internet", "/lesson/transport", "/lesson/applications"];
 
 function srgb(c) {
   const v = c / 255;
@@ -79,10 +79,21 @@ for (const theme of ["dark", "light"]) {
       const data = await page.evaluate(() => {
         const de = document.documentElement;
         const overflow = Math.max(0, de.scrollWidth - de.clientWidth);
+        // Content inside a horizontal scroll container is *meant* to be wider
+        // than the viewport, so only report elements that actually escape.
+        const escapes = (el) => {
+          let anc = el.parentElement;
+          while (anc && anc !== document.body) {
+            const ox = getComputedStyle(anc).overflowX;
+            if (ox === "auto" || ox === "scroll" || ox === "hidden") return false;
+            anc = anc.parentElement;
+          }
+          return true;
+        };
         const wide = [...document.querySelectorAll("body *")]
           .filter((el) => {
             const r = el.getBoundingClientRect();
-            return r.width > 0 && r.right > window.innerWidth + 2;
+            return r.width > 0 && r.right > de.clientWidth + 2 && escapes(el);
           })
           .slice(0, 5)
           .map((el) => `${el.tagName.toLowerCase()}[${(el.className || "").toString().slice(0, 60)}]`);
