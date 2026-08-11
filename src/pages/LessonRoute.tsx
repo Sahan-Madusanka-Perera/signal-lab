@@ -17,6 +17,9 @@ const BODIES: Record<string, React.LazyExoticComponent<() => React.ReactElement>
   internet: lazy(() => import("../lessons/Internet").then((m) => ({ default: m.InternetLesson }))),
   transport: lazy(() => import("../lessons/Transport").then((m) => ({ default: m.TransportLesson }))),
   applications: lazy(() => import("../lessons/Applications").then((m) => ({ default: m.ApplicationsLesson }))),
+  models: lazy(() => import("../lessons/Models").then((m) => ({ default: m.ModelsLesson }))),
+  security: lazy(() => import("../lessons/Security").then((m) => ({ default: m.SecurityLesson }))),
+  isp: lazy(() => import("../lessons/Isp").then((m) => ({ default: m.IspLesson }))),
 };
 
 export function LessonRoute() {

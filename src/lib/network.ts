@@ -1,6 +1,7 @@
 /**
- * Maths for competency levels 6.6 – 6.9: media access, addressing, transport
- * and the application protocols.
+ * Maths for competency levels 6.6 – 6.9 and 6.12: media access, addressing,
+ * transport, the application protocols, and the access link and address
+ * translation that join a home network to an ISP.
  *
  * As in `signal.ts`, everything here is a pure function so the same computation
  * drives the animation, the readout and the answer a student checks against.
@@ -560,3 +561,188 @@ export const HTTP_STATUS = [
   { code: "404", meaning: "Not found — no such resource on this server", tone: "warn" },
   { code: "500", meaning: "Internal server error — the server broke", tone: "bad" },
 ] as const;
+
+/* ================================================================== *
+ * 6.12 — ISPs and the access link
+ * ================================================================== */
+
+export const ISP_SERVICES = [
+  {
+    name: "A path to the rest of the Internet",
+    what: "The ISP is already connected to other networks, so buying a connection to the ISP buys reachability to everything they can reach.",
+  },
+  {
+    name: "A public IP address",
+    what: "Addresses are allocated in blocks to ISPs, who lend one to each customer. Without it your traffic has no return address the Internet can route to.",
+  },
+  {
+    name: "Name resolution",
+    what: "A DNS resolver, handed to your router automatically, so names can be turned into addresses.",
+  },
+  {
+    name: "Extra services",
+    what: "Mail accounts, web hosting, and increasingly television and telephone over the same line.",
+  },
+];
+
+export type AccessLink = {
+  id: "dialup" | "adsl" | "sdsl";
+  name: string;
+  long: string;
+  /** Downstream and upstream capacity in bits per second. */
+  down: number;
+  up: number;
+  alwaysOn: boolean;
+  /** What happens to the telephone while the link is in use. */
+  voice: string;
+  how: string;
+  series: number;
+};
+
+export const ACCESS_LINKS: AccessLink[] = [
+  {
+    id: "dialup",
+    name: "Dial-up",
+    long: "Voice-band modem over a dial-up line",
+    down: 56_000,
+    up: 33_600,
+    alwaysOn: false,
+    voice: "The line is busy — nobody can call in or out",
+    how: "The modem dials the ISP's number, and the data is modulated into the same 300 Hz – 3.4 kHz band a voice would occupy. The exchange treats it as an ordinary call.",
+    series: 4,
+  },
+  {
+    id: "adsl",
+    name: "ADSL",
+    long: "Asymmetric Digital Subscriber Line",
+    down: 8_000_000,
+    up: 1_000_000,
+    alwaysOn: true,
+    voice: "Unaffected — voice and data use different frequencies on the same pair",
+    how: "The copper pair can carry far more than the 4 kHz the telephone system reserves for speech. ADSL uses the frequencies above that band, leaving the voice band alone.",
+    series: 0,
+  },
+  {
+    id: "sdsl",
+    name: "SDSL",
+    long: "Symmetric Digital Subscriber Line",
+    down: 2_000_000,
+    up: 2_000_000,
+    alwaysOn: true,
+    voice: "The whole pair is used for data — no telephone on this line",
+    how: "The same idea as ADSL, but the capacity is split evenly. Chosen by a business that has to send as much as it receives, such as one hosting its own server.",
+    series: 1,
+  },
+];
+
+/** Seconds to move `bytes` over a link of `bitsPerSecond`. */
+export const transferTime = (bytes: number, bitsPerSecond: number): number =>
+  (bytes * 8) / bitsPerSecond;
+
+/** A duration in a form a student would say out loud. */
+export function formatDuration(seconds: number): string {
+  if (seconds < 1) return `${(seconds * 1000).toFixed(0)} ms`;
+  if (seconds < 60) return `${seconds < 10 ? seconds.toFixed(1) : Math.round(seconds)} s`;
+  if (seconds < 3600) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.round(seconds % 60);
+    return s ? `${m} min ${s} s` : `${m} min`;
+  }
+  const h = Math.floor(seconds / 3600);
+  const m = Math.round((seconds % 3600) / 60);
+  return m ? `${h} h ${m} min` : `${h} h`;
+}
+
+/** Bits per second in the unit a student would quote. */
+export function formatRate(bps: number): string {
+  if (bps >= 1_000_000) return `${(bps / 1_000_000).toFixed(bps % 1_000_000 ? 1 : 0)} Mbps`;
+  return `${Math.round(bps / 1000)} kbps`;
+}
+
+/**
+ * How ADSL divides the copper pair. The voice band is left where it has always
+ * been, and the two data bands sit above it — the upstream band deliberately
+ * narrower than the downstream one, which is where the "asymmetric" comes from.
+ */
+export const ADSL_BANDS = [
+  { name: "Voice", from: 0, to: 4_000, what: "The ordinary telephone call, untouched", series: 2 },
+  { name: "Upstream", from: 25_000, to: 138_000, what: "Data from you to the ISP", series: 3 },
+  { name: "Downstream", from: 138_000, to: 1_104_000, what: "Data from the ISP to you", series: 0 },
+];
+
+/* ================================================================== *
+ * 6.12 — NAT
+ * ================================================================== */
+
+export const HOME_PUBLIC_IP = "203.0.113.24";
+
+export type HomeHost = { name: string; ip: string; kind: string; series: number };
+
+export const HOME_HOSTS: HomeHost[] = [
+  { name: "Laptop", ip: "192.168.1.10", kind: "browsing a web page", series: 0 },
+  { name: "Phone", ip: "192.168.1.11", kind: "loading a map", series: 1 },
+  { name: "Tablet", ip: "192.168.1.12", kind: "playing a video", series: 3 },
+];
+
+export type NatEntry = {
+  id: number;
+  host: HomeHost;
+  privatePort: number;
+  publicPort: number;
+  remoteIp: string;
+  remotePort: number;
+};
+
+/**
+ * The router hands out a fresh public port for every conversation, because the
+ * public port is the only thing distinguishing one internal host from another
+ * once the private address has been rewritten away.
+ */
+export const NAT_PORT_BASE = 51000;
+
+export const nextPublicPort = (entries: NatEntry[]): number =>
+  NAT_PORT_BASE + entries.length;
+
+/** The two rewrites, written out as the router would perform them. */
+export function natOutbound(entry: NatEntry) {
+  return {
+    before: `${entry.host.ip}:${entry.privatePort} → ${entry.remoteIp}:${entry.remotePort}`,
+    after: `${HOME_PUBLIC_IP}:${entry.publicPort} → ${entry.remoteIp}:${entry.remotePort}`,
+  };
+}
+
+export function natInbound(entry: NatEntry) {
+  return {
+    before: `${entry.remoteIp}:${entry.remotePort} → ${HOME_PUBLIC_IP}:${entry.publicPort}`,
+    after: `${entry.remoteIp}:${entry.remotePort} → ${entry.host.ip}:${entry.privatePort}`,
+  };
+}
+
+/* ================================================================== *
+ * 6.12 — Proxies
+ * ================================================================== */
+
+export const PROXY_JOBS = [
+  {
+    name: "Caching",
+    what: "Keeps a copy of pages that have been fetched recently. The next person to ask for the same page is served from the proxy, so the ISP link is not used at all.",
+    series: 2,
+  },
+  {
+    name: "One point of contact",
+    what: "Servers on the Internet see only the proxy's address. Every machine behind it can share one public address without needing one of its own.",
+    series: 1,
+  },
+  {
+    name: "Filtering and logging",
+    what: "Because every request passes through it, a proxy can refuse some sites and keep a record of what was requested — which is why schools and offices use them.",
+    series: 3,
+  },
+];
+
+/** Pages used by the proxy cache demonstration. */
+export const PROXY_PAGES = [
+  { url: "school.lk/timetable", size: "48 kB" },
+  { url: "news.lk/headlines", size: "310 kB" },
+  { url: "wikipedia.org/Networks", size: "126 kB" },
+];

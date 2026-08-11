@@ -1,6 +1,6 @@
 # SignalLab
 
-An interactive, visual-aided learning site covering **all nine competency levels
+An interactive, visual-aided learning site covering **all twelve competency levels
 of Competency 6** of the Sri Lankan GCE Advanced Level ICT syllabus — *"Explores
 the data communication and computer networking technologies to share information
 effectively."*
@@ -22,6 +22,9 @@ diagrams.
 | **6.7** | Joining networks into the Internet | Gateway animation, IPv4 octet explorer with binary, class identifier, subnet calculator with a 32-bit network/host ruler, block splitting, private-address checker, DHCP DORA walkthrough, packet switching with link failure and congestion loss |
 | **6.8** | Transport protocols | Port demultiplexing animation, TCP-vs-UDP trait comparison, and a delivery race that runs both protocols over the same lossy link |
 | **6.9** | Applications on the Internet | DNS hierarchy tree with path tracing, step-by-step recursive resolution, annotated HTTP request and response, and the whole page load traced back through every level |
+| **6.10** | Reference models | OSI/TCP-IP layer explorer whose geometry *is* the mapping between the two models, an encapsulation diagram drawn to scale from real header sizes with a live efficiency readout, and a nine-step data-flow walkthrough down one stack and up the other |
+| **6.11** | Security of communication | Eavesdropping demo, symmetric shift cipher, a working RSA key pair (p=5, q=11) that encrypts and decrypts letter by letter, a signature workbench where altering the message in transit breaks verification, a phishing drill with seven clues to find, a first-match firewall rule tester and a password entropy lab |
+| **6.12** | ISPs and home networks | ISP tier hierarchy, the ADSL frequency plan against the 4 kHz voice band, a download-time table computed from size ÷ rate, a NAT translation lab that builds the router's table as you send, and a proxy cache hit/miss demo |
 
 Each level ends with a set of checkpoint questions. Answers are stored in
 `localStorage` only — there is no account and nothing is uploaded.
@@ -53,9 +56,15 @@ src/
     signal.ts       6.1–6.5 equations — waves, line codes, keying, modulation,
                     PCM, impairments, parity, topology maths. Pure functions,
                     so one number drives the trace, the readout and the quiz.
-    network.ts      6.6–6.9 — MAC address parsing, a discrete event simulation
-                    of ALOHA / slotted ALOHA / CSMA-CD, IPv4 and CIDR maths,
-                    subnet splitting, DHCP and DNS reference data.
+    network.ts      6.6–6.9 and 6.12 — MAC address parsing, a discrete event
+                    simulation of ALOHA / slotted ALOHA / CSMA-CD, IPv4 and CIDR
+                    maths, subnet splitting, DHCP and DNS reference data, access
+                    link rates and the NAT rewrites.
+    models.ts       6.10 — the OSI and TCP/IP layer tables, the mapping between
+                    them, and encapsulation computed from real header sizes.
+    security.ts     6.11 — modular exponentiation and a real (tiny) RSA key
+                    pair, signing and verification, a first-match firewall
+                    evaluator, password entropy, and the threat reference data.
     plot.ts         Plot: data-space drawing over Canvas2D (grid, traces,
                     step waveforms, measurement arrows, direct labels)
     canvas.ts       useCanvas — DPR-correct sizing, ResizeObserver, optional
@@ -65,7 +74,7 @@ src/
     progress.tsx    localStorage-backed checkpoint progress
     curriculum.ts   syllabus metadata: outcomes and contents, quoted
   components/       Panel, Slider, Segmented, Toggle, BitTrain, Quiz, Shell,
-                    LessonPage — one component vocabulary across all nine levels
+                    LessonPage — one component vocabulary across all twelve levels
   lessons/          one file per competency level, each lazily loaded so a
                     student downloads only the level they are reading
 ```
@@ -92,7 +101,7 @@ through `usePalette()`, so a theme switch can't leave a plot on stale colours.
 node scripts/audit.mjs   # needs the dev server running
 ```
 
-Sweeps all ten routes × both themes × 1440/768/390 px — sixty combinations —
+Sweeps all thirteen routes × both themes × 1440/768/390 px — 78 combinations —
 and reports horizontal overflow, WCAG AA text-contrast failures (OKLCH-aware and
 alpha-composited), unlabelled canvases, unnamed buttons, heading structure, and
 console errors. Requires `npx playwright install chromium` once.

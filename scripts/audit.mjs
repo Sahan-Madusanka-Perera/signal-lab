@@ -1,8 +1,7 @@
 import { chromium } from "playwright";
 
-const OUT =
-  "/private/tmp/claude-501/-Users-sahanperera-Documents-Projects-Networking-Visual-Aided-Learning/4ab44738-563e-4f14-a510-6e0bb7de085a/scratchpad/shots";
-const ROUTES = ["/", "/lesson/signals", "/lesson/media", "/lesson/encoding", "/lesson/pstn", "/lesson/topologies", "/lesson/mac", "/lesson/internet", "/lesson/transport", "/lesson/applications"];
+const OUT = process.env.AUDIT_OUT ?? ".audit-shots";
+const ROUTES = ["/", "/lesson/signals", "/lesson/media", "/lesson/encoding", "/lesson/pstn", "/lesson/topologies", "/lesson/mac", "/lesson/internet", "/lesson/transport", "/lesson/applications", "/lesson/models", "/lesson/security", "/lesson/isp"];
 
 function srgb(c) {
   const v = c / 255;

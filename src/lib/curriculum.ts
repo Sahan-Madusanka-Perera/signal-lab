@@ -1,5 +1,5 @@
 /**
- * Competency 6 of the GCE A/L ICT syllabus, split into the five competency
+ * Competency 6 of the GCE A/L ICT syllabus, split into its twelve competency
  * levels. `outcomes` are quoted from the syllabus so students can check their
  * own coverage against the paper.
  */
@@ -273,6 +273,90 @@ export const LESSONS: LessonMeta[] = [
       { id: "resolve", label: "Resolving a name" },
       { id: "http", label: "HTTP" },
       { id: "journey", label: "The whole journey" },
+      { id: "check", label: "Check yourself" },
+    ],
+  },
+  {
+    id: "models",
+    code: "6.10",
+    title: "Reference models",
+    tagline: "The map of the whole stack: seven layers, or four, and what each one adds.",
+    periods: 4,
+    questions: 6,
+    outcomes: [
+      "Describes the functions of layers of TCP/IP and OSI models",
+      "Describes the data units in different layers (packet, frame and bit)",
+      "Describes the data flow in a network using TCP/IP and OSI models",
+    ],
+    contents: [
+      "TCP/IP model: application, transport, Internet, host to network",
+      "OSI model: application, presentation, session, transport, network, data link, physical",
+      "The function of each layer",
+      "Data units: segment, packet, frame and bit",
+      "Data flow between two hosts through the layers",
+    ],
+    sections: [
+      { id: "why", label: "Why layers" },
+      { id: "stack", label: "The two models" },
+      { id: "units", label: "Data units" },
+      { id: "flow", label: "Data flow" },
+      { id: "check", label: "Check yourself" },
+    ],
+  },
+  {
+    id: "security",
+    code: "6.11",
+    title: "Security of communication",
+    tagline: "Keeping a message private, proving who sent it, and what is trying to get in.",
+    periods: 4,
+    questions: 6,
+    outcomes: [
+      "Identifies the need for confidentiality and authentication of messages and notes that the Internet does not provide",
+      "Briefly explains the use of the public and private keys to encrypt and sign messages",
+      "Describes different threats faced by networked systems and protection against them",
+    ],
+    contents: [
+      "Encryption and digital signature — the basic idea",
+      "Public key, private key and signing",
+      "Threats: viruses, trojans, malware, phishing",
+      "Protection: firewalls, antivirus software",
+      "Education, better awareness and good practices",
+    ],
+    sections: [
+      { id: "need", label: "What is missing" },
+      { id: "keys", label: "Keys" },
+      { id: "sign", label: "Signing" },
+      { id: "threats", label: "Threats" },
+      { id: "protect", label: "Protection" },
+      { id: "check", label: "Check yourself" },
+    ],
+  },
+  {
+    id: "isp",
+    code: "6.12",
+    title: "ISPs and home networks",
+    tagline: "The last mile: modems, ADSL, and one public address shared by a whole house.",
+    periods: 4,
+    questions: 6,
+    outcomes: [
+      "Describes the role of an ISP",
+      "Explains the use of modems and dialup lines to connect a home machine to an ISP's network",
+      "Explains the advantages of DSL/ADSL lines",
+      "Explains the roles of NATs and Proxies in a LAN that uses private IPs",
+    ],
+    contents: [
+      "Internet Service Providers",
+      "Connecting to an ISP: modems and dial-up lines",
+      "DSL and ADSL",
+      "A home LAN that uses private IPs",
+      "Network Address Translation and proxies",
+    ],
+    sections: [
+      { id: "isp", label: "The ISP" },
+      { id: "access", label: "Reaching the ISP" },
+      { id: "home", label: "The home LAN" },
+      { id: "nat", label: "NAT" },
+      { id: "proxy", label: "Proxies" },
       { id: "check", label: "Check yourself" },
     ],
   },

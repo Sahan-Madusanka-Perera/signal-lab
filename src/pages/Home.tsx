@@ -282,7 +282,7 @@ function drawThumb(
       ctx.fill();
     });
     ctx.restore();
-  } else {
+  } else if (index === 8) {
     // 6.9 — the DNS tree
     const ctx = plot.ctx;
     const top = 8;
@@ -314,6 +314,75 @@ function drawThumb(
         ctx.fill();
       });
     });
+    ctx.restore();
+  } else if (index === 9) {
+    // 6.10 — the stack of layers
+    const ctx = plot.ctx;
+    const n = 4;
+    const h = (plot.h - 12) / n;
+    ctx.save();
+    for (let i = 0; i < n; i++) {
+      const inset = 6 + i * 3;
+      ctx.strokeStyle = c;
+      ctx.globalAlpha = 0.45 + i * 0.18;
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.roundRect(inset, 6 + i * h, plot.w - inset * 2, h - 3, 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  } else if (index === 10) {
+    // 6.11 — a padlock
+    const ctx = plot.ctx;
+    const cx = plot.w / 2;
+    const bodyH = plot.h * 0.42;
+    const bodyW = plot.w * 0.34;
+    const bodyY = plot.h * 0.5;
+    ctx.save();
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.arc(cx, bodyY, bodyW * 0.36, Math.PI, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.roundRect(cx - bodyW / 2, bodyY, bodyW, bodyH, 2.5);
+    ctx.stroke();
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(cx, bodyY + bodyH * 0.45, 1.8, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  } else {
+    // 6.12 — three private addresses funnelling into one public one
+    const ctx = plot.ctx;
+    const midX = plot.w * 0.5;
+    const midY = plot.h / 2;
+    ctx.save();
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.2;
+    [0.16, 0.5, 0.84].forEach((f) => {
+      ctx.beginPath();
+      ctx.moveTo(8, 6 + f * (plot.h - 12));
+      ctx.lineTo(midX - 5, midY);
+      ctx.stroke();
+    });
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(midX + 5, midY);
+    ctx.lineTo(plot.w - 7, midY);
+    ctx.stroke();
+    ctx.fillStyle = c;
+    [0.16, 0.5, 0.84].forEach((f) => {
+      ctx.beginPath();
+      ctx.arc(8, 6 + f * (plot.h - 12), 2.2, 0, TAU);
+      ctx.fill();
+    });
+    ctx.beginPath();
+    ctx.roundRect(midX - 5, midY - 5, 10, 10, 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(plot.w - 7, midY, 2.6, 0, TAU);
+    ctx.fill();
     ctx.restore();
   }
 }
