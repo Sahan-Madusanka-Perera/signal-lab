@@ -23,6 +23,7 @@ import type { Palette } from "../lib/theme";
 import {
   KEYING,
   LINE_CODES,
+  MANCHESTER_CONVENTIONS,
   baudPerBit,
   clockSegments,
   encode,
@@ -34,6 +35,7 @@ import {
   transitionCount,
   type Keying,
   type LineCode,
+  type ManchesterConvention,
   type Parity,
   type Segment,
 } from "../lib/signal";
@@ -189,11 +191,17 @@ function EncodingLab() {
   const [code, setCode] = useState<LineCode>("nrz-l");
   const [showClock, setShowClock] = useState(true);
   const [compare, setCompare] = useState(false);
+  const [conv, setConv] = useState<ManchesterConvention>("ieee");
 
-  const segs = useMemo(() => encode(bits, code), [bits, code]);
+  const segs = useMemo(() => encode(bits, code, conv), [bits, code, conv]);
   const clock = useMemo(() => clockSegments(bits.length), [bits.length]);
   const transitions = transitionCount(segs);
   const flat = longestFlatRun(segs);
+
+  // Only plain Manchester changes with the convention; the differential code
+  // carries its value in the boundary transition, so polarity is irrelevant.
+  const convApplies = compare || code === "manchester";
+  const rule = MANCHESTER_CONVENTIONS[conv];
 
   const clockLane: Lane[] = showClock ? [{ label: "Clock", series: 2, segs: clock, dim: true }] : [];
   const lanes: Lane[] = compare
@@ -201,7 +209,7 @@ function EncodingLab() {
         ...clockLane,
         { label: "NRZ-L", series: 0, segs: encode(bits, "nrz-l") },
         { label: "NRZ-I", series: 1, segs: encode(bits, "nrz-i") },
-        { label: "Manchester", series: 3, segs: encode(bits, "manchester") },
+        { label: "Manchester", series: 3, segs: encode(bits, "manchester", conv) },
       ]
     : [...clockLane, { label: LINE_CODES[code].name, series: 0, segs }];
 
@@ -223,10 +231,30 @@ function EncodingLab() {
           </div>
         }
       >
+        {convApplies && (
+          <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="text-xs font-medium text-ink-2">Manchester convention</span>
+            <Segmented
+              size="sm"
+              label="Manchester convention"
+              value={conv}
+              onChange={setConv}
+              options={(Object.keys(MANCHESTER_CONVENTIONS) as ManchesterConvention[]).map((k) => ({
+                value: k,
+                label: MANCHESTER_CONVENTIONS[k].name,
+                title: MANCHESTER_CONVENTIONS[k].attribution,
+              }))}
+            />
+            <span className="text-2xs text-ink-3">
+              1 = {rule.one}, 0 = {rule.zero}
+            </span>
+          </div>
+        )}
+
         <Scope height={laneCount * 62 + 46}>
           <ScopeCanvas
-            label={`Line coding of the bits ${bits.join("")}${compare ? " in NRZ-L, NRZ-I and Manchester" : ` using ${LINE_CODES[code].name}`}`}
-            deps={[bits.join(""), code, showClock, compare]}
+            label={`Line coding of the bits ${bits.join("")}${compare ? " in NRZ-L, NRZ-I and Manchester" : ` using ${LINE_CODES[code].name}`}${convApplies ? `, with Manchester drawn in the ${rule.name} convention` : ""}`}
+            deps={[bits.join(""), code, showClock, compare, conv]}
             bounds={{ x0: 0, x1: bits.length, y0: 0, y1: laneCount * 2 }}
             insets={{ left: 84, right: 18, top: 26, bottom: 18 }}
             draw={({ plot, palette }) => {
@@ -302,12 +330,57 @@ function EncodingLab() {
         )}
       </Panel>
 
+      <Panel
+        title="The two Manchester conventions"
+        subtitle="Manchester was published twice with opposite polarity, and both names are in circulation. The waveforms are exact inverses of each other, so neither is 'wrong'; what is wrong is drawing one without saying which."
+      >
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
+          {(Object.keys(MANCHESTER_CONVENTIONS) as ManchesterConvention[]).map((k) => {
+            const c = MANCHESTER_CONVENTIONS[k];
+            const active = convApplies && k === conv;
+            return (
+              <div
+                key={k}
+                className={clsx(
+                  "rounded-lg border px-3.5 py-3",
+                  active ? "border-brand-edge bg-brand-wash" : "border-line bg-surface-2",
+                )}
+              >
+                <p className="flex items-center gap-2 text-xs font-semibold text-ink">
+                  {c.name}
+                  {active && <span className="text-2xs font-medium text-brand">shown above</span>}
+                </p>
+                <p className="mt-0.5 text-2xs text-ink-3">{c.attribution}</p>
+                <dl className="mt-2.5 grid grid-cols-2 gap-2">
+                  {(["1", "0"] as const).map((bit) => (
+                    <div key={bit} className="rounded-md border border-line bg-surface px-2.5 py-1.5">
+                      <dt className="text-2xs text-ink-3">Binary {bit}</dt>
+                      <dd className="tnum font-mono text-xs font-medium text-ink">
+                        {bit === "1" ? c.one : c.zero}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-2.5 text-2xs text-ink-2">{c.note}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="mt-4 max-w-[70ch] text-sm text-ink-2">
+          Invert a Manchester signal on the wire and you have not corrupted it, you have simply turned one
+          convention into the other. That is exactly why a receiver cannot work it out for itself: the two devices
+          have to agree beforehand, the same agreement the voltage question at the top of this page needed.
+        </p>
+      </Panel>
+
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
         <Callout kind="exam" title="How to draw Manchester in the exam">
-          Split every bit cell in half. For a <strong>1</strong>, the voltage goes <strong>low then high</strong>;
-          for a <strong>0</strong>, it goes <strong>high then low</strong>. There is a transition in the middle of
-          every single bit, without exception. If your drawing has a bit cell with no mid-point transition, it is
-          not Manchester.
+          Split every bit cell in half, then apply the convention you named: under{" "}
+          <strong>IEEE 802.3</strong> a <strong>1</strong> goes low then high, under{" "}
+          <strong>G. E. Thomas</strong> a <strong>1</strong> goes high then low. Whichever you pick, there is a
+          transition in the middle of every single bit, without exception. If your drawing has a bit cell with no
+          mid-point transition, it is not Manchester.
         </Callout>
         <Callout kind="warn" title="Try 'All zeros' with each scheme">
           With NRZ-L and NRZ-I a long run of zeros produces a flat line: nothing changes for eight whole bit
@@ -1006,7 +1079,19 @@ const QUESTIONS: Question[] = [
       { label: "By the number of cycles in the bit period" },
     ],
     explain:
-      "Manchester puts a transition in the middle of every bit and uses its direction to carry the value: low-to-high for 1, high-to-low for 0. The mid-bit transition is always present, which is what makes the code self-clocking.",
+      "Manchester puts a transition in the middle of every bit and uses its direction to carry the value. Which direction means 1 depends on the convention: under IEEE 802.3 a 1 is low-to-high, under G. E. Thomas it is high-to-low. The mid-bit transition itself is always present, which is what makes the code self-clocking.",
+  },
+  {
+    id: "e1b",
+    prompt: "Manchester encoding is defined by two conventions. How do they differ?",
+    options: [
+      { label: "One transitions mid-bit, the other transitions at the bit boundary" },
+      { label: "They assign the two transition directions to 1 and 0 the opposite way round", correct: true },
+      { label: "One uses two voltage levels, the other uses three" },
+      { label: "One is self-clocking and the other is not" },
+    ],
+    explain:
+      "IEEE 802.3, used by 10 Mbit/s Ethernet, makes a low-to-high mid-bit transition a 1. The older G. E. Thomas convention of 1949, also called Manchester II, makes that same transition a 0. Everything else is identical, so the two waveforms are exact inverses. Both are self-clocking, and both transition in the middle of every bit. In an exam, state which convention you are drawing.",
   },
   {
     id: "e2",

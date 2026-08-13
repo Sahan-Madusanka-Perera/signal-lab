@@ -124,7 +124,7 @@ export const LINE_CODES: Record<LineCode, { name: string; blurb: string; syllabu
   },
   manchester: {
     name: "Manchester",
-    blurb: "Every bit has a mid-bit transition. Low→high = 1, high→low = 0.",
+    blurb: "Every bit has a mid-bit transition; its direction carries the value.",
     syllabus: true,
   },
   "manchester-diff": {
@@ -135,12 +135,43 @@ export const LINE_CODES: Record<LineCode, { name: string; blurb: string; syllabu
 };
 
 /**
+ * Manchester has two published conventions that are exact inverses of each
+ * other, and the syllabus names both. Getting the direction backwards is only
+ * an error relative to a stated convention, so the lesson always states one.
+ */
+export type ManchesterConvention = "ieee" | "thomas";
+
+export const MANCHESTER_CONVENTIONS: Record<
+  ManchesterConvention,
+  { name: string; attribution: string; one: string; zero: string; note: string }
+> = {
+  ieee: {
+    name: "IEEE 802.3",
+    attribution: "IEEE 802.3 (10 Mbit/s Ethernet) and IEEE 802.4",
+    one: "low→high",
+    zero: "high→low",
+    note: "The convention written into the Ethernet standards, and the one Stallings uses.",
+  },
+  thomas: {
+    name: "G. E. Thomas",
+    attribution: "G. E. Thomas (1949), also called Manchester II or biphase-L",
+    one: "high→low",
+    zero: "low→high",
+    note: "The original 1949 definition, and the one Tanenbaum's Computer Networks uses.",
+  },
+};
+
+/**
  * A line-coded waveform as level segments in bit-time units.
  * `from`/`to` are in bits (0…bits.length), `level` is -1 or +1.
  */
 export type Segment = { from: number; to: number; level: -1 | 1 };
 
-export function encode(bits: number[], code: LineCode): Segment[] {
+export function encode(
+  bits: number[],
+  code: LineCode,
+  convention: ManchesterConvention = "ieee",
+): Segment[] {
   const segs: Segment[] = [];
   let last: -1 | 1 = -1; // resting level for the differential codes
 
@@ -155,12 +186,14 @@ export function encode(bits: number[], code: LineCode): Segment[] {
         segs.push({ from: i, to: i + 1, level: last });
         break;
 
-      case "manchester":
-        // IEEE 802.3 convention, as taught in the syllabus:
-        // 1 = low→high, 0 = high→low.
-        segs.push({ from: i, to: i + 0.5, level: bit ? -1 : 1 });
-        segs.push({ from: i + 0.5, to: i + 1, level: bit ? 1 : -1 });
+      case "manchester": {
+        // IEEE 802.3: 1 = low→high, 0 = high→low. G. E. Thomas is the exact
+        // inverse, so the whole waveform simply flips.
+        const rising = convention === "ieee" ? bit === 1 : bit === 0;
+        segs.push({ from: i, to: i + 0.5, level: rising ? -1 : 1 });
+        segs.push({ from: i + 0.5, to: i + 1, level: rising ? 1 : -1 });
         break;
+      }
 
       case "manchester-diff": {
         // A 0 flips the level at the bit boundary; a 1 does not.
