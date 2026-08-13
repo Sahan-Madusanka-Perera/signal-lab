@@ -25,13 +25,117 @@ export function Shell() {
 
       <TopBar onMenu={() => setNavOpen((o) => !o)} navOpen={navOpen} />
 
-      <div className="mx-auto flex w-full max-w-[1600px]">
+      {/* Full viewport height minus the 3.5rem bar, so short pages still push the footer down. */}
+      <div className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-[1600px]">
         <SideNav open={navOpen} onClose={() => setNavOpen(false)} />
-        <main id="main" tabIndex={-1} className="min-w-0 flex-1 outline-none">
-          <Outlet />
-        </main>
+        {/* main and footer share a column so the footer clears the sidebar. */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <main id="main" tabIndex={-1} className="min-w-0 flex-1 outline-none">
+            <Outlet />
+          </main>
+          <SiteFooter />
+        </div>
       </div>
     </div>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="border-t border-line px-4 py-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1180px] flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <p className="flex items-center gap-1.5 text-xs text-ink-2">
+          Made with
+          <HeartMark />
+          <span className="sr-only">love</span>
+          by <span className="font-medium text-ink">Sahan Perera</span>
+          <span className="text-ink-3">·</span>
+          <span className="tnum font-mono text-ink-3">2026</span>
+        </p>
+
+        <nav aria-label="Elsewhere" className="flex items-center gap-1.5">
+          {/* Icon-only for the two secondary profiles; h-8 matches the GitHub pill's height. */}
+          <SocialIcon
+            href="https://www.linkedin.com/in/sahan-perera-64183b204/"
+            label="Sahan Perera on LinkedIn"
+          >
+            <LinkedInMark />
+          </SocialIcon>
+          <SocialIcon href="https://www.instagram.com/sahan._perera/" label="Sahan Perera on Instagram">
+            <InstagramMark />
+          </SocialIcon>
+
+          <a
+            href="https://github.com/Sahan-Madusanka-Perera"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+          >
+            <GitHubMark />
+            Sahan-Madusanka-Perera
+          </a>
+        </nav>
+      </div>
+    </footer>
+  );
+}
+
+function SocialIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      title={label}
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+    >
+      {children}
+      <span className="sr-only">{label}</span>
+    </a>
+  );
+}
+
+function HeartMark() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden className="shrink-0">
+      <path
+        d="M8 14s-5.5-3.4-5.5-7A3.2 3.2 0 018 5.1 3.2 3.2 0 0113.5 7c0 3.6-5.5 7-5.5 7z"
+        fill="var(--brand)"
+      />
+    </svg>
+  );
+}
+
+function LinkedInMark() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden className="shrink-0">
+      <path
+        fill="currentColor"
+        d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"
+      />
+    </svg>
+  );
+}
+
+/* Instagram's mark is an outline by design, so it is drawn with strokes like the other UI icons. */
+function InstagramMark() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0">
+      <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="2" />
+      <circle cx="17.4" cy="6.6" r="1.3" fill="currentColor" />
+    </svg>
+  );
+}
+
+function GitHubMark() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden className="shrink-0">
+      <path
+        fill="currentColor"
+        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"
+      />
+    </svg>
   );
 }
 
