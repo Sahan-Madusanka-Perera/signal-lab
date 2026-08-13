@@ -7,6 +7,7 @@ import {
   Badge,
   Button,
   Callout,
+  Extra,
   Legend,
   Panel,
   Readout,
@@ -19,6 +20,7 @@ import { useReducedMotion } from "../lib/theme";
 import {
   ENCAP_STEPS,
   FLOW,
+  NETWORK_DEVICES,
   MODEL_DIFFERENCES,
   MODEL_MAP,
   OSI_LAYERS,
@@ -35,6 +37,7 @@ export function ModelsLesson() {
       <StackSection />
       <UnitsSection />
       <FlowSection />
+      <DevicesSection />
       <Section id="check" title="Check yourself">
         <Quiz lessonId="models" questions={QUESTIONS} />
       </Section>
@@ -70,7 +73,7 @@ function WhySection() {
     <Section
       id="why"
       title="Nobody could write this as one program"
-      lead="Every level so far has solved one piece of the problem — signals, frames, addresses, ports, names. A reference model is the map that says how those pieces stack up: what each one is responsible for, and where one ends and the next begins. Two such models matter for the paper, and they describe the same journey at different resolutions."
+      lead="Every level so far has solved one piece of the problem: signals, frames, addresses, ports, names. A reference model is the map that says how those pieces stack up: what each one is responsible for, and where one ends and the next begins. Two such models matter for the paper, and they describe the same journey at different resolutions."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="Without layers">
@@ -124,7 +127,7 @@ function WhySection() {
       </div>
 
       <Callout kind="note" title="A model is not a protocol">
-        Neither model is software you can install. They are descriptions — agreed vocabulary for saying which
+        Neither model is software you can install. They are descriptions, an agreed vocabulary for saying which
         job belongs where. TCP/IP is the model the Internet was actually built on; OSI is the fuller reference
         that examiners use to talk about layers that TCP/IP leaves inside the application.
       </Callout>
@@ -150,7 +153,7 @@ function StackSection() {
     <Section
       id="stack"
       title="Seven layers, or four"
-      lead="The OSI model splits the journey into seven layers; the TCP/IP model does the same job in four. They are not rivals — TCP/IP simply draws fewer lines, folding OSI's top three layers into one application layer and its bottom two into one host-to-network layer. Select any layer to see what it does and what it lines up with."
+      lead="The OSI model splits the journey into seven layers; the TCP/IP model does the same job in four. They are not rivals; TCP/IP simply draws fewer lines, folding OSI's top three layers into one application layer and its bottom two into one host-to-network layer. Select any layer to see what it does and what it lines up with."
     >
       <Panel
         title="The two models, side by side"
@@ -327,7 +330,7 @@ function UnitsSection() {
     <Section
       id="units"
       title="Data, segment, packet, frame, bits"
-      lead="The same information has a different name at every layer, because at every layer it is wrapped in one more header. That wrapping is called encapsulation, and the name of the unit tells you exactly how far down the stack it has travelled — which is why the paper asks for the names."
+      lead="The same information has a different name at every layer, because at every layer it is wrapped in one more header. That wrapping is called encapsulation, and the name of the unit tells you exactly how far down the stack it has travelled, which is why the paper asks for the names."
     >
       <Panel
         title="Encapsulation, drawn to scale"
@@ -358,7 +361,7 @@ function UnitsSection() {
               const top = 16;
 
               // A header two bytes wide would vanish, and the whole point is that
-              // it is still there — so slivers get a floor.
+              // it is still there, so slivers get a floor.
               const wOf = (bytes: number) => (bytes === 0 ? 0 : Math.max(bytes * pxPerByte, 3));
 
               type Block = { bytes: number; label: string; series: number; hatch?: boolean };
@@ -517,7 +520,7 @@ function UnitsSection() {
 
         <p className="mt-3 max-w-[74ch] rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm text-ink-2">
           {frame.padBytes > 0
-            ? `Your ${payload} bytes produce a ${enc.frameBytes}-byte frame — Ethernet will not send anything shorter, so ${frame.padBytes} bytes of padding are added to reach the minimum. Sending one keystroke costs the same as sending forty-six.`
+            ? `Your ${payload} bytes produce a ${enc.frameBytes}-byte frame, and Ethernet will not send anything shorter, so ${frame.padBytes} bytes of padding are added to reach the minimum. Sending one keystroke costs the same as sending forty-six.`
             : `Your ${payload} bytes travel inside a ${enc.frameBytes}-byte frame. The 58 bytes of headers and trailer are a fixed cost, so the longer the payload, the smaller a share of the wire they take.`}
         </p>
       </Panel>
@@ -560,17 +563,21 @@ function UnitsSection() {
         <Callout kind="exam" title="Three names worth memorising">
           The network layer unit is a <strong>packet</strong>, the data link layer unit is a{" "}
           <strong>frame</strong>, and the physical layer deals in <strong>bits</strong>. Above them, the
-          transport layer unit is a <strong>segment</strong> in TCP and a datagram in UDP.
+          transport layer unit is a <strong>segment</strong> in TCP and a datagram in UDP. Those names are what
+          the paper asks for; the byte counts above are here to make the idea concrete, not to be learnt.
         </Callout>
 
-        <Panel title="Why the smallest messages are the most expensive">
+        <Panel
+          title="Why the smallest messages are the most expensive"
+          actions={<Extra>frame padding and efficiency</Extra>}
+        >
           <Reveal label="Work it out">
             <p className="max-w-[58ch]">
               A one-byte keystroke gets a 20-byte TCP header and a 20-byte IP header, which is still only 41
-              bytes — below Ethernet's 46-byte minimum payload, so five bytes of padding are added. With the
+              bytes, below Ethernet's 46-byte minimum payload, so five bytes of padding are added. With the
               14-byte Ethernet header and the 4-byte FCS the frame is 64 bytes, of which one byte is yours:
               an efficiency of 1.6 %. At the other end of the slider, 1460 bytes of data ride in a 1518-byte
-              frame — 96.2 %.
+              frame, or 96.2 %.
             </p>
           </Reveal>
         </Panel>
@@ -603,7 +610,7 @@ function FlowSection() {
       lead="Here is the whole model in motion. Data goes down the sender's stack, gaining a header at each layer; it crosses the medium as nothing but bits; then it climbs the receiver's stack, losing exactly the header its opposite number added. Each layer only ever reads what the matching layer at the far end wrote."
     >
       <Panel
-        title={`Step ${step + 1} of ${FLOW.length} — ${cur.title}`}
+        title={`Step ${step + 1} of ${FLOW.length}: ${cur.title}`}
         subtitle={cur.detail}
         actions={
           <div className="flex flex-wrap gap-1.5">
@@ -731,7 +738,7 @@ function FlowSection() {
                 ctx.stroke();
               });
               ctx.restore();
-              plot.text((laneL + laneR) / 2, wireY + 12, "the medium — bits only", palette.inkFaint, {
+              plot.text((laneL + laneR) / 2, wireY + 12, "the medium: bits only", palette.inkFaint, {
                 size: 9,
                 align: "center",
               });
@@ -830,30 +837,172 @@ function FlowSection() {
           Both descriptions are correct, and the model is what lets you use whichever is more useful.
         </Callout>
 
-        <Panel title="Where a device fits">
-          <ul className="grid gap-2">
-            {[
-              { d: "Hub, repeater, cable", l: "Physical / host to network", s: 3, n: "Deals in signals. It has no idea what a frame is." },
-              { d: "Switch, bridge", l: "Data link / host to network", s: 3, n: "Reads MAC addresses to forward a frame on one network." },
-              { d: "Router, gateway", l: "Network / Internet", s: 2, n: "Reads IP addresses to move a packet between networks." },
-              { d: "Browser, mail client", l: "Application", s: 0, n: "Produces and consumes the data everything else carries." },
-            ].map((r) => (
-              <li key={r.d} className="flex items-start justify-between gap-3 rounded-lg border border-line bg-surface-2 px-3 py-2">
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium text-ink">{r.d}</span>
-                  <span className="block text-2xs text-ink-3">{r.n}</span>
-                </span>
-                <span
-                  className="shrink-0 text-2xs font-semibold"
-                  style={{ color: `var(--s${r.s + 1}-ink)` }}
-                >
-                  {r.l}
-                </span>
-              </li>
-            ))}
-          </ul>
+        <Panel title="The rule that decides what a device can do">
+          <p className="max-w-[52ch] text-sm text-ink-2">
+            A device can only act on what it can read. A repeater sees voltages, so all it can do is make them
+            stronger. A switch reads MAC addresses, so it can decide which port a frame belongs on, but only
+            within one network. A router reads IP addresses, so it can move a packet between networks that have
+            nothing else in common.
+          </p>
+          <p className="mt-2 max-w-[52ch] text-sm text-ink-2">
+            Learn the layer and the capability follows. The next section is every device in this competency,
+            placed on that ladder.
+          </p>
         </Panel>
       </div>
+    </Section>
+  );
+}
+
+/* ================================================================== *
+ * 5. Devices, by the layer they work at
+ * ================================================================== */
+
+function DevicesSection() {
+  const [pick, setPick] = useState("switch");
+  const device = NETWORK_DEVICES.find((d) => d.id === pick) ?? NETWORK_DEVICES[0];
+  const layer = OSI_LAYERS.find((l) => l.n === device.osiLayer)!;
+
+  return (
+    <Section
+      id="devices"
+      title="Every device, on the ladder"
+      lead="Networking hardware is easiest to remember by the layer it understands, because that is what sets the limit on what it can do. Reading nothing means you can only repeat a signal; reading MAC addresses means you can forward within a network; reading IP addresses means you can move between networks."
+    >
+      <Panel
+        title="Placed by layer"
+        subtitle="Select a device to see what it reads and what that lets it do."
+      >
+        <Scope height={228}>
+          <ScopeCanvas
+            label={`Networking devices arranged by OSI layer. ${NETWORK_DEVICES.map((d) => `${d.name} at layer ${d.osiLayer}`).join("; ")}.`}
+            deps={[pick]}
+            bounds={{ x0: 0, x1: 1, y0: 0, y1: 1 }}
+            insets={{ left: 0, right: 0, top: 0, bottom: 0 }}
+            draw={({ plot, ctx, palette, w, h }) => {
+              const narrow = w < 560;
+              const gutter = narrow ? 58 : 92;
+              // One row per layer that actually has a device on it.
+              const rows = [7, 4, 3, 2, 1];
+              const rowH = (h - 34) / rows.length;
+              const yOf = (n: number) => 20 + (rows.indexOf(n) + 0.5) * rowH;
+
+              rows.forEach((n) => {
+                const l = OSI_LAYERS.find((x) => x.n === n)!;
+                const colour = palette.series[l.series];
+                const y = yOf(n);
+                ctx.save();
+                ctx.strokeStyle = palette.grid;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(gutter - 6, y + rowH / 2);
+                ctx.lineTo(w - 8, y + rowH / 2);
+                ctx.stroke();
+                ctx.restore();
+                plot.text(gutter - 12, y, `${n} ${narrow ? l.name.slice(0, 5) : l.name}`, colour, {
+                  size: narrow ? 8.5 : 10,
+                  weight: 700,
+                  align: "right",
+                  baseline: "middle",
+                });
+              });
+
+              // Devices spread along their layer's row.
+              rows.forEach((n) => {
+                const on = NETWORK_DEVICES.filter((d) => d.osiLayer === n);
+                const y = yOf(n);
+                on.forEach((d, i) => {
+                  const active = d.id === pick;
+                  const colour = palette.series[OSI_LAYERS.find((x) => x.n === n)!.series];
+                  const bw = Math.min(narrow ? 74 : 104, (w - gutter - 16) / on.length - 8);
+                  const x = gutter + 4 + i * (bw + 8);
+                  ctx.save();
+                  if (active && palette.isDark) {
+                    ctx.shadowColor = colour;
+                    ctx.shadowBlur = 12;
+                  }
+                  ctx.fillStyle = active ? colour : palette.bg;
+                  ctx.strokeStyle = colour;
+                  ctx.lineWidth = active ? 2.2 : 1.4;
+                  ctx.globalAlpha = active ? 1 : 0.85;
+                  ctx.beginPath();
+                  ctx.roundRect(x, y - 12, bw, 24, 5);
+                  ctx.fill();
+                  ctx.stroke();
+                  ctx.shadowBlur = 0;
+                  ctx.globalAlpha = 1;
+                  ctx.font = `${active ? 700 : 600} ${narrow ? 8 : 9}px "JetBrains Mono Variable", ui-monospace, monospace`;
+                  ctx.fillStyle = active ? palette.bg : colour;
+                  ctx.textAlign = "center";
+                  ctx.textBaseline = "middle";
+                  const short = d.name.replace("Wireless access point", "Access point").replace("Network interface card", "NIC");
+                  let text = short;
+                  while (ctx.measureText(text).width > bw - 8 && text.length > 3) text = text.slice(0, -2) + "…";
+                  ctx.fillText(text, x + bw / 2, y + 0.5);
+                  ctx.restore();
+                });
+              });
+            }}
+          />
+        </Scope>
+
+        <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line pt-4">
+          {NETWORK_DEVICES.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              onClick={() => setPick(d.id)}
+              aria-pressed={pick === d.id}
+              className={clsx(
+                "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-150",
+                pick === d.id ? "shadow-sm" : "border-line bg-surface text-ink-2 hover:bg-surface-2",
+              )}
+              style={
+                pick === d.id
+                  ? {
+                      borderColor: `var(--s${OSI_LAYERS.find((l) => l.n === d.osiLayer)!.series + 1})`,
+                      background: `color-mix(in oklab, var(--s${OSI_LAYERS.find((l) => l.n === d.osiLayer)!.series + 1}) 10%, transparent)`,
+                      color: `var(--s${OSI_LAYERS.find((l) => l.n === d.osiLayer)!.series + 1}-ink)`,
+                    }
+                  : undefined
+              }
+            >
+              {d.name}
+            </button>
+          ))}
+        </div>
+
+        <div
+          key={device.id}
+          className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[minmax(0,1fr)_auto]"
+          style={{ animation: "rise var(--dur) var(--ease-out-quart)" }}
+        >
+          <div>
+            <h4 className="text-sm font-semibold text-ink">{device.name}</h4>
+            <p className="mt-1 max-w-[62ch] text-sm text-ink-2">{device.what}</p>
+            <p className="mt-2 max-w-[62ch] text-sm text-ink-2">
+              <span className="font-medium text-ink">What sets it apart: </span>
+              {device.key}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-6 sm:w-[200px] sm:border-l sm:border-line sm:pl-4">
+            <Readout
+              label="Works at"
+              value={`Layer ${device.osiLayer}`}
+              sub={`${layer.name} · ${TCPIP_LAYERS[device.tcpLayer].name}`}
+              tone="brand"
+            />
+            <Readout label="Reads" value={device.reads} />
+          </div>
+        </div>
+      </Panel>
+
+      <Callout kind="exam" title="The three that are confused most often">
+        A <strong>hub</strong> copies everything to every port and is one collision domain. A{" "}
+        <strong>switch</strong> reads MAC addresses and sends each frame only where it belongs, giving every port
+        its own collision domain. A <strong>router</strong> reads IP addresses and moves packets between separate
+        networks. Hub, switch, router: physical, data link, network.
+      </Callout>
     </Section>
   );
 }
@@ -921,7 +1070,7 @@ const QUESTIONS: Question[] = [
       { label: "The data is sent onto the medium" },
     ],
     explain:
-      "Each layer wraps what it received from the layer above in its own header — this is encapsulation. The receiving host's matching layer removes exactly that header on the way up, so the application finally receives precisely what was sent.",
+      "Each layer wraps what it received from the layer above in its own header, and this is encapsulation. The receiving host's matching layer removes exactly that header on the way up, so the application finally receives precisely what was sent.",
   },
   {
     id: "m6",
@@ -933,6 +1082,18 @@ const QUESTIONS: Question[] = [
       { label: "Host to network", correct: true },
     ],
     explain:
-      "The host-to-network layer — the network access layer — is the bottom of the TCP/IP model. It takes the datagram the Internet layer produced, wraps it in a frame with MAC addresses, and puts it onto whatever physical network is actually in use.",
+      "The host-to-network layer, also called the network access layer, is the bottom of the TCP/IP model. It takes the datagram the Internet layer produced, wraps it in a frame with MAC addresses, and puts it onto whatever physical network is actually in use.",
+  },
+  {
+    id: "m7",
+    prompt: "Which device reads MAC addresses to decide which port to forward a frame to?",
+    options: [
+      { label: "A repeater" },
+      { label: "A hub" },
+      { label: "A switch", correct: true },
+      { label: "A modem" },
+    ],
+    explain:
+      "A switch works at the data link layer, so it can read the destination MAC address and send the frame only to the port that address is on. A hub and a repeater work at the physical layer and can do nothing but copy the signal onward; a modem only changes the signal's form.",
   },
 ];

@@ -1,5 +1,5 @@
 /**
- * Reference models for competency level 6.10 — the OSI seven-layer model, the
+ * Reference models for competency level 6.10: the OSI seven-layer model, the
  * TCP/IP four-layer model, and the encapsulation that happens as data moves
  * down one stack and back up the other.
  *
@@ -30,7 +30,7 @@ export type Layer = {
 };
 
 /* ================================================================== *
- * The OSI model — seven layers, top to bottom
+ * The OSI model: seven layers, top to bottom
  * ================================================================== */
 
 export const OSI_LAYERS: Layer[] = [
@@ -41,7 +41,7 @@ export const OSI_LAYERS: Layer[] = [
     role: "Provides network services directly to the user's programs.",
     jobs: [
       "Gives applications a way to use the network",
-      "Defines the messages a service exchanges — a request and its response",
+      "Defines the messages a service exchanges: a request and its response",
       "Identifies resources and services by name",
     ],
     unit: "Data",
@@ -69,7 +69,7 @@ export const OSI_LAYERS: Layer[] = [
     role: "Sets up, keeps and ends the conversation between two applications.",
     jobs: [
       "Establishes a session and closes it cleanly at the end",
-      "Decides whose turn it is to send — dialogue control",
+      "Decides whose turn it is to send: dialogue control",
       "Inserts checkpoints so a long transfer can resume rather than restart",
     ],
     unit: "Data",
@@ -84,7 +84,7 @@ export const OSI_LAYERS: Layer[] = [
     jobs: [
       "Identifies the end points with port numbers",
       "Splits a long message into segments and reassembles them",
-      "Reliability, flow control and error recovery — if the protocol offers them",
+      "Reliability, flow control and error recovery, if the protocol offers them",
     ],
     unit: "Segment",
     examples: ["TCP", "UDP"],
@@ -96,7 +96,7 @@ export const OSI_LAYERS: Layer[] = [
     name: "Network",
     role: "Gets a packet across many networks to the destination host.",
     jobs: [
-      "Logical addressing that does not depend on the hardware — IP addresses",
+      "Logical addressing that does not depend on the hardware: IP addresses",
       "Routing: choosing a path from the sender to the receiver",
       "Fragmenting a packet when the next network cannot carry it whole",
     ],
@@ -110,7 +110,7 @@ export const OSI_LAYERS: Layer[] = [
     name: "Data link",
     role: "Moves a frame across one link, between two directly connected devices.",
     jobs: [
-      "Framing — marking where the data begins and ends",
+      "Framing: marking where the data begins and ends",
       "Physical (MAC) addressing on the local network",
       "Media access control, and error detection with a checksum",
     ],
@@ -125,7 +125,7 @@ export const OSI_LAYERS: Layer[] = [
     role: "Puts raw bits onto the medium as a signal.",
     jobs: [
       "Defines voltages, light pulses or radio signals for a 0 and a 1",
-      "Bit timing — how long one bit lasts",
+      "Bit timing: how long one bit lasts",
       "Cables, connectors and pin layouts",
     ],
     unit: "Bit",
@@ -135,7 +135,7 @@ export const OSI_LAYERS: Layer[] = [
 ];
 
 /* ================================================================== *
- * The TCP/IP model — four layers, top to bottom
+ * The TCP/IP model: four layers, top to bottom
  * ================================================================== */
 
 export const TCPIP_LAYERS: Layer[] = [
@@ -197,7 +197,7 @@ export const TCPIP_LAYERS: Layer[] = [
   },
 ];
 
-/** Which OSI layers each TCP/IP layer absorbs — the comparison the paper asks for. */
+/** Which OSI layers each TCP/IP layer absorbs, the comparison the paper asks for. */
 export const MODEL_MAP: Record<string, string[]> = {
   "tcp-application": ["osi-application", "osi-presentation", "osi-session"],
   "tcp-transport": ["osi-transport"],
@@ -229,7 +229,7 @@ export const MODEL_DIFFERENCES: { osi: string; tcpip: string }[] = [
     tcpip: "Combined into one host-to-network layer",
   },
   {
-    osi: "A teaching and reference model — rarely implemented as it stands",
+    osi: "A teaching and reference model, rarely implemented as it stands",
     tcpip: "What the Internet actually runs on",
   },
 ];
@@ -258,7 +258,7 @@ export const ENCAP_STEPS: EncapStep[] = [
     unit: "Data",
     headerBytes: 0,
     trailerBytes: 0,
-    adds: "The message itself — the text of a request, or part of a file.",
+    adds: "The message itself: the text of a request, or part of a file.",
     series: 0,
   },
   {
@@ -290,7 +290,7 @@ export const ENCAP_STEPS: EncapStep[] = [
     unit: "Bits",
     headerBytes: 0,
     trailerBytes: 0,
-    adds: "No header — the frame becomes a stream of signal elements on the medium.",
+    adds: "No header. The frame becomes a stream of signal elements on the medium.",
     series: 3,
   },
 ];
@@ -355,7 +355,7 @@ export function encapsulate(dataBytes: number): Encapsulation {
 }
 
 /* ================================================================== *
- * Data flow — down the sender's stack, across, up the receiver's
+ * Data flow: down the sender's stack, across, up the receiver's
  * ================================================================== */
 
 export type FlowStep = {
@@ -370,7 +370,7 @@ export type FlowStep = {
 
 /**
  * One journey, described in TCP/IP terms. The sender adds a header at each
- * layer and the receiver strips exactly the same header off — which is the
+ * layer and the receiver strips exactly the same header off, which is the
  * whole point of a layered model: each layer talks to its opposite number.
  */
 export const FLOW: FlowStep[] = [
@@ -378,7 +378,7 @@ export const FLOW: FlowStep[] = [
     side: "sender",
     layer: 0,
     title: "The browser writes a request",
-    detail: "An application produces data. Nothing has been added to it yet — this is the message a person cares about.",
+    detail: "An application produces data. Nothing has been added to it yet. This is the message a person cares about.",
     unit: "Data",
   },
   {
@@ -406,7 +406,7 @@ export const FLOW: FlowStep[] = [
     side: "wire",
     layer: null,
     title: "Bits cross the medium",
-    detail: "The frame becomes a signal — voltages on copper, light in fibre, radio in the air. On the medium itself there is nothing but a stream of bits.",
+    detail: "The frame becomes a signal: voltages on copper, light in fibre, radio in the air. On the medium itself there is nothing but a stream of bits.",
     unit: "Bits",
   },
   {
@@ -434,7 +434,121 @@ export const FLOW: FlowStep[] = [
     side: "receiver",
     layer: 0,
     title: "The server application reads the request",
-    detail: "What the application receives is exactly what the sending application wrote — every header added on the way down has been removed on the way up.",
+    detail: "What the application receives is exactly what the sending application wrote. Every header added on the way down has been removed on the way up.",
     unit: "Data",
+  },
+];
+
+/* ================================================================== *
+ * Networking devices, placed by the layer they work at
+ *
+ * The layer a device understands is what decides what it can do: a device
+ * that only sees voltages cannot make a forwarding decision, and one that
+ * reads IP addresses can join two different kinds of network together.
+ * ================================================================== */
+
+export type Device = {
+  id: string;
+  name: string;
+  /** OSI layer number it works up to. */
+  osiLayer: number;
+  /** Index into TCPIP_LAYERS. */
+  tcpLayer: number;
+  what: string;
+  /** The one thing that distinguishes it from the device below it. */
+  key: string;
+  reads: string;
+};
+
+export const NETWORK_DEVICES: Device[] = [
+  {
+    id: "nic",
+    name: "Network interface card",
+    osiLayer: 2,
+    tcpLayer: 3,
+    what: "The hardware that connects one computer to the network. It converts the computer's data into signals for the medium and back again, and carries the MAC address burned in at the factory.",
+    key: "Every device that is on a network has one, and it is where the MAC address lives.",
+    reads: "Its own MAC address",
+  },
+  {
+    id: "repeater",
+    name: "Repeater",
+    osiLayer: 1,
+    tcpLayer: 3,
+    what: "Receives a weakened signal, cleans it up and retransmits it at full strength, so a cable run can be longer than attenuation would otherwise allow.",
+    key: "It regenerates the signal rather than simply amplifying it, so noise is not amplified too.",
+    reads: "Nothing, since it deals in signals, not data",
+  },
+  {
+    id: "hub",
+    name: "Hub",
+    osiLayer: 1,
+    tcpLayer: 3,
+    what: "A multi-port repeater. Whatever arrives on one port is copied to every other port, so the whole hub is one shared collision domain running half duplex.",
+    key: "It has no idea who is connected where, so it wastes bandwidth and cannot prevent collisions.",
+    reads: "Nothing",
+  },
+  {
+    id: "bridge",
+    name: "Bridge",
+    osiLayer: 2,
+    tcpLayer: 3,
+    what: "Joins two LAN segments and learns which MAC addresses live on each side, forwarding a frame across only when it has to.",
+    key: "It splits one collision domain into two, which is the idea a switch then applies to every port.",
+    reads: "MAC addresses",
+  },
+  {
+    id: "switch",
+    name: "Switch",
+    osiLayer: 2,
+    tcpLayer: 3,
+    what: "A multi-port bridge. It builds a table of which MAC address is on which port and sends each frame only to the port it belongs to.",
+    key: "Every port is its own collision domain, so many conversations run at once, in full duplex.",
+    reads: "MAC addresses",
+  },
+  {
+    id: "ap",
+    name: "Wireless access point",
+    osiLayer: 2,
+    tcpLayer: 3,
+    what: "Lets wireless devices join a wired network. It bridges between Wi-Fi and Ethernet and is usually plugged into a switch, or built into the home router.",
+    key: "It extends a LAN to devices with no cable, and is the wireless equivalent of a switch port.",
+    reads: "MAC addresses",
+  },
+  {
+    id: "router",
+    name: "Router",
+    osiLayer: 3,
+    tcpLayer: 2,
+    what: "Connects different networks and chooses which way to send each packet, using a routing table and the destination IP address.",
+    key: "It works with IP addresses, so it can join networks that use completely different media.",
+    reads: "IP addresses",
+  },
+  {
+    id: "gateway",
+    name: "Gateway",
+    osiLayer: 7,
+    tcpLayer: 0,
+    what: "A device that joins two networks which do not speak the same protocols, translating between them. In everyday use the word also means the router a host sends anything non-local to, its default gateway.",
+    key: "It can translate as well as forward, which is why it may work all the way up to the application layer.",
+    reads: "Whatever it has to translate",
+  },
+  {
+    id: "modem",
+    name: "Modem",
+    osiLayer: 1,
+    tcpLayer: 3,
+    what: "Modulates digital data onto an analog signal the local loop can carry, and demodulates the signal coming back.",
+    key: "It changes the form of the signal, not the data. Nothing about the packet changes as it passes through.",
+    reads: "Nothing",
+  },
+  {
+    id: "firewall",
+    name: "Firewall",
+    osiLayer: 4,
+    tcpLayer: 1,
+    what: "Inspects traffic crossing the boundary of a network and allows or blocks it against a list of rules, usually written in terms of addresses, protocols and port numbers.",
+    key: "It is the one device here whose job is to stop traffic rather than move it.",
+    reads: "Addresses, protocols and ports",
   },
 ];

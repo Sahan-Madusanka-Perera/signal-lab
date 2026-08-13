@@ -57,7 +57,7 @@ function IspSection() {
   return (
     <Section
       id="isp"
-      title="You cannot join the Internet — you join somebody who is already on it"
+      title="You cannot join the Internet; you join somebody who is already on it"
       lead="There is no central Internet to plug into. It is thousands of separate networks that have agreed to carry each other's traffic, and an Internet Service Provider is simply one of those networks that will sell you a connection to itself. Everything reachable from them becomes reachable from you."
     >
       <Panel title="Your house, and everything above it" subtitle="Traffic climbs until it finds a network that knows the way down to the destination.">
@@ -137,7 +137,7 @@ function IspSection() {
                 ctx.restore();
               });
 
-              plot.text(w / 2, h - 14, "no single owner — just networks that agree to carry each other's traffic", palette.inkFaint, {
+              plot.text(w / 2, h - 14, "no single owner, just networks that agree to carry each other's traffic", palette.inkFaint, {
                 size: 9,
                 align: "center",
               });
@@ -217,15 +217,15 @@ function AccessSection() {
                 : ADSL_BANDS;
 
               // A log-ish axis would hide how small the voice band is, and that
-              // smallness is the entire point — so this stays linear.
+              // smallness is the entire point, so this stays linear.
               plot.axisFrame();
               [0, 200e3, 400e3, 600e3, 800e3, 1e6].forEach((f) => {
                 plot.vLine(f, palette.grid, { alpha: 0.8 });
               });
               plot.xTicks(200e3, (v) => (v === 0 ? "0" : `${Math.round(v / 1000)} kHz`), { size: 9 });
 
-              // One label row per band, so the 4 kHz voice band — three pixels
-              // wide at this scale — is still readable next to a 1 MHz one.
+              // One label row per band, so the 4 kHz voice band (three pixels
+              // wide at this scale) is still readable next to a 1 MHz one.
               const rowH = 30;
               bands.forEach((b, i) => {
                 const x0 = plot.sx(b.from);
@@ -292,7 +292,7 @@ function AccessSection() {
 
       <Panel
         title="The same file, over each connection"
-        subtitle="Transfer time is simply size ÷ rate — the arithmetic the paper asks for."
+        subtitle="Transfer time is simply size ÷ rate, the arithmetic the paper asks for."
         actions={
           <Segmented
             label="File"
@@ -351,7 +351,7 @@ function AccessSection() {
             <p className="max-w-[58ch]">
               {file.label} is {(file.bytes / 1_000_000).toFixed(file.bytes < 1_000_000 ? 1 : 0)} MB, which is{" "}
               {(file.bytes / 1_000_000).toFixed(file.bytes < 1_000_000 ? 1 : 0)} × 8 ={" "}
-              {((file.bytes * 8) / 1_000_000).toFixed(1)} Mb — remember the file is quoted in{" "}
+              {((file.bytes * 8) / 1_000_000).toFixed(1)} Mb. Remember the file is quoted in{" "}
               <strong>bytes</strong> and the line in <strong>bits</strong> per second. Over{" "}
               {link.name} at {formatRate(link.down)} that is {((file.bytes * 8) / 1_000_000).toFixed(1)} ÷{" "}
               {(link.down / 1_000_000).toFixed(link.down < 1_000_000 ? 3 : 0)} ={" "}
@@ -363,7 +363,7 @@ function AccessSection() {
             <p className="mt-1 max-w-[52ch] text-sm text-ink-2">
               A home connection spends its life receiving: pages, video, updates. What it sends is mostly
               requests, which are tiny. Giving the downstream direction the wider band matches how the line is
-              actually used — and a narrower upstream band also interferes less with the neighbouring pairs in
+              actually used, and a narrower upstream band also interferes less with the neighbouring pairs in
               the same cable.
             </p>
           </div>
@@ -376,7 +376,7 @@ function AccessSection() {
             The local loop to the exchange was built to carry an analog voice signal, but a computer produces
             digital data. A <strong className="font-semibold text-ink">mod</strong>ulator turns that data into an
             analog signal the line will accept, and a <strong className="font-semibold text-ink">dem</strong>
-            odulator at the far end turns it back — <em>modem</em> is the two words joined.
+            odulator at the far end turns it back; <em>modem</em> is the two words joined.
           </p>
           <p className="mt-2 max-w-[52ch] text-sm text-ink-2">
             A dial-up modem does this inside the voice band, so the exchange cannot tell the difference between
@@ -388,10 +388,10 @@ function AccessSection() {
         <Callout kind="exam" title="Advantages of DSL / ADSL over dial-up">
           <ul className="mt-1 grid gap-1">
             {[
-              "Far higher speed — megabits rather than kilobits",
+              "Far higher speed: megabits rather than kilobits",
               "Always on: no dialling, no connection delay, no per-minute charge",
               "The telephone still works, because voice and data use different frequencies",
-              "Independent services — losing the data service does not take the telephone with it",
+              "Independent services: losing the data service does not take the telephone with it",
               "Each subscriber has their own line to the exchange, rather than a shared medium",
             ].map((t) => (
               <li key={t} className="flex gap-2">
@@ -415,7 +415,7 @@ function HomeSection() {
     <Section
       id="home"
       title="One public address for the whole house"
-      lead="Your ISP gives you a single public IP address. Nearly every home has more devices than that, and IPv4 addresses ran short long ago — so the router hands each device an address from a private range that is meaningless outside your house, and does the translating itself."
+      lead="Your ISP gives you a single public IP address. Nearly every home has more devices than that, and IPv4 addresses ran short long ago, so the router hands each device an address from a private range that is meaningless outside your house, and does the translating itself."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="Public address" subtitle="Unique across the whole Internet.">
@@ -425,7 +425,7 @@ function HomeSection() {
           </div>
           <ul className="mt-3 grid gap-1.5 text-sm text-ink-2">
             {[
-              "Routable — any machine on the Internet can send to it",
+              "Routable: any machine on the Internet can send to it",
               "Allocated from a block the ISP holds, and often changes over time",
               "There is exactly one, no matter how many devices you own",
             ].map((t) => (
@@ -526,7 +526,7 @@ function NatSection() {
     <Section
       id="nat"
       title="Network Address Translation"
-      lead="A packet leaving your house cannot carry 192.168.1.10 as its source — no reply could ever find its way back. So the router rewrites the source address to its own public one on the way out, and rewrites it back on the way in. The table it keeps to remember which reply belongs to which device is the whole of NAT."
+      lead="A packet leaving your house cannot carry 192.168.1.10 as its source, because no reply could ever find its way back. So the router rewrites the source address to its own public one on the way out, and rewrites it back on the way in. The table it keeps to remember which reply belongs to which device is the whole of NAT."
     >
       <Panel
         title="Translation lab"
@@ -708,7 +708,7 @@ function NatSection() {
                 plot.text(
                   w / 2,
                   h - 18,
-                  outbound ? "request going out — source address rewritten" : "reply coming back — destination address restored",
+                  outbound ? "request going out: source address rewritten" : "reply coming back: destination address restored",
                   outbound ? palette.series[1] : palette.series[2],
                   { size: 10, weight: 700, align: "center" },
                 );
@@ -755,14 +755,14 @@ function NatSection() {
           >
             <div className="min-w-0 overflow-x-auto rounded-lg border border-line bg-surface-2 p-3">
               <p className="text-2xs font-semibold" style={{ color: "var(--s2-ink)" }}>
-                Going out — the router rewrites the source
+                Going out: the router rewrites the source
               </p>
               <p className="tnum mt-1.5 font-mono text-xs whitespace-nowrap text-ink-3 line-through">{out.before}</p>
               <p className="tnum mt-1 font-mono text-xs whitespace-nowrap text-ink">{out.after}</p>
             </div>
             <div className="min-w-0 overflow-x-auto rounded-lg border border-line bg-surface-2 p-3">
               <p className="text-2xs font-semibold" style={{ color: "var(--s3-ink)" }}>
-                Coming back — the router rewrites the destination
+                Coming back: the router rewrites the destination
               </p>
               <p className="tnum mt-1.5 font-mono text-xs whitespace-nowrap text-ink-3 line-through">{back.before}</p>
               <p className="tnum mt-1 font-mono text-xs whitespace-nowrap text-ink">{back.after}</p>
@@ -773,7 +773,7 @@ function NatSection() {
         <div className="mt-4 overflow-x-auto border-t border-line pt-4">
           <table className="w-full min-w-[560px] border-collapse text-left text-sm">
             <caption className="pb-2 text-left text-2xs text-ink-3">
-              The router's translation table — how a reply finds its way back to the right device.
+              The router's translation table: how a reply finds its way back to the right device.
             </caption>
             <thead>
               <tr className="border-b border-line">
@@ -817,7 +817,7 @@ function NatSection() {
         </div>
 
         <p className="mt-3 max-w-[74ch] rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm text-ink-2">
-          Every row has the same public address — the port number is what tells them apart. When a reply arrives
+          Every row has the same public address, so the port number is what tells them apart. When a reply arrives
           for port {entries.length ? entries[entries.length - 1].publicPort : "51000"}, the router looks that
           number up, finds the device it belongs to, and rewrites the destination back to the private address.
         </p>
@@ -834,7 +834,7 @@ function NatSection() {
         <Panel title="The cost of translating">
           <p className="max-w-[52ch] text-sm text-ink-2">
             Because there is no way in from outside without a rule set up by hand, running a server at home is
-            awkward — the router must be told to forward a particular port to a particular machine. NAT also
+            awkward: the router must be told to forward a particular port to a particular machine. NAT also
             breaks the original idea that any host could address any other, which is one of the arguments for
             moving to IPv6, where there are enough addresses that nobody needs to share.
           </p>
@@ -852,7 +852,7 @@ function ProxySection() {
   const [cache, setCache] = useState<string[]>([]);
   const [lastUrl, setLastUrl] = useState<string | null>(null);
   // Whether the *last* request was a hit has to be decided before the fetched
-  // page is added to the cache — deriving it afterwards would make the very
+  // page is added to the cache, since deriving it afterwards would make the very
   // first request look like a hit.
   const [hit, setHit] = useState(false);
 
@@ -873,7 +873,7 @@ function ProxySection() {
     <Section
       id="proxy"
       title="A stand-in that fetches on your behalf"
-      lead="A proxy server sits between the client machines and the Internet. Instead of connecting to a site directly, a computer asks the proxy, and the proxy makes the request for it. Every reply passes back through the same place — which is what makes caching, filtering and a single point of contact possible at once."
+      lead="A proxy server sits between the client machines and the Internet. Instead of connecting to a site directly, a computer asks the proxy, and the proxy makes the request for it. Every reply passes back through the same place, which is what makes caching, filtering and a single point of contact possible at once."
     >
       <Panel
         title="Cache hit or cache miss"
@@ -980,7 +980,7 @@ function ProxySection() {
                 plot.text(
                   w / 2,
                   h - 16,
-                  hit ? "cache hit — the ISP link is not used at all" : "cache miss — fetched from the origin, and kept",
+                  hit ? "cache hit: the ISP link is not used at all" : "cache miss: fetched from the origin, and kept",
                   colour,
                   { size: 10, weight: 700, align: "center" },
                 );
@@ -1039,7 +1039,7 @@ function ProxySection() {
         Both let many machines share one public address, but they work at different levels. NAT rewrites address
         fields in the packet header and has no idea what the packet contains. A proxy is an application-layer
         program: it understands the requests it is passing on, which is what lets it cache a page, refuse a site
-        or keep a log — and also why it must be told about each kind of traffic it handles.
+        or keep a log, and also why it must be told about each kind of traffic it handles.
       </Callout>
     </Section>
   );
@@ -1060,7 +1060,7 @@ const QUESTIONS: Question[] = [
       { label: "It manufactures the modems and routers customers use" },
     ],
     explain:
-      "Nobody owns the Internet — it is many networks that agree to carry each other's traffic. An ISP is one of those networks, selling you a connection to itself along with a public IP address and supporting services such as DNS.",
+      "Nobody owns the Internet: it is many networks that agree to carry each other's traffic. An ISP is one of those networks, selling you a connection to itself along with a public IP address and supporting services such as DNS.",
   },
   {
     id: "i2",
@@ -1072,7 +1072,7 @@ const QUESTIONS: Question[] = [
       { label: "To store data while the line is busy" },
     ],
     explain:
-      "The local loop was built to carry analog voice. A modem MODulates digital data onto an analog signal for the journey and DEModulates it at the far end — the two words that give it its name.",
+      "The local loop was built to carry analog voice. A modem MODulates digital data onto an analog signal for the journey and DEModulates it at the far end, and those are the two words that give it its name.",
   },
   {
     id: "i3",
@@ -1096,7 +1096,7 @@ const QUESTIONS: Question[] = [
       { label: "Because upstream data does not need to be error checked" },
     ],
     explain:
-      "A typical home downloads pages, video and updates while sending little more than requests. Matching the split to that use gets more from the same line — which is what the 'asymmetric' in ADSL means.",
+      "A typical home downloads pages, video and updates while sending little more than requests. Matching the split to that use gets more from the same line, which is what the 'asymmetric' in ADSL means.",
   },
   {
     id: "i5",
@@ -1108,7 +1108,7 @@ const QUESTIONS: Question[] = [
       { label: "It forwards the private address unchanged, since routers ignore it" },
     ],
     explain:
-      "A packet with a private source address could never be replied to, because no router on the Internet will carry one. NAT rewrites the source to the router's own public address and remembers the mapping — keyed by port number — so it can rewrite the reply back on the way in.",
+      "A packet with a private source address could never be replied to, because no router on the Internet will carry one. NAT rewrites the source to the router's own public address and remembers the mapping, keyed by port number, so it can rewrite the reply back on the way in.",
   },
   {
     id: "i6",
@@ -1120,6 +1120,6 @@ const QUESTIONS: Question[] = [
       { label: "It routes packets between two networks" },
     ],
     explain:
-      "Both hide a private network behind one address, but NAT only rewrites header fields — it never looks at the contents. A proxy works at the application layer and makes the request on the client's behalf, so it can keep a copy of the answer, refuse the request, or record it.",
+      "Both hide a private network behind one address, but NAT only rewrites header fields and never looks at the contents. A proxy works at the application layer and makes the request on the client's behalf, so it can keep a copy of the answer, refuse the request, or record it.",
   },
 ];

@@ -41,7 +41,7 @@ export function sampleWave(w: Wave, duration: number, n: number): Float64Array {
   return out;
 }
 
-/** Sum of waves — used for the harmonics / noise demonstrations. */
+/** Sum of waves, used for the harmonics / noise demonstrations. */
 export function sampleSum(waves: Wave[], duration: number, n: number): Float64Array {
   const out = new Float64Array(n);
   const dt = duration / (n - 1);
@@ -54,7 +54,7 @@ export function sampleSum(waves: Wave[], duration: number, n: number): Float64Ar
 }
 
 /* ------------------------------------------------------------------ *
- * Wave relationships — the 6.1 problem set
+ * Wave relationships: the 6.1 problem set
  * ------------------------------------------------------------------ */
 
 /** Speed of light in a vacuum, m/s. */
@@ -106,7 +106,7 @@ function trim(v: number, digits: number): string {
 }
 
 /* ------------------------------------------------------------------ *
- * Digital line coding — 6.3
+ * Digital line coding (6.3)
  * ------------------------------------------------------------------ */
 
 export type LineCode = "nrz-l" | "nrz-i" | "manchester" | "manchester-diff";
@@ -194,7 +194,7 @@ export function baudPerBit(code: LineCode): number {
   return code === "manchester" || code === "manchester-diff" ? 2 : 1;
 }
 
-/** Count of level changes in a coded waveform — the honest measure of transitions. */
+/** Count of level changes in a coded waveform, the honest measure of transitions. */
 export function transitionCount(segs: Segment[]): number {
   let n = 0;
   for (let i = 1; i < segs.length; i++) if (segs[i].level !== segs[i - 1].level) n++;
@@ -259,7 +259,7 @@ export function sampleWithDrift(
 }
 
 /* ------------------------------------------------------------------ *
- * Parity — 6.3 error detection
+ * Parity (6.3 error detection)
  * ------------------------------------------------------------------ */
 
 export type Parity = "even" | "odd";
@@ -275,7 +275,7 @@ export function parityHolds(bitsWithParity: number[], kind: Parity): boolean {
 }
 
 /* ------------------------------------------------------------------ *
- * Digital → analog keying (ASK / FSK / PSK) — 6.3 and 6.4
+ * Digital → analog keying (ASK / FSK / PSK), 6.3 and 6.4
  * ------------------------------------------------------------------ */
 
 export type Keying = "ask" | "fsk" | "psk";
@@ -328,7 +328,7 @@ export function keyedCarrier(
 }
 
 /* ------------------------------------------------------------------ *
- * Analog modulation (AM / FM / PM) — 6.4
+ * Analog modulation (AM / FM / PM), 6.4
  * ------------------------------------------------------------------ */
 
 export type Modulation = "am" | "fm" | "pm";
@@ -358,7 +358,7 @@ export type ModulationResult = {
   message: Float64Array;
   carrier: Float64Array;
   modulated: Float64Array;
-  /** Upper envelope for AM — drawn as a guide, not as data. */
+  /** Upper envelope for AM, drawn as a guide, not as data. */
   envelope: Float64Array | null;
 };
 
@@ -408,7 +408,7 @@ export function modulate(
 }
 
 /* ------------------------------------------------------------------ *
- * PCM — 6.4
+ * PCM (6.4)
  * ------------------------------------------------------------------ */
 
 export type PcmResult = {
@@ -461,7 +461,7 @@ export function pcm(
 }
 
 /* ------------------------------------------------------------------ *
- * Transmission impairments — 6.2
+ * Transmission impairments (6.2)
  * ------------------------------------------------------------------ */
 
 export type Impairments = {
@@ -508,7 +508,7 @@ export function impair(source: Float64Array, imp: Impairments, seed = 1): Float6
   return out;
 }
 
-/** Peak amplitude of a trace — used for the "is this still readable?" verdict. */
+/** Peak amplitude of a trace, used for the "is this still readable?" verdict. */
 export function peakOf(a: Float64Array): number {
   let m = 0;
   for (let i = 0; i < a.length; i++) m = Math.max(m, Math.abs(a[i]));
@@ -533,10 +533,125 @@ export function snrDb(clean: Float64Array, received: Float64Array): number | nul
 }
 
 /* ------------------------------------------------------------------ *
- * Topology maths — 6.5
+ * Topology maths (6.5)
  * ------------------------------------------------------------------ */
 
 /** Cable runs needed for a full mesh: n(n−1)/2. */
 export const meshLinks = (n: number) => (n * (n - 1)) / 2;
 /** Ports each host needs in a full mesh. */
 export const meshPorts = (n: number) => Math.max(0, n - 1);
+
+/* ------------------------------------------------------------------ *
+ * Direction of flow (6.2)
+ * ------------------------------------------------------------------ */
+
+export type Mode = "simplex" | "half" | "full";
+
+export const TRANSMISSION_MODES: Record<
+  Mode,
+  { name: string; how: string; capacity: string; examples: string[]; series: number }
+> = {
+  simplex: {
+    name: "Simplex",
+    how: "Data travels in one direction only. One device is permanently the sender and the other permanently the receiver.",
+    capacity: "The whole channel is available to the one direction that uses it.",
+    examples: ["Radio and television broadcasting", "A keyboard to a computer", "A computer to a monitor"],
+    series: 1,
+  },
+  half: {
+    name: "Half duplex",
+    how: "Both devices can send, but only one at a time. The line has to be turned round between turns.",
+    capacity: "The whole channel goes to whichever device is currently sending.",
+    examples: ["Walkie-talkies", "A hub-based Ethernet segment", "CB radio"],
+    series: 0,
+  },
+  full: {
+    name: "Full duplex",
+    how: "Both devices send at the same time, either on separate paths or in separate frequency bands.",
+    capacity: "The capacity is shared between the two directions.",
+    examples: ["Telephone calls", "Switched Ethernet", "Mobile phone calls"],
+    series: 2,
+  },
+};
+
+/* ------------------------------------------------------------------ *
+ * Multiplexing (6.2)
+ *
+ * One medium, several conversations. Each technique divides a different
+ * resource: time, frequency, wavelength, or the code the data is wrapped in.
+ * ------------------------------------------------------------------ */
+
+export type Muxing = "tdm" | "fdm" | "wdm" | "cdm";
+
+export const MULTIPLEXING: Record<
+  Muxing,
+  {
+    name: string;
+    long: string;
+    divides: string;
+    how: string;
+    used: string;
+    key: { term: string; what: string }[];
+  }
+> = {
+  tdm: {
+    name: "TDM",
+    long: "Time Division Multiplexing",
+    divides: "time",
+    how: "Transmission time is cut into slots and each channel is given its own slot in turn. One complete round of slots is a frame, and the frames repeat.",
+    used: "Digital telephone trunks, where 24 or 30 voice channels share one line.",
+    key: [
+      { term: "Time slot", what: "The share of time one channel gets to transmit in." },
+      { term: "Frame", what: "One complete set of slots: one slot per input channel." },
+      { term: "Round robin", what: "Slots are handed out in sequence, then the cycle repeats." },
+      { term: "Guard time", what: "A small unused gap between slots so a timing error cannot overlap two channels." },
+      { term: "Synchronisation", what: "Both ends must agree where each slot begins, or every channel is read wrongly." },
+    ],
+  },
+  fdm: {
+    name: "FDM",
+    long: "Frequency Division Multiplexing",
+    divides: "frequency",
+    how: "The bandwidth of the medium is split into bands and each channel is modulated onto its own carrier frequency. All channels travel at once.",
+    used: "Radio and television broadcasting, and the upstream/downstream split in ADSL.",
+    key: [
+      { term: "Carrier", what: "The frequency a channel's data is modulated onto." },
+      { term: "Band", what: "The slice of the spectrum reserved for one channel." },
+      { term: "Guard band", what: "An unused strip of spectrum between bands, so neighbours do not interfere." },
+    ],
+  },
+  wdm: {
+    name: "WDM",
+    long: "Wavelength Division Multiplexing",
+    divides: "wavelength",
+    how: "The same idea as FDM, but in optical fibre: several beams of different wavelength (different colours of light) travel down one fibre at once.",
+    used: "Long-haul fibre backbones and submarine cables.",
+    key: [
+      { term: "Prism or grating", what: "Combines the beams at the sending end and separates them again at the far end." },
+      { term: "Wavelength", what: "Each channel gets its own colour of light, so they never mix." },
+    ],
+  },
+  cdm: {
+    name: "CDM",
+    long: "Code Division Multiplexing",
+    divides: "code",
+    how: "Every channel is given a unique code and all of them transmit over the whole band at the same time. A receiver that knows a code can pull that channel out and treat the rest as noise.",
+    used: "Mobile telephone networks (CDMA) and GPS.",
+    key: [
+      { term: "Chip code", what: "The unique pattern each channel's bits are multiplied by." },
+      { term: "Orthogonal", what: "Codes are chosen so that any two of them cancel out, and that is what keeps the channels separable." },
+    ],
+  },
+};
+
+export const MUX_PROS = [
+  "One expensive medium carries many conversations, so the cost per channel falls",
+  "The capacity of a link that would otherwise sit idle is actually used",
+  "The network can grow by adding channels rather than cable",
+];
+
+export const MUX_CONS = [
+  "If the shared link fails, every channel on it fails together",
+  "Extra hardware is needed at both ends: a multiplexer and a demultiplexer",
+  "The equipment, and the synchronisation it needs, make the system more complex",
+];

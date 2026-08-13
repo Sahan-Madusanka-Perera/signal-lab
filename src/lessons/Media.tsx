@@ -15,7 +15,19 @@ import {
   Slider,
   Toggle,
 } from "../components/ui";
-import { TAU, impair, peakOf, sampleSum, snrDb } from "../lib/signal";
+import {
+  MULTIPLEXING,
+  MUX_CONS,
+  MUX_PROS,
+  TAU,
+  TRANSMISSION_MODES,
+  impair,
+  peakOf,
+  sampleSum,
+  snrDb,
+  type Mode,
+  type Muxing,
+} from "../lib/signal";
 
 export function MediaLesson() {
   return (
@@ -25,6 +37,8 @@ export function MediaLesson() {
       <SortingDrill />
       <ImpairmentLab />
       <PointToPoint />
+      <ModesSection />
+      <MuxSection />
       <Section id="check" title="Check yourself">
         <Quiz lessonId="media" questions={QUESTIONS} />
       </Section>
@@ -41,10 +55,10 @@ function GuidedVsUnguided() {
     <Section
       id="guided"
       title="Two families of medium"
-      lead="Every transmission medium either confines the signal to a physical path or lets it spread out into the surroundings. That single distinction — guided or unguided — decides most of what follows: who can overhear it, how far it reaches, and how badly it degrades."
+      lead="Every transmission medium either confines the signal to a physical path or lets it spread out into the surroundings. That single distinction, guided or unguided, decides most of what follows: who can overhear it, how far it reaches, and how badly it degrades."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-        <Panel title="Guided media — wires" subtitle="The signal is steered along a physical conductor or fibre.">
+        <Panel title="Guided media: wires" subtitle="The signal is steered along a physical conductor or fibre.">
           <Scope height={116} caption="The wave is confined: it can only go where the cable goes.">
             <ScopeCanvas
               label="A signal confined inside a cable, travelling from left to right"
@@ -92,7 +106,7 @@ function GuidedVsUnguided() {
           </ul>
         </Panel>
 
-        <Panel title="Unguided media — free space" subtitle="The signal is radiated and spreads in every direction.">
+        <Panel title="Unguided media: free space" subtitle="The signal is radiated and spreads in every direction.">
           <Scope height={116} caption="No physical path: anything in range receives it, wanted or not.">
             <ScopeCanvas
               label="A signal radiating outwards in all directions from an antenna"
@@ -206,7 +220,7 @@ const MEDIA: MediumCard[] = [
     name: "Optical fibre",
     family: "guided",
     carries: "Pulses of light inside a glass core",
-    bandwidth: "Extremely high — tens of Gbit/s and beyond",
+    bandwidth: "Extremely high: tens of Gbit/s and beyond",
     distance: "Kilometres without a repeater",
     strengths: ["Immune to electrical noise entirely", "Very low attenuation", "Very hard to tap without detection"],
     weaknesses: ["Most expensive", "Fragile; splicing needs skill and equipment"],
@@ -231,7 +245,7 @@ const MEDIA: MediumCard[] = [
     bandwidth: "Moderate, shared",
     distance: "Intercontinental",
     strengths: ["Covers oceans and remote regions", "One hop reaches an enormous area"],
-    weaknesses: ["Very high latency — the signal travels ~72 000 km", "Expensive", "Affected by heavy rain"],
+    weaknesses: ["Very high latency: the signal travels ~72 000 km", "Expensive", "Affected by heavy rain"],
     series: 4,
   },
 ];
@@ -397,7 +411,7 @@ function SortingDrill() {
             <p className="text-center text-sm text-ink-3">
               {wrong === 0
                 ? "All eight sorted, all correct."
-                : `${wrong} in the wrong column — the red ones. Reset and try again.`}
+                : `${wrong} in the wrong column, the red ones. Reset and try again.`}
             </p>
           )}
         </div>
@@ -443,7 +457,7 @@ function SortingDrill() {
 }
 
 /* ================================================================== *
- * 4. Impairment lab — the centrepiece of 6.2
+ * 4. Impairment lab: the centrepiece of 6.2
  * ================================================================== */
 
 type Carried = "digital" | "analog";
@@ -642,7 +656,7 @@ function ImpairmentLab() {
               onChange={setNoise}
               accent="var(--s5)"
               readout={`${Math.round(noise * 100)}%`}
-              hint="Unwanted energy added by the surroundings — motors, other cables, lightning. A received signal that makes no sense."
+              hint="Unwanted energy added by the surroundings: motors, other cables, lightning. A received signal that makes no sense."
             />
             <ImpairmentSlider
               name="Distortion"
@@ -694,17 +708,40 @@ function ImpairmentLab() {
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
         <Callout kind="exam" title="Latency and bandwidth are not the same thing">
-          <strong>Bandwidth</strong> is a range of frequencies, measured in hertz — how much can be in flight at
-          once. <strong>Latency</strong> is a delay, measured in milliseconds — how long one unit takes to arrive.
+          <strong>Bandwidth</strong> is a range of frequencies, measured in hertz: how much can be in flight at
+          once. <strong>Latency</strong> is a delay, measured in milliseconds: how long one unit takes to arrive.
           A satellite link can have plenty of bandwidth and terrible latency; a short thin wire can have low
           latency and almost no bandwidth. Widening the pipe does not shorten it.
         </Callout>
         <Callout kind="warn" title="Noise and distortion are different faults">
-          <strong>Distortion</strong> is the medium changing the shape of your own signal — nothing was added.
+          <strong>Distortion</strong> is the medium changing the shape of your own signal; nothing was added.
           <strong> Noise</strong> is extra energy from outside being added on top. Distortion is predictable and
           can often be equalised out; noise is random and cannot.
         </Callout>
       </div>
+
+      <Panel title="Bandwidth is the promise; throughput is what you get">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+          <div>
+            <p className="max-w-[64ch] text-sm text-ink-2">
+              <strong className="font-semibold text-ink">Throughput</strong> is the amount of data that actually
+              gets through in a given time, and it is measured, not advertised. Every impairment above eats into it:
+              noise forces retransmissions, a narrow bandwidth limits how fast symbols can be sent, and the
+              protocol's own headers take a share of whatever is left.
+            </p>
+            <p className="mt-2 max-w-[64ch] text-sm text-ink-2">
+              A link sold as 100 Mbps might carry only 70 Mbps of your data. The 100 is the capacity of the
+              channel; the 70 is what arrived. Throughput is never higher than bandwidth, and in practice it is
+              always lower.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-6 md:border-l md:border-line md:pl-4">
+            <Readout label="Bandwidth" value="100 Mbps" sub="the channel's capacity" />
+            <Readout label="Throughput" value="70 Mbps" tone="warn" sub="what actually arrives" />
+            <Readout label="Lost to overhead" value="30 %" sub="noise, retries, headers" />
+          </div>
+        </div>
+      </Panel>
     </Section>
   );
 }
@@ -745,17 +782,17 @@ function verdict(
 ): string {
   if (!s.readable) {
     return carried === "digital"
-      ? "The received levels no longer sit clearly either side of the decision threshold. The receiver will read some bits wrongly — this is a bit error, and it is what parity in level 6.3 is designed to catch."
+      ? "The received levels no longer sit clearly either side of the decision threshold. The receiver will read some bits wrongly. This is a bit error, and it is what parity in level 6.3 is designed to catch."
       : "The original waveform can no longer be picked out of the damage. An analog receiver has no threshold to fall back on, so the error is passed straight through to whatever is listening.";
   }
   const worst = Math.max(s.attenuation, s.noise, s.distortion);
   if (worst < 0.05) return "A near-perfect medium: what arrives is what was sent. No real cable behaves like this.";
   if (worst === s.attenuation)
-    return "Attenuation dominates. The shape is intact but the wave is smaller — put a repeater partway along the run and the signal is restored.";
+    return "Attenuation dominates. The shape is intact but the wave is smaller. Put a repeater partway along the run and the signal is restored.";
   if (worst === s.noise)
     return "Noise dominates. The signal is the right size but is riding on unwanted energy. Shielding, twisting the pair, or moving to fibre would help.";
   if (s.bandwidth < 4)
-    return "Bandwidth is the limit here — the medium simply cannot pass the sharp edges, so the corners have been rounded off before anything else happened.";
+    return "Bandwidth is the limit here: the medium simply cannot pass the sharp edges, so the corners have been rounded off before anything else happened.";
   return "Distortion dominates. The medium has changed the shape of the signal; the edges are no longer square, so the receiver has less margin when it decides each bit.";
 }
 
@@ -768,7 +805,7 @@ function PointToPoint() {
     <Section
       id="p2p"
       title="The simplest topology of all"
-      lead="A point-to-point connection joins exactly two devices with one dedicated length of cable. The whole capacity belongs to those two, nothing has to be shared, and no addressing is needed — whatever goes in one end comes out the other."
+      lead="A point-to-point connection joins exactly two devices with one dedicated length of cable. The whole capacity belongs to those two, nothing has to be shared, and no addressing is needed, since whatever goes in one end comes out the other."
     >
       <Panel title="Point-to-point link">
         <Scope height={150}>
@@ -830,6 +867,408 @@ function PointToPoint() {
           ))}
         </ul>
       </Panel>
+    </Section>
+  );
+}
+
+/* ================================================================== *
+ * 6. Direction of flow
+ * ================================================================== */
+
+function ModesSection() {
+  const [mode, setMode] = useState<Mode>("half");
+  const info = TRANSMISSION_MODES[mode];
+
+  return (
+    <Section
+      id="modes"
+      title="Which way can it go?"
+      lead="A link is described not only by what it carries but by which directions it can carry it in. There are three arrangements, and the difference between the last two is whether the two ends may talk at the same time or must take turns."
+    >
+      <Panel
+        title={`${info.name} transmission`}
+        subtitle={info.how}
+        actions={
+          <Segmented
+            label="Transmission mode"
+            value={mode}
+            onChange={setMode}
+            options={(Object.keys(TRANSMISSION_MODES) as Mode[]).map((m) => ({
+              value: m,
+              label: TRANSMISSION_MODES[m].name,
+            }))}
+          />
+        }
+      >
+        <Scope height={168}>
+          <ScopeCanvas
+            label={`${info.name}: ${info.how}`}
+            animate
+            deps={[mode]}
+            bounds={{ x0: 0, x1: 1, y0: 0, y1: 1 }}
+            insets={{ left: 0, right: 0, top: 0, bottom: 0 }}
+            draw={({ plot, ctx, palette, time, w, h }) => {
+              const y = h * 0.46;
+              const xa = 82;
+              const xb = w - 82;
+              const colour = palette.series[info.series];
+
+              ctx.save();
+              ctx.strokeStyle = palette.gridMajor;
+              ctx.lineWidth = 3;
+              ctx.lineCap = "round";
+              ctx.beginPath();
+              ctx.moveTo(xa, y);
+              ctx.lineTo(xb, y);
+              ctx.stroke();
+              ctx.restore();
+
+              const chip = (px: number, py: number, text: string, c: string) => {
+                ctx.save();
+                ctx.font = '700 9px "JetBrains Mono Variable", ui-monospace, monospace';
+                const tw = ctx.measureText(text).width + 14;
+                if (palette.isDark) {
+                  ctx.shadowColor = c;
+                  ctx.shadowBlur = 12;
+                }
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.roundRect(px - tw / 2, py - 8, tw, 16, 4);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = palette.bg;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(text, px, py + 0.5);
+                ctx.restore();
+              };
+
+              // One cycle of the conversation, drawn differently per mode.
+              const cyc = (time * 0.34) % 2;
+              if (mode === "simplex") {
+                const p = cyc / 2;
+                chip(xa + (xb - xa) * p, y - 18, "data", colour);
+                plot.text(w / 2, y + 30, "one direction, always: B can never reply", palette.inkFaint, {
+                  size: 10,
+                  align: "center",
+                });
+              } else if (mode === "half") {
+                // A sends for the first half of the cycle, then B replies.
+                const forward = cyc < 1;
+                const p = forward ? cyc : cyc - 1;
+                const px = forward ? xa + (xb - xa) * p : xb - (xb - xa) * p;
+                chip(px, y - 18, forward ? "A → B" : "B → A", colour);
+                plot.text(
+                  w / 2,
+                  y + 30,
+                  forward ? "A is sending, so B must wait its turn" : "now B sends, so A must wait",
+                  palette.inkFaint,
+                  { size: 10, align: "center" },
+                );
+              } else {
+                const p = cyc / 2;
+                chip(xa + (xb - xa) * p, y - 20, "A → B", colour);
+                chip(xb - (xb - xa) * p, y + 20, "B → A", palette.series[3]);
+                plot.text(w / 2, y + 44, "both directions at once, on separate paths", palette.inkFaint, {
+                  size: 10,
+                  align: "center",
+                });
+              }
+
+              drawHost(ctx, palette, xa - 34, y - 22, "A");
+              drawHost(ctx, palette, xb - 34, y - 22, "B");
+            }}
+          />
+        </Scope>
+
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <div>
+            <p className="text-2xs font-semibold text-ink-3">Where the capacity goes</p>
+            <p className="mt-1 max-w-[56ch] text-sm text-ink-2">{info.capacity}</p>
+          </div>
+          <div className="sm:w-[240px] sm:border-l sm:border-line sm:pl-4">
+            <p className="text-2xs font-semibold text-ink-3">Examples</p>
+            <ul className="mt-1.5 grid gap-1">
+              {info.examples.map((e) => (
+                <li key={e} className="flex gap-2 text-sm text-ink-2">
+                  <span
+                    className="mt-[9px] h-1 w-1 shrink-0 rounded-full"
+                    style={{ background: `var(--s${info.series + 1})` }}
+                  />
+                  {e}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Panel>
+
+      <Callout kind="exam" title="Half duplex is not half speed">
+        Both half and full duplex allow two-way communication; the difference is <em>simultaneity</em>. In half
+        duplex the whole channel is given to whichever end is talking, and the line is turned round between
+        turns. A hub forces half duplex on everything plugged into it; a switch gives every port full duplex,
+        which is one of the reasons switches replaced hubs.
+      </Callout>
+    </Section>
+  );
+}
+
+/* ================================================================== *
+ * 7. Multiplexing
+ * ================================================================== */
+
+const MUX_CHANNELS = [
+  { label: "A", series: 0 },
+  { label: "B", series: 1 },
+  { label: "C", series: 3 },
+];
+
+function MuxSection() {
+  const [kind, setKind] = useState<Muxing>("tdm");
+  const info = MULTIPLEXING[kind];
+
+  return (
+    <Section
+      id="mux"
+      title="Several conversations down one wire"
+      lead="Laying a cable is expensive and one conversation rarely fills it. Multiplexing puts several channels onto the same medium at once: a multiplexer combines them at the sending end and a demultiplexer separates them again at the far end. What differs between the four techniques is which resource gets divided up."
+    >
+      <Panel
+        title={info.long}
+        subtitle={info.how}
+        actions={
+          <Segmented
+            label="Technique"
+            value={kind}
+            onChange={setKind}
+            options={(Object.keys(MULTIPLEXING) as Muxing[]).map((m) => ({
+              value: m,
+              label: MULTIPLEXING[m].name,
+              title: MULTIPLEXING[m].long,
+            }))}
+          />
+        }
+      >
+        <Scope height={244}>
+          <ScopeCanvas
+            label={`${info.long}: three channels share one medium, divided by ${info.divides}`}
+            animate
+            deps={[kind]}
+            bounds={{ x0: 0, x1: 1, y0: 0, y1: 1 }}
+            insets={{ left: 0, right: 0, top: 0, bottom: 0 }}
+            draw={({ plot, ctx, palette, time, w, h }) => {
+              const muxX = Math.max(74, w * 0.17);
+              const demuxX = Math.min(w - 74, w * 0.83);
+              const midY = h * 0.46;
+              const rowY = (i: number) => midY - 46 + i * 46;
+
+              // The three channels in and out.
+              MUX_CHANNELS.forEach((c, i) => {
+                const colour = palette.series[c.series];
+                [true, false].forEach((left) => {
+                  const x0 = left ? 22 : demuxX + 18;
+                  const x1 = left ? muxX - 18 : w - 22;
+                  ctx.save();
+                  ctx.strokeStyle = colour;
+                  ctx.lineWidth = 1.8;
+                  ctx.beginPath();
+                  ctx.moveTo(x0, rowY(i));
+                  ctx.lineTo(x1 - 8, rowY(i));
+                  ctx.lineTo(left ? muxX - 18 : w - 22, left ? midY : rowY(i));
+                  ctx.stroke();
+                  ctx.restore();
+                  plot.text(left ? 22 : w - 22, rowY(i) - 12, `Channel ${c.label}`, colour, {
+                    size: 9,
+                    weight: 700,
+                    align: left ? "left" : "right",
+                  });
+                });
+              });
+
+              // MUX and DEMUX, drawn as the trapezoids they are in every textbook.
+              const trapezoid = (x: number, flip: boolean, label: string) => {
+                ctx.save();
+                ctx.fillStyle = palette.bg;
+                ctx.strokeStyle = palette.brand;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                const wide = 56;
+                const narrow = 26;
+                ctx.moveTo(x - 16, midY - (flip ? narrow : wide));
+                ctx.lineTo(x + 16, midY - (flip ? wide : narrow));
+                ctx.lineTo(x + 16, midY + (flip ? wide : narrow));
+                ctx.lineTo(x - 16, midY + (flip ? narrow : wide));
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                ctx.font = '700 9px "JetBrains Mono Variable", ui-monospace, monospace';
+                ctx.fillStyle = palette.brand;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(label, x, midY);
+                ctx.restore();
+              };
+              trapezoid(muxX, false, "MUX");
+              trapezoid(demuxX, true, "DEMUX");
+
+              // The shared medium, and how this technique divides it.
+              const x0 = muxX + 18;
+              const x1 = demuxX - 18;
+              const span = x1 - x0;
+
+              if (kind === "tdm") {
+                // Time slots, repeating as frames, with a guard gap between them.
+                const slots = 9;
+                const sw = span / slots;
+                const guard = sw * 0.14;
+                const shift = (time * 0.5) % 3;
+                for (let s = 0; s < slots; s++) {
+                  const c = MUX_CHANNELS[(s + Math.floor(shift)) % 3];
+                  const colour = palette.series[c.series];
+                  const sx = x0 + s * sw;
+                  ctx.save();
+                  ctx.fillStyle = colour;
+                  ctx.globalAlpha = 0.85;
+                  ctx.beginPath();
+                  ctx.roundRect(sx + guard / 2, midY - 13, sw - guard, 26, 3);
+                  ctx.fill();
+                  ctx.globalAlpha = 1;
+                  ctx.font = '700 9px "JetBrains Mono Variable", ui-monospace, monospace';
+                  ctx.fillStyle = palette.bg;
+                  ctx.textAlign = "center";
+                  ctx.textBaseline = "middle";
+                  ctx.fillText(c.label, sx + sw / 2, midY + 0.5);
+                  ctx.restore();
+                }
+                // One frame = one slot for every channel.
+                ctx.save();
+                ctx.strokeStyle = palette.axis;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(x0, midY + 20);
+                ctx.lineTo(x0 + sw * 3, midY + 20);
+                ctx.stroke();
+                ctx.restore();
+                plot.text(x0 + sw * 1.5, midY + 24, "one frame", palette.inkFaint, { size: 9, align: "center" });
+                plot.text(x0 + span / 2, midY - 30, "time →", palette.inkFaint, { size: 9, align: "center" });
+              } else if (kind === "fdm" || kind === "wdm") {
+                // Stacked bands: frequency for FDM, wavelength for WDM.
+                MUX_CHANNELS.forEach((c, i) => {
+                  const colour = palette.series[c.series];
+                  const by = midY - 30 + i * 22;
+                  ctx.save();
+                  ctx.globalAlpha = 0.22;
+                  ctx.fillStyle = colour;
+                  ctx.fillRect(x0, by - 8, span, 16);
+                  ctx.globalAlpha = 1;
+                  ctx.strokeStyle = colour;
+                  ctx.lineWidth = 1.8;
+                  ctx.beginPath();
+                  // A carrier wave inside each band, faster for the higher band.
+                  const cycles = 6 + i * 4;
+                  for (let px = 0; px <= span; px += 2) {
+                    const yy = by + Math.sin((px / span) * TAU * cycles + time * 2.4) * 5;
+                    if (px === 0) ctx.moveTo(x0 + px, yy);
+                    else ctx.lineTo(x0 + px, yy);
+                  }
+                  ctx.stroke();
+                  ctx.restore();
+                  plot.text(x0 + 4, by - 16, kind === "fdm" ? `band ${c.label}` : `${c.label}: one colour`, colour, {
+                    size: 8,
+                    weight: 700,
+                  });
+                });
+                plot.text(
+                  x0 + span / 2,
+                  midY + 40,
+                  kind === "fdm" ? "guard bands keep the neighbours apart" : "one fibre, several wavelengths at once",
+                  palette.inkFaint,
+                  { size: 9, align: "center" },
+                );
+              } else {
+                // CDM: everybody transmits over everything, all the time.
+                MUX_CHANNELS.forEach((c, i) => {
+                  const colour = palette.series[c.series];
+                  ctx.save();
+                  ctx.globalAlpha = 0.3;
+                  ctx.strokeStyle = colour;
+                  ctx.lineWidth = 2;
+                  ctx.beginPath();
+                  for (let px = 0; px <= span; px += 2) {
+                    const u = px / span;
+                    const yy =
+                      midY + Math.sin(u * TAU * (7 + i * 3) + time * 2 + i) * 16 * Math.sin(u * TAU * 0.5 + i);
+                    if (px === 0) ctx.moveTo(x0 + px, yy);
+                    else ctx.lineTo(x0 + px, yy);
+                  }
+                  ctx.stroke();
+                  ctx.restore();
+                  plot.text(x0 + 6 + i * 62, midY + 34, `code ${c.label}`, colour, { size: 9, weight: 700 });
+                });
+                plot.text(x0 + span / 2, midY - 34, "all channels, all the time, told apart by their code", palette.inkFaint, {
+                  size: 9,
+                  align: "center",
+                });
+              }
+
+              plot.text(w / 2, h - 14, `one medium · divided by ${info.divides}`, palette.inkFaint, {
+                size: 10,
+                align: "center",
+              });
+            }}
+          />
+        </Scope>
+
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+          <div>
+            <p className="text-2xs font-semibold text-ink-3">Terms this technique brings with it</p>
+            <ul className="mt-1.5 grid gap-1.5">
+              {info.key.map((k) => (
+                <li key={k.term} className="flex gap-2 text-sm text-ink-2">
+                  <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
+                  <span className="max-w-[58ch]">
+                    <span className="font-medium text-ink">{k.term}</span>: {k.what}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="lg:border-l lg:border-line lg:pl-4">
+            <Readout label="What gets divided" value={info.divides} tone="brand" />
+            <p className="mt-3 text-2xs font-semibold text-ink-3">Where you meet it</p>
+            <p className="mt-1 max-w-[38ch] text-sm text-ink-2">{info.used}</p>
+          </div>
+        </div>
+      </Panel>
+
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
+        <Panel title="Why bother">
+          <ul className="grid gap-1.5">
+            {MUX_PROS.map((t) => (
+              <li key={t} className="flex gap-2 text-sm text-ink-2">
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--ok)" }} />
+                <span className="max-w-[44ch]">{t}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+        <Panel title="What it costs">
+          <ul className="grid gap-1.5">
+            {MUX_CONS.map((t) => (
+              <li key={t} className="flex gap-2 text-sm text-ink-2">
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--bad)" }} />
+                <span className="max-w-[44ch]">{t}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </div>
+
+      <Callout kind="exam" title="Telling the four apart in one line each">
+        <strong>TDM</strong> divides time into slots. <strong>FDM</strong> divides the bandwidth into frequency
+        bands. <strong>WDM</strong> is FDM in fibre, dividing light by wavelength. <strong>CDM</strong> divides
+        nothing: every channel uses the whole medium at once and is separated by its code.
+      </Callout>
     </Section>
   );
 }
@@ -899,7 +1338,7 @@ const QUESTIONS: Question[] = [
       { label: "Latency" },
     ],
     explain:
-      "Attenuation is loss of signal energy as it travels through the medium. The shape survives — only the size falls — so it can be repaired by amplifying or regenerating the signal at a repeater.",
+      "Attenuation is loss of signal energy as it travels through the medium. The shape survives and only the size falls, so it can be repaired by amplifying or regenerating the signal at a repeater.",
   },
   {
     id: "m3",
@@ -911,7 +1350,7 @@ const QUESTIONS: Question[] = [
       { label: "Latency depends on the bandwidth of the medium" },
     ],
     explain:
-      "They measure different things. Bandwidth is how wide the pipe is — a range of frequencies in hertz. Latency is how long one unit of data takes to travel the distance. A wider pipe does not make it shorter.",
+      "They measure different things. Bandwidth is how wide the pipe is: a range of frequencies in hertz. Latency is how long one unit of data takes to travel the distance. A wider pipe does not make it shorter.",
   },
   {
     id: "m4",
@@ -923,7 +1362,7 @@ const QUESTIONS: Question[] = [
       { label: "Because the signal travels faster than in copper" },
     ],
     explain:
-      "Interference works by inducing unwanted currents in a conductor. There is no conductor and no current in a fibre — only light in glass — so external electrical noise has nothing to couple into.",
+      "Interference works by inducing unwanted currents in a conductor. There is no conductor and no current in a fibre, only light in glass, so external electrical noise has nothing to couple into.",
   },
   {
     id: "m5",
@@ -935,18 +1374,42 @@ const QUESTIONS: Question[] = [
       { label: "Latency" },
     ],
     explain:
-      "Distortion is the alteration of the properties of the signal by the medium itself — here the capacitance and inductance change the shape. Nothing was added from outside, which is what would make it noise.",
+      "Distortion is the alteration of the properties of the signal by the medium itself: here the capacitance and inductance change the shape. Nothing was added from outside, which is what would make it noise.",
   },
   {
     id: "m6",
     prompt: "In a point-to-point connection, how much of the cable's capacity is available to the two devices?",
     options: [
       { label: "Half each, because they must take turns" },
-      { label: "All of it — the link is dedicated to them", correct: true },
+      { label: "All of it: the link is dedicated to them", correct: true },
       { label: "It depends how many other devices are on the network" },
       { label: "None until a hub is added" },
     ],
     explain:
       "A point-to-point link joins exactly two devices with a dedicated cable. Nothing else shares it, so there is no contention and the full capacity of the medium is theirs.",
+  },
+  {
+    id: "m7",
+    prompt: "Two walkie-talkies let both people speak, but only one at a time. Which transmission mode is that?",
+    options: [
+      { label: "Simplex" },
+      { label: "Half duplex", correct: true },
+      { label: "Full duplex" },
+      { label: "Multiplexed" },
+    ],
+    explain:
+      "Half duplex allows communication in both directions but not simultaneously; the line is turned round between turns. Simplex would mean one of the two could never reply at all, and full duplex, like a telephone call, would let both talk at once.",
+  },
+  {
+    id: "m8",
+    prompt: "Three telephone conversations share one line, each getting the whole line for a brief slot in turn, over and over. Which technique is this?",
+    options: [
+      { label: "Frequency division multiplexing" },
+      { label: "Time division multiplexing", correct: true },
+      { label: "Wavelength division multiplexing" },
+      { label: "Code division multiplexing" },
+    ],
+    explain:
+      "Dividing the transmission time into slots and giving each channel its own slot in rotation is TDM. FDM would give each conversation its own frequency band and run them all at the same time; WDM does the same with wavelengths of light in a fibre; CDM lets them all use everything at once, separated by code.",
   },
 ];

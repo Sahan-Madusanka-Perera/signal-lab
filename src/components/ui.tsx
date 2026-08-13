@@ -8,7 +8,7 @@ import {
 import clsx from "clsx";
 
 /* ------------------------------------------------------------------ *
- * Button — one shape, one vocabulary, every state defined.
+ * Button: one shape, one vocabulary, every state defined.
  * ------------------------------------------------------------------ */
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -61,7 +61,7 @@ export function textInk(color?: string): string | undefined {
 }
 
 /* ------------------------------------------------------------------ *
- * Slider — the primary control of this app, so it carries its readout.
+ * Slider: the primary control of this app, so it carries its readout.
  * ------------------------------------------------------------------ */
 
 type SliderProps = Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "value" | "type"> & {
@@ -73,7 +73,7 @@ type SliderProps = Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "val
   step?: number;
   /** Formatted value shown at the right of the label row. */
   readout?: ReactNode;
-  /** Tints the track and thumb — use to bind a control to its trace colour. */
+  /** Tints the track and thumb. Use to bind a control to its trace colour. */
   accent?: string;
   hint?: string;
 };
@@ -132,7 +132,7 @@ export function Slider({
 }
 
 /* ------------------------------------------------------------------ *
- * Segmented control — used everywhere a lesson switches mode.
+ * Segmented control, used everywhere a lesson switches mode.
  * ------------------------------------------------------------------ */
 
 export function Segmented<T extends string>({
@@ -240,7 +240,7 @@ export function Toggle({
 }
 
 /* ------------------------------------------------------------------ *
- * Panel — the one container. Never nested inside another panel.
+ * Panel: the one container. Never nested inside another panel.
  * ------------------------------------------------------------------ */
 
 export function Panel({
@@ -266,7 +266,10 @@ export function Panel({
             {title && <h3 className="text-sm font-semibold text-ink">{title}</h3>}
             {subtitle && <p className="mt-0.5 max-w-[62ch] text-xs text-ink-2">{subtitle}</p>}
           </div>
-          {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+          {/* min-w-0 rather than shrink-0: a wide control (a Segmented with six
+              options) has to be allowed to shrink before its own flex-wrap can
+              do anything, or it pushes the whole page sideways on a phone. */}
+          {actions && <div className="flex min-w-0 flex-wrap items-center gap-2">{actions}</div>}
         </header>
       )}
       <div className={clsx("p-4", bodyClassName)}>{children}</div>
@@ -275,7 +278,7 @@ export function Panel({
 }
 
 /* ------------------------------------------------------------------ *
- * Legend — identity is never colour alone.
+ * Legend: identity is never colour alone.
  * ------------------------------------------------------------------ */
 
 export function Legend({
@@ -306,7 +309,7 @@ export function Legend({
 }
 
 /* ------------------------------------------------------------------ *
- * Readout — a labelled measurement. Deliberately not a "stat hero".
+ * Readout: a labelled measurement. Deliberately not a "stat hero".
  * ------------------------------------------------------------------ */
 
 export function Readout({
@@ -370,7 +373,34 @@ export function Badge({
 }
 
 /* ------------------------------------------------------------------ *
- * Callout — the "remember this for the exam" device.
+ * Beyond the syllabus: the counterpart to Callout kind="exam".
+ *
+ * Some of this site goes further than Competency 6 asks for: either the
+ * resource book flags the topic as outside the syllabus itself, or it is an
+ * extension added here to make a mechanism visible. A student revising for the
+ * paper should be able to tell the difference at a glance, so anything extra
+ * is marked rather than quietly mixed in.
+ * ------------------------------------------------------------------ */
+
+export function Extra({ children, className }: { children?: ReactNode; className?: string }) {
+  return (
+    <span
+      className={clsx(
+        "inline-flex items-center gap-1 rounded-md border border-dashed border-line-strong px-1.5 py-0.5 text-2xs font-medium text-ink-3",
+        className,
+      )}
+    >
+      <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden className="shrink-0">
+        <path d="M5 1.4v7.2M1.4 5h7.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+      <span className="whitespace-nowrap">Beyond the syllabus</span>
+      {children && <span className="font-normal">· {children}</span>}
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Callout: the "remember this for the exam" device.
  * ------------------------------------------------------------------ */
 
 export function Callout({
@@ -406,7 +436,7 @@ export function Callout({
 }
 
 /* ------------------------------------------------------------------ *
- * Formula — a maths line that stays readable at small sizes.
+ * Formula: a maths line that stays readable at small sizes.
  * ------------------------------------------------------------------ */
 
 export function Formula({ children, note }: { children: ReactNode; note?: ReactNode }) {
@@ -419,7 +449,7 @@ export function Formula({ children, note }: { children: ReactNode; note?: ReactN
 }
 
 /* ------------------------------------------------------------------ *
- * Bit editor — clickable bit train, used by three separate lessons.
+ * Bit editor: clickable bit train, used by three separate lessons.
  * ------------------------------------------------------------------ */
 
 export function BitTrain({
@@ -480,7 +510,7 @@ export function BitTrain({
 }
 
 /* ------------------------------------------------------------------ *
- * Reveal — progressive disclosure instead of dumping the answer.
+ * Reveal: progressive disclosure instead of dumping the answer.
  * ------------------------------------------------------------------ */
 
 export function Reveal({ label = "Show working", children }: { label?: string; children: ReactNode }) {
@@ -520,7 +550,7 @@ export function Chevron({ open }: { open: boolean }) {
 }
 
 /* ------------------------------------------------------------------ *
- * Scope frame — the standard instrument surround for a canvas.
+ * Scope frame: the standard instrument surround for a canvas.
  * ------------------------------------------------------------------ */
 
 export function Scope({

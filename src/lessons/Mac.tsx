@@ -54,7 +54,7 @@ function LanSection() {
     <Section
       id="lan"
       title="A LAN is a set of machines sharing one medium"
-      lead="A Local Area Network connects computers within a limited area — a room, a building, a campus. Level 6.5 gave us the wiring. What it did not give us is any way for a station to say which machine a particular set of bits is meant for, or any rule about when it may start talking. Those two gaps are what this level fills."
+      lead="A Local Area Network connects computers within a limited area: a room, a building, a campus. Level 6.5 gave us the wiring. What it did not give us is any way for a station to say which machine a particular set of bits is meant for, or any rule about when it may start talking. Those two gaps are what this level fills."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3">
         {[
@@ -108,7 +108,7 @@ function MacAddressSection() {
     <Section
       id="mac"
       title="Every interface carries a 48-bit name"
-      lead="A MAC address is burned into the network interface when it is manufactured. It is 48 bits long, written as six blocks of two hexadecimal digits — and because each hex digit stands for exactly four bits, the whole address is really twelve nibbles. Click a block below to open it up."
+      lead="A MAC address is burned into the network interface when it is manufactured. It is 48 bits long, written as six blocks of two hexadecimal digits, and because each hex digit stands for exactly four bits, the whole address is really twelve nibbles. Click a block below to open it up."
     >
       <Panel
         title="Address anatomy"
@@ -165,7 +165,7 @@ function MacAddressSection() {
             style={{ animation: "rise var(--dur) var(--ease-out-quart)" }}
           >
             <p className="text-xs font-medium text-ink-2">
-              Block {openByte + 1} of 6 — one byte, which is 8 bits, which is two hex digits
+              Block {openByte + 1} of 6: one byte, which is 8 bits, which is two hex digits
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               {nibbles(bytes[openByte]).map((n, i) => (
@@ -256,7 +256,7 @@ function FrameSection() {
     <Section
       id="frame"
       title="Data travels wrapped in a frame"
-      lead="A frame is the unit of transmission on a LAN. The data link layer takes the data handed down to it, puts a header in front carrying the destination and source MAC addresses, and adds a checksum on the end. The header is what makes delivery possible — without it the bits are anonymous."
+      lead="A frame is the unit of transmission on a LAN. The data link layer takes the data handed down to it, puts a header in front carrying the destination and source MAC addresses, and adds a checksum on the end. The header is what makes delivery possible; without it the bits are anonymous."
     >
       <Panel
         title="Ethernet frame layout"
@@ -276,7 +276,7 @@ function FrameSection() {
                 key={f.name}
                 type="button"
                 onClick={() => setOpenField(f.name)}
-                title={`${f.name} — ${Array.isArray(f.bytes) ? `${payload} bytes` : `${f.bytes} bytes`}`}
+                title={`${f.name}: ${Array.isArray(f.bytes) ? `${payload} bytes` : `${f.bytes} bytes`}`}
                 className={clsx(
                   "group relative flex min-w-0 shrink-0 flex-col items-center justify-center border-r border-line px-1 text-center transition-colors last:border-r-0",
                   isOpen ? "bg-brand-wash" : "bg-surface-2 hover:bg-surface-3",
@@ -343,7 +343,7 @@ function FrameSection() {
         {payload <= 60 && (
           <p className="mt-3 rounded-lg bg-warn-wash px-3.5 py-2.5 text-sm text-ink">
             With a payload this small, most of what goes on the wire is header. Sending one keystroke costs 26
-            bytes of overhead to carry a single byte of data — which is exactly why protocols batch small pieces
+            bytes of overhead to carry a single byte of data, which is exactly why protocols batch small pieces
             of data together where they can.
           </p>
         )}
@@ -353,7 +353,7 @@ function FrameSection() {
 }
 
 /* ================================================================== *
- * 4. Media access — the flagship simulation
+ * 4. Media access: the flagship simulation
  * ================================================================== */
 
 const STATIONS = 4;
@@ -378,7 +378,7 @@ function AccessSection() {
     <Section
       id="access"
       title="From ALOHA to Ethernet"
-      lead="On a shared medium two stations that transmit at the same moment destroy each other's frames. The history of local networking is the history of getting better at avoiding that. Raise the traffic below and watch each protocol cope — or fail to."
+      lead="On a shared medium two stations that transmit at the same moment destroy each other's frames. The history of local networking is the history of getting better at avoiding that. Raise the traffic below and watch each protocol cope, or fail to."
     >
       <Panel
         title={info.long}
@@ -445,7 +445,7 @@ function AccessSection() {
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // A deferred start is the whole point of carrier sense — mark it.
+                // A deferred start is the whole point of carrier sense, so mark it.
                 if (at.deferred) {
                   ctx.globalAlpha = 1;
                   ctx.strokeStyle = palette.series[1];
@@ -467,7 +467,7 @@ function AccessSection() {
           <Legend
             items={[
               { color: "var(--s3)", label: "Delivered" },
-              { color: "var(--s5)", label: "Collided — both lost" },
+              { color: "var(--s5)", label: "Collided: both lost" },
               ...(protocol === "csma-cd" ? [{ color: "var(--s2)", label: "Waited for a quiet medium" }] : []),
             ]}
           />
@@ -606,7 +606,7 @@ function AccessSection() {
         <Panel title="Why slotting doubles the throughput">
           <p className="max-w-[64ch] text-sm text-ink-2">
             In pure ALOHA a frame is destroyed by anything that starts in the frame time before it as well as
-            anything starting during it — a vulnerable window two frame times wide. Forcing every transmission to
+            anything starting during it, a vulnerable window two frame times wide. Forcing every transmission to
             begin on a slot boundary halves that window to one frame time, and the peak throughput doubles from
             18.4 % to 36.8 %.
           </p>
@@ -618,11 +618,11 @@ function AccessSection() {
             <Reveal label="What the letters mean">
               <ul className="grid gap-1.5">
                 <li>
-                  <strong className="font-semibold text-ink">G</strong> — offered load: how much traffic the
+                  <strong className="font-semibold text-ink">G</strong> is the offered load: how much traffic the
                   stations are collectively trying to send.
                 </li>
                 <li>
-                  <strong className="font-semibold text-ink">S</strong> — throughput: how much actually gets
+                  <strong className="font-semibold text-ink">S</strong> is throughput: how much actually gets
                   through. The rest is destroyed in collisions.
                 </li>
                 <li>
@@ -635,10 +635,10 @@ function AccessSection() {
         </Panel>
 
         <Callout kind="exam" title="What CSMA/CD stands for, and why each part matters">
-          <strong>Carrier Sense</strong> — listen first, and do not start if the medium is busy. That alone
+          <strong>Carrier Sense</strong>: listen first, and do not start if the medium is busy. That alone
           removes most collisions.
-          <strong> Multiple Access</strong> — many stations share the one medium.
-          <strong> Collision Detection</strong> — keep listening while sending. If a collision does happen (two
+          <strong> Multiple Access</strong>: many stations share the one medium.
+          <strong> Collision Detection</strong>: keep listening while sending. If a collision does happen (two
           stations that both heard silence and started together), detect it within microseconds, stop
           immediately instead of wasting the whole frame time, and retry after a random backoff. Set the
           protocol to Ethernet above and compare the width of a red bar with the ALOHA ones.
@@ -652,27 +652,33 @@ function accessVerdict(protocol: MacProtocol, load: number, throughput: number):
   if (protocol === "csma-cd") {
     return load > 1
       ? "Even overloaded, Ethernet keeps the medium busy with real frames. Stations queue behind whoever is transmitting instead of talking over them, so the throughput holds up where ALOHA would have collapsed."
-      : "Almost every frame gets through. Stations that find the medium busy simply wait — the blue edge marks a deferred start — so collisions only happen in the tiny window before a signal has reached everybody.";
+      : "Almost every frame gets through. Stations that find the medium busy simply wait, and the blue edge marks a deferred start, so collisions only happen in the tiny window before a signal has reached everybody.";
   }
   if (load < 0.3) {
     return `With traffic this light, collisions are rare simply because two stations seldom want the medium at the same moment. ${
       protocol === "slotted" ? "Slotted ALOHA" : "Even pure ALOHA"
-    } copes fine — the weakness only shows as the load rises.`;
+    } copes fine, and the weakness only shows as the load rises.`;
   }
   if (throughput < 0.12) {
     return "The medium is in chaos. So much is colliding that raising the load further would make things worse, not better: every retry adds to the pile-up. This is precisely the failure that carrier sense was invented to prevent.";
   }
   return protocol === "slotted"
-    ? "Slotted ALOHA is doing better than pure ALOHA would at the same load, because a frame can now only be destroyed by something starting in the same slot — not by something that started halfway through the one before."
-    : "Collisions are eating a serious share of the medium. Notice that a frame is destroyed both by transmissions starting during it and by ones that started just before — the vulnerable window is two frame times wide.";
+    ? "Slotted ALOHA is doing better than pure ALOHA would at the same load, because a frame can now only be destroyed by something starting in the same slot, not by something that started halfway through the one before."
+    : "Collisions are eating a serious share of the medium. Notice that a frame is destroyed both by transmissions starting during it and by ones that started just before, so the vulnerable window is two frame times wide.";
 }
 
 /* ================================================================== *
  * 5. Broadcast vs unicast
  * ================================================================== */
 
+type Delivery = "unicast" | "multicast" | "broadcast";
+
+/** The stations that joined the group, for the multicast case. */
+const GROUP = [1, 3];
+const GROUP_MAC = "01:00:5E:00:00:16";
+
 function DeliverySection() {
-  const [mode, setMode] = useState<"unicast" | "broadcast">("unicast");
+  const [mode, setMode] = useState<Delivery>("unicast");
   const [target, setTarget] = useState(2);
 
   const hosts = [
@@ -681,20 +687,26 @@ function DeliverySection() {
     { name: "PC3", mac: "3C:5A:B4:77:01:E2" },
     { name: "PC4", mac: "00:50:56:C0:00:08" },
   ];
-  const destination = mode === "broadcast" ? BROADCAST_MAC : hosts[target].mac;
+  const keptBy = (i: number) =>
+    mode === "broadcast" ? true : mode === "multicast" ? GROUP.includes(i) : i === target;
+  const kept = hosts.map((_, i) => i).filter((i) => i !== 0 && keptBy(i)).length;
+  const destination =
+    mode === "broadcast" ? BROADCAST_MAC : mode === "multicast" ? GROUP_MAC : hosts[target].mac;
 
   return (
     <Section
       id="delivery"
-      title="One frame, one destination — or all of them"
-      lead="Because every station on a shared medium receives every frame, delivery is really a decision each station makes for itself: it reads the destination address in the header and either keeps the frame or drops it. Two special cases follow from that."
+      title="One frame, one destination, or all of them"
+      lead="Because every station on a shared medium receives every frame, delivery is really a decision each station makes for itself: it reads the destination address in the header and either keeps the frame or drops it. Three cases follow from that, depending on what the destination address names."
     >
       <Panel
-        title={mode === "unicast" ? "Unicast" : "Broadcast"}
+        title={mode === "unicast" ? "Unicast" : mode === "multicast" ? "Multicast" : "Broadcast"}
         subtitle={
           mode === "unicast"
             ? "The destination field holds one station's address. Everyone receives the frame; only the addressed station keeps it."
-            : "The destination field is all ones. Every station recognises this as 'for everybody' and keeps the frame."
+            : mode === "multicast"
+              ? "The destination is a group address. Only the stations that joined that group keep the frame, and the sender still transmits it just once."
+              : "The destination field is all ones. Every station recognises this as 'for everybody' and keeps the frame."
         }
         actions={
           <Segmented
@@ -703,6 +715,7 @@ function DeliverySection() {
             onChange={setMode}
             options={[
               { value: "unicast", label: "Unicast" },
+              { value: "multicast", label: "Multicast" },
               { value: "broadcast", label: "Broadcast" },
             ]}
           />
@@ -714,13 +727,21 @@ function DeliverySection() {
               <p className="text-2xs font-medium text-ink-3">Destination MAC in the frame header</p>
               <p
                 className="tnum mt-0.5 font-mono text-lg font-semibold"
-                style={{ color: mode === "broadcast" ? "var(--s5-ink)" : "var(--s3-ink)" }}
+                style={{
+                  color:
+                    mode === "broadcast" ? "var(--s5-ink)" : mode === "multicast" ? "var(--s4-ink)" : "var(--s3-ink)",
+                }}
               >
                 {destination}
               </p>
               {mode === "broadcast" && (
                 <p className="mt-1 text-2xs text-ink-3">
-                  All 48 bits set to 1 — the reserved broadcast address.
+                  All 48 bits set to 1: the reserved broadcast address.
+                </p>
+              )}
+              {mode === "multicast" && (
+                <p className="mt-1 text-2xs text-ink-3">
+                  Not any station's own address: the low bit of the first byte marks it as a group address.
                 </p>
               )}
             </div>
@@ -730,7 +751,9 @@ function DeliverySection() {
                 label={
                   mode === "broadcast"
                     ? "A broadcast frame on the bus, kept by all four stations"
-                    : `A unicast frame addressed to ${hosts[target].name}, kept only by that station`
+                    : mode === "multicast"
+                      ? `A multicast frame on the bus, kept by the ${GROUP.length} stations that joined the group`
+                      : `A unicast frame addressed to ${hosts[target].name}, kept only by that station`
                 }
                 animate
                 deps={[mode, target]}
@@ -779,7 +802,7 @@ function DeliverySection() {
 
                   xs.forEach((x, i) => {
                     const arrived = Math.abs(x - xs[0]) <= reach;
-                    const keeps = mode === "broadcast" || i === target;
+                    const keeps = keptBy(i);
                     const colour =
                       i === 0
                         ? palette.series[0]
@@ -825,6 +848,28 @@ function DeliverySection() {
           </div>
 
           <div className="grid content-start gap-4 lg:border-l lg:border-line lg:pl-4">
+            {mode === "multicast" && (
+              <div>
+                <p className="mb-2 text-xs font-medium text-ink-2">Joined the group</p>
+                <div className="grid gap-1">
+                  {hosts.slice(1).map((hst, i) => (
+                    <div
+                      key={hst.name}
+                      className={clsx(
+                        "rounded-lg border px-2.5 py-1.5",
+                        GROUP.includes(i + 1) ? "border-brand-edge bg-brand-wash" : "border-line bg-surface opacity-60",
+                      )}
+                    >
+                      <span className="block text-xs font-medium text-ink">{hst.name}</span>
+                      <span className="block text-2xs text-ink-3">
+                        {GROUP.includes(i + 1) ? "subscribed" : "not in the group"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {mode === "unicast" && (
               <div>
                 <p className="mb-2 text-xs font-medium text-ink-2">Addressed to</p>
@@ -853,15 +898,18 @@ function DeliverySection() {
               <Readout label="Stations that receive it" value={hosts.length - 1} sub="everyone on the medium" />
               <Readout
                 label="Stations that keep it"
-                value={mode === "broadcast" ? hosts.length - 1 : 1}
+                value={kept}
                 tone={mode === "broadcast" ? "warn" : "ok"}
+                sub={mode === "multicast" ? "the ones that joined the group" : undefined}
               />
             </div>
 
             <p className="text-2xs text-ink-3">
               {mode === "broadcast"
-                ? "Broadcasts are how a station finds something it cannot yet name — a DHCP server, or the MAC address behind an IP. Useful, but every broadcast costs every machine on the LAN a little work."
-                : "A switch takes this one step further: because it knows which port each address is on, it does not even send the frame down the other cables. See level 6.5."}
+                ? "Broadcasts are how a station finds something it cannot yet name: a DHCP server, or the MAC address behind an IP. Useful, but every broadcast costs every machine on the LAN a little work."
+                : mode === "multicast"
+                  ? "Multicast is what makes live video to many viewers affordable: one copy on the wire however many are watching, instead of one copy per viewer. In IPv4 the group addresses are class D, 224.0.0.0 to 239.255.255.255."
+                  : "A switch takes this one step further: because it knows which port each address is on, it does not even send the frame down the other cables. See level 6.5."}
             </p>
           </div>
         </div>
@@ -885,7 +933,7 @@ const QUESTIONS: Question[] = [
       { label: "128 bits, as eight groups of hexadecimal digits" },
     ],
     explain:
-      "A MAC address is 48 bits — six bytes. Each byte is written as two hexadecimal digits and the six blocks are separated by colons, giving the familiar form 4A:8F:3C:4F:9E:3D. The 32-bit dotted-decimal form is an IP address, which is a different thing entirely.",
+      "A MAC address is 48 bits, or six bytes. Each byte is written as two hexadecimal digits and the six blocks are separated by colons, giving the familiar form 4A:8F:3C:4F:9E:3D. The 32-bit dotted-decimal form is an IP address, which is a different thing entirely.",
   },
   {
     id: "mac2",
@@ -921,7 +969,7 @@ const QUESTIONS: Question[] = [
       { label: "Each station is given its own frequency" },
     ],
     explain:
-      "Slotted ALOHA still transmits blindly — it adds no listening. It only requires transmissions to begin on a slot boundary, which halves the vulnerable window from two frame times to one and so doubles the peak throughput to 36.8 %.",
+      "Slotted ALOHA still transmits blindly and adds no listening. It only requires transmissions to begin on a slot boundary, which halves the vulnerable window from two frame times to one and so doubles the peak throughput to 36.8 %.",
   },
   {
     id: "mac5",
@@ -945,6 +993,6 @@ const QUESTIONS: Question[] = [
       { label: "It is sent back to the sender" },
     ],
     explain:
-      "All 48 bits set to one is the reserved broadcast address. Every station recognises it as meaning 'for everybody' and processes the frame instead of discarding it — which is how a host reaches a service it cannot yet address, such as a DHCP server.",
+      "All 48 bits set to one is the reserved broadcast address. Every station recognises it as meaning 'for everybody' and processes the frame instead of discarding it, which is how a host reaches a service it cannot yet address, such as a DHCP server.",
   },
 ];

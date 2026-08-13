@@ -6,6 +6,7 @@ import {
   Badge,
   Button,
   Callout,
+  Extra,
   Formula,
   Legend,
   Panel,
@@ -45,7 +46,7 @@ function WhatIsASignal() {
       lead={
         <>
           Data communication means moving data between two devices over a transmission medium. The data
-          itself cannot travel — what travels is a <strong className="font-semibold text-ink">signal</strong>:
+          itself cannot travel. What travels is a <strong className="font-semibold text-ink">signal</strong>:
           an electrical voltage, a current, or a light or radio wave whose value changes over time. Everything
           in this competency is about shaping that changing value so the far end can work out what was sent.
         </>
@@ -53,8 +54,8 @@ function WhatIsASignal() {
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.15fr_1fr]">
         <Panel
-          title="The communication model"
-          subtitle="Three parts, and the only one that carries anything physical is the middle one."
+          title="The five components of communication"
+          subtitle="Take any one away and no communication happens at all."
         >
           <ModelDiagram />
         </Panel>
@@ -64,7 +65,7 @@ function WhatIsASignal() {
             <div>
               <div className="mb-1.5 flex items-center gap-2">
                 <Badge tone="brand">Analog</Badge>
-                <span className="text-xs text-ink-2">continuous — takes every value in between</span>
+                <span className="text-xs text-ink-2">continuous: takes every value in between</span>
               </div>
               <Scope height={72}>
                 <ScopeCanvas
@@ -85,7 +86,7 @@ function WhatIsASignal() {
             <div>
               <div className="mb-1.5 flex items-center gap-2">
                 <Badge>Digital</Badge>
-                <span className="text-xs text-ink-2">discrete — only the agreed levels, nothing between</span>
+                <span className="text-xs text-ink-2">discrete: only the agreed levels, nothing between</span>
               </div>
               <Scope height={72}>
                 <ScopeCanvas
@@ -112,37 +113,68 @@ function WhatIsASignal() {
   );
 }
 
+const COMPONENTS = [
+  { label: "Sender", sub: "the device that starts it", detail: "The device that has something to say: a computer, a phone, a sensor." },
+  { label: "Medium", sub: "the path it travels", detail: "The physical path the signal takes: a cable, a fibre, or the air itself." },
+  { label: "Receiver", sub: "the device it is for", detail: "The device the message is meant for, which has to turn the signal back into data." },
+];
+
 function ModelDiagram() {
-  const boxes = [
-    { label: "Source", sub: "prepares the data" },
-    { label: "Transmission system", sub: "carries the signal" },
-    { label: "Destination", sub: "hands data to the app" },
-  ];
   return (
-    <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-      {boxes.map((b, i) => (
-        <div key={b.label} className="flex min-w-0 flex-1 items-center gap-2">
-          <div
-            className={`min-w-0 flex-1 rounded-lg border px-3 py-2.5 text-center ${
-              i === 1 ? "border-brand-edge bg-brand-wash" : "border-line bg-surface-2"
-            }`}
-          >
-            <p className="truncate text-xs font-semibold text-ink">{b.label}</p>
-            <p className="mt-0.5 text-2xs text-ink-3">{b.sub}</p>
+    <div>
+      <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+        {COMPONENTS.map((b, i) => (
+          <div key={b.label} className="flex min-w-0 flex-1 items-center gap-2">
+            <div
+              className={`min-w-0 flex-1 rounded-lg border px-3 py-2.5 text-center ${
+                i === 1 ? "border-brand-edge bg-brand-wash" : "border-line bg-surface-2"
+              }`}
+            >
+              <p className="truncate text-xs font-semibold text-ink">{b.label}</p>
+              <p className="mt-0.5 text-2xs text-ink-3">{b.sub}</p>
+            </div>
+            {i < COMPONENTS.length - 1 && (
+              <svg width="18" height="10" viewBox="0 0 18 10" fill="none" aria-hidden className="hidden shrink-0 sm:block">
+                <path d="M0 5h15m0 0l-4-3.5M15 5l-4 3.5" stroke="var(--ink-3)" strokeWidth="1.3" strokeLinecap="round" />
+              </svg>
+            )}
           </div>
-          {i < boxes.length - 1 && (
-            <svg width="18" height="10" viewBox="0 0 18 10" fill="none" aria-hidden className="hidden shrink-0 sm:block">
-              <path d="M0 5h15m0 0l-4-3.5M15 5l-4 3.5" stroke="var(--ink-3)" strokeWidth="1.3" strokeLinecap="round" />
-            </svg>
-          )}
+        ))}
+      </div>
+
+      {/* The other two components are not boxes on the diagram: one travels
+          along it, and the other is the agreement that makes it mean anything. */}
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <div className="rounded-lg border border-dashed border-line-strong px-3 py-2">
+          <p className="text-xs font-semibold text-ink">Message</p>
+          <p className="mt-0.5 text-2xs text-ink-3">
+            The data itself: text, a number, a picture, a sound. It is what travels, not what sends.
+          </p>
         </div>
-      ))}
+        <div className="rounded-lg border border-dashed border-line-strong px-3 py-2">
+          <p className="text-xs font-semibold text-ink">Protocol</p>
+          <p className="mt-0.5 text-2xs text-ink-3">
+            The rules both ends agreed on beforehand. Without it the signal arrives and means nothing.
+          </p>
+        </div>
+      </div>
+
+      <ul className="mt-3 grid gap-1">
+        {COMPONENTS.map((c) => (
+          <li key={c.label} className="flex gap-2 text-xs text-ink-2">
+            <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-line-strong" />
+            <span className="max-w-[56ch]">
+              <span className="font-medium text-ink">{c.label}</span>: {c.detail}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 /* ================================================================== *
- * 2. Wave lab — the flagship interactive
+ * 2. Wave lab: the flagship interactive
  * ================================================================== */
 
 type Axis = "time" | "distance";
@@ -354,7 +386,7 @@ function WaveLab() {
         <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div>
             <p className="mb-1.5 text-xs font-medium text-ink-2">
-              Medium — sets the propagation speed v, and so the wavelength
+              Medium: sets the propagation speed v, and so the wavelength
             </p>
             <div className="flex flex-wrap gap-1.5">
               {MEDIA_OPTIONS.map((m) => (
@@ -384,14 +416,14 @@ function WaveLab() {
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
         <Callout kind="exam" title="The distinction examiners look for">
-          <strong>Period</strong> is measured along a <em>time</em> axis at one point on the wire — it is how
+          <strong>Period</strong> is measured along a <em>time</em> axis at one point on the wire, and it is how
           long one cycle takes. <strong>Wavelength</strong> is measured along a <em>distance</em> axis at one
-          instant — it is how far one cycle stretches down the cable. Switch the lab between the two axes and
+          instant, and it is how far one cycle stretches down the cable. Switch the lab between the two axes and
           notice that the picture is identical; only the horizontal units change.
         </Callout>
         <Callout kind="warn" title="Phase changes nothing about the shape">
           Sliding phase does not make the wave taller, faster or slower. It only decides where in its cycle the
-          wave is when you start looking. That is exactly why phase can be used on its own to carry data —
+          wave is when you start looking. That is exactly why phase can be used on its own to carry data:
           see <em>Phase Shift Keying</em> in level 6.3.
         </Callout>
       </div>
@@ -411,14 +443,19 @@ function PhaseSection() {
     <Section
       id="phase"
       title="Phase, seen as rotation"
-      lead="A sine wave is the shadow of a point going round a circle at a steady rate. Phase is simply how far apart two such points are on that circle — so a 180° difference means one wave is at a crest exactly when the other is at a trough."
+      lead="A sine wave is the shadow of a point going round a circle at a steady rate. Phase is simply how far apart two such points are on that circle, so a 180° difference means one wave is at a crest exactly when the other is at a trough."
     >
       <Panel
         title="Two waves, one phase difference"
         actions={
-          <Button size="sm" onClick={() => setRunning((r) => !r)}>
-            {running ? "Pause" : "Play"}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Circular motion → waves is outside the syllabus, but it is the
+                shortest route to understanding what phase actually is. */}
+            <Extra>the rotating-circle picture</Extra>
+            <Button size="sm" onClick={() => setRunning((r) => !r)}>
+              {running ? "Pause" : "Play"}
+            </Button>
+          </div>
         }
       >
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[190px_minmax(0,1fr)]">
@@ -547,7 +584,7 @@ function PhaseSection() {
                 ? "In phase. The two waves are identical and reinforce each other completely."
                 : delta === 180
                   ? "Exactly out of phase. Add these two together and they cancel to nothing."
-                  : `B is ${delta}° behind A — that is ${(delta / 360).toFixed(3).replace(/0+$/, "")} of a full cycle.`}
+                  : `B is ${delta}° behind A, which is ${(delta / 360).toFixed(3).replace(/0+$/, "")} of a full cycle.`}
             </p>
           </div>
         </div>
@@ -566,7 +603,7 @@ function AnalogVsDigital() {
   const rows = [
     ["Values it can take", "Any value in a continuous range", "Only the agreed discrete levels"],
     ["Natural examples", "Sound, light, temperature, human voice", "Data inside a computer"],
-    ["Effect of small noise", "Changes the value — the error stays", "Ignored, as long as the level is still identifiable"],
+    ["Effect of small noise", "Changes the value, and the error stays", "Ignored, as long as the level is still identifiable"],
     ["Drawn as", "A smooth curve", "A square, stepped waveform"],
   ];
 
@@ -574,7 +611,7 @@ function AnalogVsDigital() {
     <Section
       id="compare"
       title="Analog and digital, side by side"
-      lead="Both are signals; the difference is how many values they are allowed to take. Raise the number of levels below and watch the digital version creep closer to the analog original — this is exactly what happens inside a modem when it digitises a voice."
+      lead="Both are signals; the difference is how many values they are allowed to take. Raise the number of levels below and watch the digital version creep closer to the analog original. This is exactly what happens inside a modem when it digitises a voice."
     >
       <Panel
         title="One source, two representations"
@@ -683,7 +720,7 @@ function PropagationSection() {
     <Section
       id="speed"
       title="Propagation speed ties the properties together"
-      lead="A signal does not arrive instantly. It travels through the medium at a fixed speed, and that speed depends on the medium — not on how loud or how fast the signal is. One equation links the three quantities, and every numerical problem in this level is a rearrangement of it."
+      lead="A signal does not arrive instantly. It travels through the medium at a fixed speed, and that speed depends on the medium, not on how loud or how fast the signal is. One equation links the three quantities, and every numerical problem in this level is a rearrangement of it."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_1.1fr]">
         <div className="grid content-start gap-4">
@@ -700,7 +737,7 @@ function PropagationSection() {
             <ul className="divide-y divide-[var(--line)]">
               {[
                 ["Vacuum / free space", "3.0 × 10⁸ m/s", "the speed of light, c"],
-                ["Optical fibre", "≈ 2.0 × 10⁸ m/s", "about 0.67 c — glass slows light"],
+                ["Optical fibre", "≈ 2.0 × 10⁸ m/s", "about 0.67 c, because glass slows light"],
                 ["Copper cable", "≈ 2.0 × 10⁸ m/s", "about 0.66 c"],
                 ["Sound in air", "343 m/s", "roughly a million times slower"],
               ].map(([m, v, n]) => (
@@ -898,7 +935,7 @@ const QUESTIONS: Question[] = [
       { label: "The phase" },
     ],
     explain:
-      "On a time axis, crest to crest is one complete cycle, which takes one period T. Wavelength is the same measurement made on a distance axis. Both describe one cycle — the axis tells you which name to use.",
+      "On a time axis, crest to crest is one complete cycle, which takes one period T. Wavelength is the same measurement made on a distance axis. Both describe one cycle, and the axis tells you which name to use.",
   },
   {
     id: "s2",
@@ -920,7 +957,7 @@ const QUESTIONS: Question[] = [
       { label: "20 m" },
       { label: "2 × 10¹⁶ m" },
     ],
-    explain: "λ = v / f = (2 × 10⁸) / (1 × 10⁸) = 2 m. Watch the powers of ten — they cancel here.",
+    explain: "λ = v / f = (2 × 10⁸) / (1 × 10⁸) = 2 m. Watch the powers of ten, which cancel here.",
   },
   {
     id: "s4",
@@ -956,6 +993,6 @@ const QUESTIONS: Question[] = [
       { label: "Propagation speed", correct: true },
     ],
     explain:
-      "The transmitter chooses amplitude, frequency and phase. How fast the signal then travels is a property of the medium — about 2 × 10⁸ m/s in copper and fibre, close to 3 × 10⁸ m/s in free space.",
+      "The transmitter chooses amplitude, frequency and phase. How fast the signal then travels is a property of the medium: about 2 × 10⁸ m/s in copper and fibre, close to 3 × 10⁸ m/s in free space.",
   },
 ];

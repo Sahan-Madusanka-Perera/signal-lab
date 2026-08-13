@@ -3,7 +3,7 @@ import { LESSONS } from "./curriculum";
 
 /**
  * Progress lives in localStorage only. There is no account, so a student can
- * open the app on a lab machine and lose nothing they care about — and the
+ * open the app on a lab machine and lose nothing they care about, and the
  * "reset" affordance is honest about what it clears.
  */
 

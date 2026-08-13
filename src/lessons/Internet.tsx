@@ -20,8 +20,11 @@ import {
 import { TAU } from "../lib/signal";
 import {
   DHCP_STEPS,
+  IP_ASSIGNMENT,
   IP_CLASSES,
+  NETWORK_SCALES,
   PRIVATE_RANGES,
+  VPN_FACTS,
   classOf,
   intToIp,
   ipBits,
@@ -40,6 +43,7 @@ export function InternetLesson() {
   return (
     <>
       <GatewaySection />
+      <ScaleSection />
       <AddressSection />
       <ClassSection />
       <SubnetSection />
@@ -62,7 +66,7 @@ function GatewaySection() {
     <Section
       id="gateway"
       title="A LAN can only reach its own members"
-      lead="A MAC address identifies an interface on one local network and nothing beyond it. Put an Ethernet LAN next to a Wi-Fi LAN and neither has any way to name a machine on the other. Joining them needs a device sitting in both — a gateway — and an addressing scheme that works the same way on either side."
+      lead="A MAC address identifies an interface on one local network and nothing beyond it. Put an Ethernet LAN next to a Wi-Fi LAN and neither has any way to name a machine on the other. Joining them needs a device sitting in both (a gateway) and an addressing scheme that works the same way on either side."
     >
       <Panel
         title="Two LANs, one gateway"
@@ -182,13 +186,137 @@ function GatewaySection() {
             </ul>
           </div>
           <Callout kind="exam" title="Why MAC addresses are not enough">
-            MAC addresses have no structure — nothing in <span className="tnum font-mono">B8:27:EB:1A:2C:9F</span>{" "}
+            MAC addresses have no structure. Nothing in <span className="tnum font-mono">B8:27:EB:1A:2C:9F</span>{" "}
             tells you where in the world that card is. A router would need an entry for every interface on Earth.
             IP addresses are <strong>hierarchical</strong>: the front of the address names the network, so a router
             can forward on that alone and needs to know only about networks, not machines.
           </Callout>
         </div>
       </Panel>
+    </Section>
+  );
+}
+
+/* ================================================================== *
+ * 1b. Networks by size
+ * ================================================================== */
+
+function ScaleSection() {
+  const [pick, setPick] = useState("LAN");
+  const scale = NETWORK_SCALES.find((s) => s.abbr === pick) ?? NETWORK_SCALES[1];
+
+  return (
+    <Section
+      id="scale"
+      title="Networks come in sizes, and the name follows the size"
+      lead="Once networks can be joined to other networks there is no longer one kind of network. The names are simply labels for how much ground a network covers, and usually for who owns it. They are not different technologies; a WAN is built from the same frames and packets as the LAN in your house."
+    >
+      <Panel title="From a pair of earphones to the whole Internet" subtitle="Select a size to see what it covers.">
+        <Scope height={168}>
+          <ScopeCanvas
+            label={`The five network sizes drawn to scale: ${NETWORK_SCALES.map((s) => `${s.abbr}, ${s.reach}`).join("; ")}`}
+            deps={[pick]}
+            bounds={{ x0: 0, x1: 1, y0: 0, y1: 1 }}
+            insets={{ left: 0, right: 0, top: 0, bottom: 0 }}
+            draw={({ plot, ctx, palette, w, h }) => {
+              const narrow = w < 480;
+              const gutter = narrow ? 40 : 52;
+              const x0 = gutter;
+              // Each bar's length is the ground that size of network covers. The
+              // smallest is a tenth of the largest, so the ladder is the point.
+              const full = w - gutter - (narrow ? 96 : 150);
+              const rowH = (h - 40) / NETWORK_SCALES.length;
+
+              NETWORK_SCALES.forEach((s, i) => {
+                const on = s.abbr === pick;
+                const colour = palette.series[s.series];
+                const y = 14 + (i + 0.5) * rowH;
+                const bw = Math.max(10, s.weight * full);
+
+                ctx.save();
+                ctx.globalAlpha = on ? 1 : 0.4;
+                if (on && palette.isDark) {
+                  ctx.shadowColor = colour;
+                  ctx.shadowBlur = 12;
+                }
+                ctx.fillStyle = colour;
+                ctx.beginPath();
+                ctx.roundRect(x0, y - 7, bw, 14, 4);
+                ctx.fill();
+                ctx.restore();
+
+                plot.text(x0 - 8, y, s.abbr, colour, {
+                  size: on ? 11 : 10,
+                  weight: 700,
+                  align: "right",
+                  baseline: "middle",
+                });
+                plot.text(x0 + bw + 8, y, s.reach, on ? palette.inkStrong : palette.inkFaint, {
+                  size: 9,
+                  weight: on ? 700 : 500,
+                  baseline: "middle",
+                });
+              });
+
+              plot.text(x0, h - 15, "each bar is the ground that size of network covers", palette.inkFaint, {
+                size: 9,
+              });
+            }}
+          />
+        </Scope>
+
+        <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line pt-4">
+          {NETWORK_SCALES.map((s) => (
+            <button
+              key={s.abbr}
+              type="button"
+              onClick={() => setPick(s.abbr)}
+              aria-pressed={pick === s.abbr}
+              className={clsx(
+                "rounded-lg border px-3 py-1.5 text-sm font-medium transition-all duration-150",
+                pick === s.abbr ? "shadow-sm" : "border-line bg-surface text-ink-2 hover:bg-surface-2",
+              )}
+              style={
+                pick === s.abbr
+                  ? {
+                      borderColor: `var(--s${s.series + 1})`,
+                      background: `color-mix(in oklab, var(--s${s.series + 1}) 10%, transparent)`,
+                      color: `var(--s${s.series + 1}-ink)`,
+                    }
+                  : undefined
+              }
+            >
+              {s.abbr}
+            </button>
+          ))}
+        </div>
+
+        <div
+          key={scale.abbr}
+          className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-3"
+          style={{ animation: "rise var(--dur) var(--ease-out-quart)" }}
+        >
+          <div className="min-w-0">
+            <h4 className="text-sm font-semibold text-ink">{scale.name}</h4>
+            <p className="mt-1 max-w-[40ch] text-sm text-ink-2">{scale.example}</p>
+          </div>
+          <div className="min-w-0">
+            <p className="text-2xs font-medium tracking-wide text-ink-3">Reach</p>
+            <p className="mt-0.5 text-sm font-medium text-ink">{scale.reach}</p>
+            <p className="mt-0.5 text-2xs text-ink-3">{scale.span}</p>
+          </div>
+          <div className="min-w-0">
+            <p className="text-2xs font-medium tracking-wide text-ink-3">Owned by</p>
+            <p className="mt-0.5 max-w-[34ch] text-sm font-medium text-ink">{scale.owner}</p>
+          </div>
+        </div>
+      </Panel>
+
+      <Callout kind="exam" title="The three that are asked for most">
+        A <strong>LAN</strong> covers one site and is owned by one organisation. A <strong>MAN</strong> spans a
+        city and usually involves a service provider. A <strong>WAN</strong> covers any distance, is made of many
+        organisations' networks joined together, and the Internet is the largest example of one.
+      </Callout>
     </Section>
   );
 }
@@ -212,7 +340,7 @@ function AddressSection() {
     <Section
       id="address"
       title="Thirty-two bits, written to be readable"
-      lead="An IPv4 address is a single 32-bit number. Writing it as thirty-two ones and zeros is unusable for humans, so it is split into four groups of eight bits — octets — and each is written as a decimal number from 0 to 255, separated by dots. Move any octet below and watch the binary follow."
+      lead="An IPv4 address is a single 32-bit number. Writing it as thirty-two ones and zeros is unusable for humans, so it is split into four groups of eight bits, called octets, and each is written as a decimal number from 0 to 255, separated by dots. Move any octet below and watch the binary follow."
     >
       <Panel title="Dotted decimal notation" subtitle="The same number, three ways.">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-4">
@@ -281,7 +409,7 @@ function AddressSection() {
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="How many addresses is 32 bits?">
-          <Formula note="Just over four billion — which sounded limitless in 1981 and does not now.">
+          <Formula note="Just over four billion, which sounded limitless in 1981 and does not now.">
             2³² = 4 294 967 296
           </Formula>
           <p className="mt-3 max-w-[62ch] text-sm text-ink-2">
@@ -299,7 +427,7 @@ function AddressSection() {
 
         <Callout kind="warn" title="An octet stops at 255">
           Eight bits can count from 00000000 to 11111111, which is 0 to 255. An address written with any number
-          above 255 in it — 192.300.1.1, say — is not a valid IPv4 address at all. This is a favourite exam trap.
+          above 255 in it, such as 192.300.1.1, is not a valid IPv4 address at all. This is a favourite exam trap.
         </Callout>
       </div>
     </Section>
@@ -320,7 +448,7 @@ function ClassSection() {
     <Section
       id="classes"
       title="The first octet decides the class"
-      lead="Before subnetting existed, the split between the network part and the host part of an address was fixed by the address itself. You can read the class straight off the leading bits of the first octet — and that is still how the syllabus asks you to identify one."
+      lead="Before subnetting existed, the split between the network part and the host part of an address was fixed by the address itself. You can read the class straight off the leading bits of the first octet, and that is still how the syllabus asks you to identify one."
     >
       <Panel title="Class identifier" subtitle="Change the first octet and watch the class change with it.">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
@@ -412,7 +540,7 @@ function ClassSection() {
               tone={cls ? "brand" : "warn"}
               sub={
                 isLoopback(value)
-                  ? "127.x.x.x is loopback — this machine"
+                  ? "127.x.x.x is loopback: this machine"
                   : first === 0
                     ? "0.x.x.x is reserved"
                     : cls
@@ -535,10 +663,10 @@ function SubnetSection() {
             {sub && (
               <div className="mt-4 grid gap-2">
                 {[
-                  ["Network address", intToIp(sub.network), "all host bits set to 0 — names the network itself"],
+                  ["Network address", intToIp(sub.network), "all host bits set to 0, naming the network itself"],
                   ["First usable host", sub.firstHost !== null ? intToIp(sub.firstHost) : "—", "the first address you can give a machine"],
                   ["Last usable host", sub.lastHost !== null ? intToIp(sub.lastHost) : "—", "the last one"],
-                  ["Broadcast address", intToIp(sub.broadcast), "all host bits set to 1 — reaches every host here"],
+                  ["Broadcast address", intToIp(sub.broadcast), "all host bits set to 1, reaching every host here"],
                   ["Subnet mask", intToIp(sub.mask), `written /${prefix} in CIDR notation`],
                 ].map(([k, v, note]) => (
                   <div
@@ -599,7 +727,7 @@ function SubnetSection() {
         Take <span className="tnum font-mono">192.168.10.130/26</span>. A /26 leaves 6 host bits, so each subnet
         holds 2⁶ = 64 addresses. The subnets therefore start at .0, .64, .128 and .192. The address .130 falls in
         the block beginning at <span className="tnum font-mono">.128</span>, so the network address is
-        192.168.10.128, the broadcast is 192.168.10.191, and the usable hosts run from .129 to .190 — 62 of them.
+        192.168.10.128, the broadcast is 192.168.10.191, and the usable hosts run from .129 to .190, which is 62 of them.
       </Callout>
     </Section>
   );
@@ -757,7 +885,41 @@ function SplitSection() {
             </p>
           </Panel>
 
-          <Callout kind="note" title="CIDR — dropping the classes entirely">
+          {/* min-w-0: the table inside sets a 400px floor, which would otherwise
+              become this grid column's minimum and push the page sideways. */}
+          <Panel title="Fixed length or variable length" className="min-w-0" bodyClassName="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[400px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-line">
+                    <th className="px-4 py-2.5 text-2xs font-semibold tracking-wide text-ink-3">FLSM</th>
+                    <th className="px-4 py-2.5 text-2xs font-semibold tracking-wide text-ink-3">VLSM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ["Every subnet is the same size, with the same mask", "Each subnet is only as large as it needs to be"],
+                    ["One calculation covers the whole block", "A separate calculation for each department"],
+                    ["Simple to work out and to document", "Harder to plan, and easy to overlap by mistake"],
+                    ["Wastes addresses whenever the groups differ in size", "Wastes very little, which is why it is used in practice"],
+                  ].map(([a, b]) => (
+                    <tr key={a} className="border-b border-line last:border-0">
+                      <td className="max-w-[34ch] px-4 py-2.5 align-top text-ink-2">{a}</td>
+                      <td className="max-w-[34ch] px-4 py-2.5 align-top text-ink-2">{b}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="border-t border-line px-4 py-3 text-2xs text-ink-3">
+              The splitter above performs <strong className="font-semibold text-ink">FLSM</strong>: it cuts the
+              block into equal pieces. Sizing each piece separately (a /26 for the 50-machine lab and a /30 for
+              the two-address link beside it) is{" "}
+              <strong className="font-semibold text-ink">VLSM</strong>, variable length subnet masking.
+            </p>
+          </Panel>
+
+          <Callout kind="note" title="CIDR: dropping the classes entirely">
             Classful addressing wasted enormous amounts of space: an organisation needing 300 addresses had to be
             given a whole class B block of 65 534. <strong>Classless Inter-Domain Routing</strong> abandons the
             fixed class boundaries and lets a block of any prefix length be allocated, written as{" "}
@@ -783,7 +945,7 @@ function PrivateSection() {
     <Section
       id="private"
       title="Private addresses, and getting one automatically"
-      lead="Three blocks of the address space are reserved for use inside private networks. They are not routed on the Internet, so the same 192.168.1.5 can exist in millions of homes at once — which is what makes four billion addresses stretch as far as it has."
+      lead="Three blocks of the address space are reserved for use inside private networks. They are not routed on the Internet, so the same 192.168.1.5 can exist in millions of homes at once, which is what makes four billion addresses stretch as far as it has."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[1.1fr_1fr]">
         <Panel title="The three private ranges" bodyClassName="p-0">
@@ -836,7 +998,7 @@ function PrivateSection() {
         </Panel>
 
         <Panel
-          title="DHCP — four messages to get an address"
+          title="DHCP: four messages to get an address"
           subtitle={DHCP_STEPS[step].detail}
           actions={
             <div className="flex gap-1.5">
@@ -948,10 +1110,90 @@ function PrivateSection() {
 
           <p className="mt-3 max-w-[60ch] text-2xs text-ink-3">
             Notice the first three messages are broadcast. The client has no address yet, so it cannot be spoken
-            to directly — the only way to reach it is to address the whole LAN.
+            to directly, and the only way to reach it is to address the whole LAN.
           </p>
         </Panel>
       </div>
+
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
+        {IP_ASSIGNMENT.map((a) => (
+          <Panel key={a.kind} title={`${a.kind} addressing`} subtitle={a.how}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <p className="text-2xs font-semibold" style={{ color: "var(--ok)" }}>
+                  In its favour
+                </p>
+                <ul className="mt-1 grid gap-1">
+                  {a.good.map((g) => (
+                    <li key={g} className="max-w-[32ch] text-2xs text-ink-2">
+                      {g}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-2xs font-semibold" style={{ color: "var(--bad)" }}>
+                  Against it
+                </p>
+                <ul className="mt-1 grid gap-1">
+                  {a.bad.map((b) => (
+                    <li key={b} className="max-w-[32ch] text-2xs text-ink-2">
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="mt-3 border-t border-line pt-2.5 text-2xs text-ink-3">
+              <span className="font-semibold">Used for: </span>
+              {a.used}
+            </p>
+          </Panel>
+        ))}
+      </div>
+
+      <Panel
+        title="A private network stretched over a public one"
+        subtitle="A VPN is what happens when the two ends of a private network are in different cities."
+      >
+        <p className="max-w-[74ch] text-sm text-ink-2">{VPN_FACTS.what}</p>
+
+        <ol className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-4">
+          {VPN_FACTS.how.map((s, i) => (
+            <li key={s.step} className="rounded-lg border border-line bg-surface-2 px-3 py-2.5">
+              <span
+                className="tnum inline-block rounded-md px-1.5 py-0.5 font-mono text-2xs font-semibold"
+                style={{
+                  background: `color-mix(in oklab, var(--s${i + 1}) 10%, transparent)`,
+                  color: `var(--s${i + 1}-ink)`,
+                }}
+              >
+                {i + 1}
+              </span>
+              <p className="mt-1.5 text-sm font-medium text-ink">{s.step}</p>
+              <p className="mt-0.5 max-w-[30ch] text-2xs text-ink-3">{s.detail}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 md:grid-cols-2">
+          <div>
+            <p className="text-2xs font-semibold text-ink-3">What it buys</p>
+            <ul className="mt-1.5 grid gap-1.5">
+              {VPN_FACTS.why.map((t) => (
+                <li key={t} className="flex gap-2 text-sm text-ink-2">
+                  <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
+                  <span className="max-w-[46ch]">{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="md:border-l md:border-line md:pl-4">
+            <p className="text-2xs font-semibold text-ink-3">Why "virtual"</p>
+            <p className="mt-1 max-w-[46ch] text-sm text-ink-2">{VPN_FACTS.limit}</p>
+          </div>
+        </div>
+      </Panel>
     </Section>
   );
 }
@@ -991,7 +1233,7 @@ function RoutingSection() {
     <Section
       id="routing"
       title="Packets find their own way, and nobody promises they arrive"
-      lead="A message is not sent as one lump. It is chopped into packets, each carrying the destination address in its own header, and each forwarded independently. Routers pass a packet on towards the destination using their routing tables — and if a link fails, later packets simply take a different path."
+      lead="A message is not sent as one lump. It is chopped into packets, each carrying the destination address in its own header, and each forwarded independently. Routers pass a packet on towards the destination using their routing tables, and if a link fails, later packets simply take a different path."
     >
       <Panel
         title="Packet switching"
@@ -1109,7 +1351,7 @@ function RoutingSection() {
                 ctx.restore();
               }
 
-              plot.text(w / 2, h - 16, "each packet is forwarded on its own — they may not even take the same route", palette.inkFaint, {
+              plot.text(w / 2, h - 16, "each packet is forwarded on its own, and may not even take the same route", palette.inkFaint, {
                 size: 10,
                 align: "center",
               });
@@ -1147,7 +1389,7 @@ function RoutingSection() {
           <ul className="grid gap-2 text-sm text-ink-2">
             {[
               "Keep a routing table: a list of destination networks and which neighbour to send them towards.",
-              "Read only the destination network part of the address — not the host part, and not the payload.",
+              "Read only the destination network part of the address, not the host part, and not the payload.",
               "Exchange tables with neighbouring routers periodically, so the tables stay current when a link fails.",
               "Forward each packet independently. A router has no memory of the packets before it.",
             ].map((t) => (
@@ -1162,7 +1404,7 @@ function RoutingSection() {
         <Callout kind="exam" title="Best effort delivery">
           IP promises to <em>try</em>. It does not promise that a packet arrives, that packets arrive in the
           order they were sent, or that they all take the same route. A router whose queue is full just discards
-          what it cannot hold. If an application needs reliability, something above IP has to provide it — which
+          what it cannot hold. If an application needs reliability, something above IP has to provide it, which
           is exactly what TCP does in the next level.
         </Callout>
       </div>
@@ -1185,7 +1427,7 @@ const QUESTIONS: Question[] = [
       { label: "MAC addresses only work on wireless networks" },
     ],
     explain:
-      "A MAC address is flat — it identifies an interface but says nothing about where it is. IP addresses are hierarchical: the leading bits name the network, so a router can forward on that alone and needs to know about networks rather than individual machines.",
+      "A MAC address is flat: it identifies an interface but says nothing about where it is. IP addresses are hierarchical: the leading bits name the network, so a router can forward on that alone and needs to know about networks rather than individual machines.",
   },
   {
     id: "ip2",
@@ -1197,7 +1439,7 @@ const QUESTIONS: Question[] = [
       { label: "Class D, no mask" },
     ],
     explain:
-      "The first octet is 150, which falls in the range 128–191, so it is class B. Class B has a default mask of 16 bits — /16, or 255.255.0.0 — leaving 16 host bits and therefore 65 534 hosts per network.",
+      "The first octet is 150, which falls in the range 128–191, so it is class B. Class B has a default mask of 16 bits (/16, or 255.255.0.0), leaving 16 host bits and therefore 65 534 hosts per network.",
   },
   {
     id: "ip3",
@@ -1209,7 +1451,7 @@ const QUESTIONS: Question[] = [
       { label: "64" },
     ],
     explain:
-      "A /26 leaves 32 − 26 = 6 host bits, giving 2⁶ = 64 addresses. Two of those can never be given to a host — the network address (all host bits 0) and the broadcast address (all host bits 1) — so 64 − 2 = 62 are usable.",
+      "A /26 leaves 32 − 26 = 6 host bits, giving 2⁶ = 64 addresses. Two of those can never be given to a host: the network address (all host bits 0) and the broadcast address (all host bits 1). So 64 − 2 = 62 are usable.",
   },
   {
     id: "ip4",
@@ -1270,5 +1512,29 @@ const QUESTIONS: Question[] = [
     ],
     explain:
       "IP makes no promises. A router with a full queue discards packets, packets may take different routes and so arrive out of order, and nothing at the IP layer notices. Any application that needs reliability gets it from TCP, one layer up.",
+  },
+  {
+    id: "ip9",
+    prompt: "A city council links the networks in its libraries, offices and schools right across one city. What kind of network is that?",
+    options: [
+      { label: "A LAN" },
+      { label: "A MAN", correct: true },
+      { label: "A PAN" },
+      { label: "A WAN" },
+    ],
+    explain:
+      "A Metropolitan Area Network spans a city, larger than a LAN, which covers a single site, and smaller than a WAN, which crosses regions and countries. It usually involves a service provider, because the links between the sites cross public ground.",
+  },
+  {
+    id: "ip10",
+    prompt: "A branch office reaches head office's internal servers over the Internet as though it were on the same network. What makes that possible?",
+    options: [
+      { label: "A VPN, which tunnels the private traffic across the public Internet inside an encrypted wrapper", correct: true },
+      { label: "A gateway, which converts one private network into another" },
+      { label: "DHCP, which gives both offices the same address range" },
+      { label: "A subnet mask wide enough to cover both sites" },
+    ],
+    explain:
+      "A Virtual Private Network puts the private packet inside an ordinary public one, encrypts it, and sends that across the Internet like any other traffic. The far end decrypts it and delivers the inner packet on its own network. It is virtual because no private line was rented. The traffic still shares the same Internet as everything else.",
   },
 ];

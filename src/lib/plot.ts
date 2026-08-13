@@ -179,7 +179,7 @@ export class Plot {
 
   /**
    * A continuous trace from a sampled array spanning the full x range.
-   * `glow` adds a soft halo — the one place a shadow earns its keep, because it
+   * `glow` adds a soft halo, the one place a shadow earns its keep, because it
    * is what makes a phosphor trace read as luminous rather than as a hairline.
    */
   trace(
@@ -224,7 +224,7 @@ export class Plot {
     ctx.restore();
   }
 
-  /** Filled area between a trace and a baseline — used sparingly, for envelopes. */
+  /** Filled area between a trace and a baseline, used sparingly, for envelopes. */
   area(data: ArrayLike<number>, color: string, baseline: number, alpha = 0.12) {
     const { ctx } = this;
     const n = data.length;
@@ -316,7 +316,7 @@ export class Plot {
     ctx.restore();
   }
 
-  /** Shade a band of the x axis — one bit cell, one symbol period. */
+  /** Shade a band of the x axis: one bit cell, one symbol period. */
   band(xa: number, xb: number, color: string, alpha = 0.09) {
     const { ctx } = this;
     ctx.save();
@@ -343,7 +343,7 @@ export class Plot {
     ctx.restore();
   }
 
-  /** Stem from the baseline to a sample — the PCM picture. */
+  /** Stem from the baseline to a sample: the PCM picture. */
   stem(x: number, y: number, color: string, baseline = 0, width = 1.5) {
     const { ctx } = this;
     ctx.save();

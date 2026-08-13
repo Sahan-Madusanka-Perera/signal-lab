@@ -4,10 +4,10 @@ import { Section } from "../components/LessonPage";
 import { ScopeCanvas } from "../components/ScopeCanvas";
 import { Quiz, type Question } from "../components/Quiz";
 import {
-  Badge,
   BitTrain,
   Button,
   Callout,
+  Extra,
   Formula,
   Legend,
   Panel,
@@ -55,12 +55,12 @@ export function EncodingLesson() {
 }
 
 /* ------------------------------------------------------------------ *
- * Lane helper — several aligned waveforms share one canvas so the bit
+ * Lane helper: several aligned waveforms share one canvas so the bit
  * boundaries can never drift apart between rows.
  * ------------------------------------------------------------------ */
 
 /**
- * `series` is an index into the palette, never a CSS string — canvas cannot
+ * `series` is an index into the palette, never a CSS string, because canvas cannot
  * resolve `var(--s1)`, and a colour it cannot parse silently paints black.
  */
 type Lane = { label: string; series: number; segs: Segment[]; dim?: boolean };
@@ -122,7 +122,7 @@ function ProtocolSection() {
     <Section
       id="protocol"
       title="Encoding is an agreement, not a law of physics"
-      lead="A wire carries voltage. It has no idea what a 1 is. Before any data can cross it, both ends must agree on which signal element stands for which bit — and that agreement is what we call a protocol. Flip the agreement below and watch the same seven bits produce the opposite waveform."
+      lead="A wire carries voltage. It has no idea what a 1 is. Before any data can cross it, both ends must agree on which signal element stands for which bit, and that agreement is what we call a protocol. Flip the agreement below and watch the same seven bits produce the opposite waveform."
     >
       <Panel
         title="The same bits, two agreements"
@@ -159,13 +159,13 @@ function ProtocolSection() {
         <p className="mt-3 max-w-[70ch] text-sm text-ink-2">
           Both waveforms are equally valid. A receiver using the wrong agreement reads{" "}
           <span className="tnum font-mono text-ink">{bits.map((b) => 1 - b).join("")}</span> instead of{" "}
-          <span className="tnum font-mono text-ink">{bits.join("")}</span> — every single bit inverted. This is
+          <span className="tnum font-mono text-ink">{bits.join("")}</span>, every single bit inverted. This is
           why the encoding scheme has to be settled in advance and built into both devices.
         </p>
       </Panel>
 
       <Callout kind="note" title="Three properties, three ways to signal">
-        Amplitude is the obvious choice — two voltage levels — but it is not the only one. The transmitter can
+        Amplitude is the obvious choice (two voltage levels), but it is not the only one. The transmitter can
         equally well hold the amplitude constant and change the <strong>frequency</strong>, or change the{" "}
         <strong>phase</strong>. All three appear later on this page.
       </Callout>
@@ -211,7 +211,7 @@ function EncodingLab() {
     <Section
       id="encoder"
       title="Encoding lab"
-      lead="Click any bit to flip it, or load a preset. Watch what each scheme does at the bit boundaries and in the middle of each bit — that difference is the whole story."
+      lead="Click any bit to flip it, or load a preset. Watch what each scheme does at the bit boundaries and in the middle of each bit, because that difference is the whole story."
     >
       <Panel
         title="Line coding"
@@ -240,7 +240,7 @@ function EncodingLab() {
 
         <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
           <div>
-            <p className="mb-2 text-xs font-medium text-ink-2">Bit stream — click a bit to flip it</p>
+            <p className="mb-2 text-xs font-medium text-ink-2">Bit stream: click a bit to flip it</p>
             <BitTrain bits={bits} onToggle={(i) => setBits((b) => b.map((v, j) => (j === i ? 1 - v : v)))} />
             <div className="mt-2.5 flex flex-wrap gap-1.5">
               {PRESETS.map(([label, preset]) => (
@@ -278,7 +278,7 @@ function EncodingLab() {
                   >
                     <span className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-ink">{LINE_CODES[c].name}</span>
-                      {!LINE_CODES[c].syllabus && <Badge>beyond syllabus</Badge>}
+                      {!LINE_CODES[c].syllabus && <Extra />}
                     </span>
                     <span className="mt-0.5 block text-2xs text-ink-2">{LINE_CODES[c].blurb}</span>
                   </button>
@@ -310,7 +310,7 @@ function EncodingLab() {
           not Manchester.
         </Callout>
         <Callout kind="warn" title="Try 'All zeros' with each scheme">
-          With NRZ-L and NRZ-I a long run of zeros produces a flat line — nothing changes for eight whole bit
+          With NRZ-L and NRZ-I a long run of zeros produces a flat line: nothing changes for eight whole bit
           times, and a receiver has nothing to lock on to. With Manchester the same run still transitions in the
           middle of every bit. That is the problem the next two sections are about.
         </Callout>
@@ -330,7 +330,7 @@ function RateSection() {
     <Section
       id="rate"
       title="How fast the signal elements change"
-      lead="Bit rate and signal element rate are not the same number. Bit rate counts bits per second; the signal element rate — the baud rate — counts how many times per second the signal is allowed to change. Manchester buys its reliability by needing two signal elements for every one bit."
+      lead="Bit rate and signal element rate are not the same number. Bit rate counts bits per second; the signal element rate, or baud rate, counts how many times per second the signal is allowed to change. Manchester buys its reliability by needing two signal elements for every one bit."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_1.15fr]">
         <Panel title="Set a bit rate" subtitle="Then read off what each scheme demands of the medium.">
@@ -432,7 +432,7 @@ function RateSection() {
 }
 
 /* ================================================================== *
- * 4. Synchronisation — the drift demo
+ * 4. Synchronisation: the drift demo
  * ================================================================== */
 
 function SyncSection() {
@@ -451,7 +451,7 @@ function SyncSection() {
     <Section
       id="sync"
       title="Why the two ends must stay in step"
-      lead="The receiver cannot see the bit boundaries — it only sees a voltage. It has to run its own clock and sample the line at what it believes is the middle of each bit. If that clock runs even slightly fast or slow, the sampling points creep away from the bit centres and the data falls apart."
+      lead="The receiver cannot see the bit boundaries; it only sees a voltage. It has to run its own clock and sample the line at what it believes is the middle of each bit. If that clock runs even slightly fast or slow, the sampling points creep away from the bit centres and the data falls apart."
     >
       <Panel
         title="Clock drift simulator"
@@ -561,7 +561,7 @@ function SyncSection() {
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
         <Callout kind="note" title="How real receivers stay in step">
-          Either a separate clock line is sent alongside the data — expensive, because it doubles the wiring — or
+          Either a separate clock line is sent alongside the data (expensive, because it doubles the wiring) or
           the clock is <strong>recovered from the data itself</strong>. That only works if the signal changes
           often enough, which is precisely what Manchester guarantees.
         </Callout>
@@ -581,7 +581,7 @@ function syncVerdict(drift: number, code: LineCode, errors: number, firstError: 
   if (errors === 0)
     return code === "manchester"
       ? `The receiver is ${Math.abs(drift - 1) > 0 ? "off by " + Math.round(Math.abs(drift - 1) * 100) + "%" : "off"}, but Manchester's mid-bit transition lets it re-align on every single bit, so nothing is lost yet.`
-      : "The drift has not yet accumulated enough to push a sample out of its bit cell — but it is building up with every bit that passes.";
+      : "The drift has not yet accumulated enough to push a sample out of its bit cell, but it is building up with every bit that passes.";
   return `The sampling points have slipped out of their bit cells. Bit ${firstError + 1} is the first casualty, and because the error accumulates, every bit after it is suspect too. ${errors} of ${12} bits are wrong.`;
 }
 
@@ -598,7 +598,7 @@ function KeyingSection() {
     <Section
       id="keying"
       title="Using frequency and phase instead"
-      lead="Two voltage levels is the simplest agreement, but any property of a wave can carry the bits. Keep the carrier running and modify one of its three properties in step with the data — that gives the three shift keying schemes."
+      lead="Two voltage levels is the simplest agreement, but any property of a wave can carry the bits. Keep the carrier running and modify one of its three properties in step with the data, and that gives the three shift keying schemes."
     >
       <Panel
         title="Shift keying"
@@ -667,7 +667,7 @@ function KeyingSection() {
               <span className="text-sm font-semibold text-ink">{KEYING[k].name}</span>
               <span className="mt-0.5 block text-xs text-ink-2">{KEYING[k].long}</span>
               <span className="mt-1 block text-2xs text-ink-3">
-                {k === "ask" && "Amplitude is switched between two values — often full size for 1 and nothing for 0."}
+                {k === "ask" && "Amplitude is switched between two values, often full size for 1 and nothing for 0."}
                 {k === "fsk" && "One frequency means 1, a different frequency means 0. Height stays constant."}
                 {k === "psk" && "The phase jumps by 180° whenever the bit changes. Height and rate stay constant."}
               </span>
@@ -677,7 +677,7 @@ function KeyingSection() {
 
         <Callout kind="note" title="Which one survives noise best?">
           <span className="text-ink-2">
-            Noise mostly adds and subtracts <em>amplitude</em>, so ASK is the most fragile of the three — a noisy
+            Noise mostly adds and subtracts <em>amplitude</em>, so ASK is the most fragile of the three: a noisy
             line can push a 0 up to look like a 1. FSK and PSK ignore amplitude entirely, which is why real modems
             use them. You will meet these again in the next competency level.
           </span>
@@ -724,7 +724,7 @@ function ParitySection() {
     <Section
       id="parity"
       title="Catching a flipped bit with one extra bit"
-      lead="Noise and drift both produce the same symptom: a bit arrives as the opposite of what was sent. Parity is the cheapest possible check — add one extra bit so that the number of 1s always comes out even (or always odd). If the count is wrong at the far end, something was corrupted."
+      lead="Noise and drift both produce the same symptom: a bit arrives as the opposite of what was sent. Parity is the cheapest possible check. Add one extra bit so that the number of 1s always comes out even (or always odd). If the count is wrong at the far end, something was corrupted."
     >
       <Panel
         title="Parity workbench"
@@ -746,7 +746,7 @@ function ParitySection() {
         <div className="grid gap-5">
           <div>
             <p className="mb-2 text-xs font-medium text-ink-2">
-              1 · Seven data bits — click any bit to flip it
+              1 · Seven data bits: click any bit to flip it
             </p>
             <BitTrain
               bits={data}
@@ -780,7 +780,7 @@ function ParitySection() {
               <p className="max-w-[38ch] text-sm text-ink-2">
                 Parity is <span className="tnum font-mono font-semibold text-ink">{p}</span>, so the eight bits
                 sent contain{" "}
-                <span className="tnum font-mono font-semibold text-ink">{ones + p}</span> ones — an{" "}
+                <span className="tnum font-mono font-semibold text-ink">{ones + p}</span> ones, an{" "}
                 <strong className="font-semibold text-ink">{kind}</strong> number, as agreed.
               </p>
             </div>
@@ -847,7 +847,7 @@ function ParitySection() {
                 {detected && (
                   <>
                     The receiver counted {receivedOnes} ones. {kind === "even" ? "Even" : "Odd"} parity was agreed,
-                    so this is impossible — <strong>an error is detected</strong>. Note what the receiver does{" "}
+                    so this is impossible: <strong>an error is detected</strong>. Note what the receiver does{" "}
                     <em>not</em> know:
                     {corruptedIndex !== null ? " which bit was flipped, so it cannot repair the data." : " which bits were flipped."}{" "}
                     It can only ask for the whole thing again.
@@ -878,9 +878,9 @@ function ParitySection() {
             {[
               ["ok", "Detects any single flipped bit"],
               ["ok", "Detects any odd number of flipped bits"],
-              ["bad", "Misses an even number of flipped bits — they cancel out"],
+              ["bad", "Misses an even number of flipped bits, since they cancel out"],
               ["bad", "Cannot say which bit was wrong"],
-              ["bad", "Cannot correct anything — it can only ask for a retransmission"],
+              ["bad", "Cannot correct anything; it can only ask for a retransmission"],
             ].map(([tone, text]) => (
               <li key={text} className="flex gap-2.5">
                 <span
@@ -911,7 +911,7 @@ function ParitySection() {
               },
               {
                 q: "A receiver expecting even parity gets 1 1 0 1 0 0 1 1. Is there an error?",
-                a: ["Count the ones: 1+1+0+1+0+0+1+1 = 5", "5 is odd, but even parity was agreed", "Yes — an error is detected, though not which bit"],
+                a: ["Count the ones: 1+1+0+1+0+0+1+1 = 5", "5 is odd, but even parity was agreed", "Yes, an error is detected, though not which bit"],
               },
             ].map((item) => (
               <div key={item.q} className="border-b border-line pb-3 last:border-0 last:pb-0">
@@ -942,6 +942,51 @@ function ParitySection() {
           { color: "var(--s5)", label: "Corrupted bit" },
         ]}
       />
+
+      <Panel title="One bit is not much to go on" subtitle="Where the idea goes next.">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
+          <div>
+            <p className="max-w-[56ch] text-sm text-ink-2">
+              A parity bit is the smallest possible check: it detects any odd number of flipped bits and misses
+              every even number of them. Stronger schemes work the same way but produce a longer summary. A{" "}
+              <strong className="font-semibold text-ink">checksum</strong> adds the data up; a{" "}
+              <strong className="font-semibold text-ink">cyclic redundancy check</strong>, the FCS at the end of
+              an Ethernet frame, divides it and keeps the remainder.
+            </p>
+          </div>
+          <div>
+            <p className="max-w-[56ch] text-sm text-ink-2">
+              Push the idea further and you get a{" "}
+              <strong className="font-semibold text-ink">hash</strong>: a fixed-length fingerprint of any amount
+              of data, built so that changing a single character changes the answer completely. That makes it
+                useful for far more than transmission errors: it is what a digital signature actually signs, in
+              level 6.11.
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-3">
+          {[
+            { n: "Parity", d: "1 bit", w: "Catches an odd number of errors" },
+            { n: "Checksum", d: "16 bits", w: "Catches most accidental corruption" },
+            { n: "Hash", d: "256 bits", w: "Catches any change at all, deliberate or not" },
+          ].map((r, i) => (
+            <div
+              key={r.n}
+              className="rounded-lg border px-3 py-2"
+              style={{
+                borderColor: `color-mix(in oklab, var(--s${i + 2}) 35%, transparent)`,
+                background: `color-mix(in oklab, var(--s${i + 2}) 6%, transparent)`,
+              }}
+            >
+              <p className="text-sm font-semibold" style={{ color: `var(--s${i + 2}-ink)` }}>
+                {r.n}
+              </p>
+              <p className="tnum font-mono text-2xs text-ink-3">{r.d}</p>
+              <p className="mt-1 max-w-[30ch] text-2xs text-ink-2">{r.w}</p>
+            </div>
+          ))}
+        </div>
+      </Panel>
     </Section>
   );
 }
@@ -997,7 +1042,7 @@ const QUESTIONS: Question[] = [
       { label: "Two parity bits are needed" },
     ],
     explain:
-      "Count the ones: 1+1+0+1+0+0+1 = 4, which is already even. Even parity requires the total number of ones — including the parity bit — to be even, so the parity bit is 0.",
+      "Count the ones: 1+1+0+1+0+0+1 = 4, which is already even. Even parity requires the total number of ones, including the parity bit, to be even, so the parity bit is 0.",
   },
   {
     id: "e5",
@@ -1009,7 +1054,7 @@ const QUESTIONS: Question[] = [
       { label: "An error has been detected but cannot be located" },
     ],
     explain:
-      "Six ones is an even count, so the check passes and no error is flagged. But parity only catches an odd number of flipped bits — if two bits were flipped, the count stays even and the corruption slips through undetected.",
+      "Six ones is an even count, so the check passes and no error is flagged. But parity only catches an odd number of flipped bits: if two bits were flipped, the count stays even and the corruption slips through undetected.",
   },
   {
     id: "e6",
@@ -1021,6 +1066,6 @@ const QUESTIONS: Question[] = [
       { label: "Its propagation speed" },
     ],
     explain:
-      "FSK holds amplitude and phase steady and switches between two frequencies — one for a 1 and another for a 0. Because it ignores amplitude, it is far less vulnerable to noise than ASK.",
+      "FSK holds amplitude and phase steady and switches between two frequencies, one for a 1 and another for a 0. Because it ignores amplitude, it is far less vulnerable to noise than ASK.",
   },
 ];

@@ -2,7 +2,7 @@
  * Security maths and reference data for competency level 6.11.
  *
  * The RSA here is real RSA, just with primes small enough that every step can
- * be shown in full — a student can check 8³ mod 55 = 17 by hand, which is the
+ * be shown in full. A student can check 8³ mod 55 = 17 by hand, which is the
  * only way "the public key encrypts, the private key decrypts" stops being a
  * slogan. Everything is pure, so the same arithmetic drives the animation, the
  * readouts and the answers.
@@ -30,14 +30,14 @@ export function gcd(a: number, b: number): number {
   return a;
 }
 
-/** The d in e·d ≡ 1 (mod φ), found by trial — φ is tiny here. */
+/** The d in e·d ≡ 1 (mod φ), found by trial, since φ is tiny here. */
 export function modInverse(e: number, phi: number): number | null {
   for (let d = 1; d < phi; d++) if ((e * d) % phi === 1) return d;
   return null;
 }
 
 /* ================================================================== *
- * Symmetric encryption — one shared key
+ * Symmetric encryption: one shared key
  * ================================================================== */
 
 const A = "A".charCodeAt(0);
@@ -56,7 +56,7 @@ export function shiftCipher(text: string, key: number): string {
 }
 
 /* ================================================================== *
- * Asymmetric encryption — a key pair
+ * Asymmetric encryption: a key pair
  * ================================================================== */
 
 export type KeyPair = {
@@ -64,7 +64,7 @@ export type KeyPair = {
   q: number;
   /** The modulus, p·q. Public. */
   n: number;
-  /** (p−1)(q−1) — used to find d, then thrown away. */
+  /** (p−1)(q−1), used to find d, then thrown away. */
   phi: number;
   /** Public exponent. Published with n as the public key. */
   e: number;
@@ -144,7 +144,7 @@ export function signMessage(text: string, keys: KeyPair): number {
 
 /**
  * Verify with the public key. The signature is checked against a digest of the
- * message *as received* — which is why altering the text breaks it.
+ * message *as received*, which is why altering the text breaks it.
  */
 export function verifyMessage(text: string, signature: number, keys: KeyPair): SignedMessage {
   const hash = digest(text, keys.n);
@@ -172,7 +172,7 @@ export const THREATS: Threat[] = [
     id: "virus",
     name: "Virus",
     what: "A program that attaches itself to another file or program, runs when that host is run, and copies itself into more files.",
-    how: "Arrives inside something you already wanted — a document, a game, a copied USB stick — and performs its malicious activity without you knowing.",
+    how: "Arrives inside something you already wanted (a document, a game, a copied USB stick) and performs its malicious activity without you knowing.",
     tell: "Files changing size or date on their own; programs starting slowly; antivirus alerts.",
     needsVictim: true,
     series: 4,
@@ -181,7 +181,7 @@ export const THREATS: Threat[] = [
     id: "trojan",
     name: "Trojan horse",
     what: "A malicious program that invades a computer by misleading users about what it is.",
-    how: "Pretends to be something useful — a free utility, a codec, a cracked game — so the user installs it willingly. It does not copy itself; it does not need to.",
+    how: "Pretends to be something useful (a free utility, a codec, a cracked game) so the user installs it willingly. It does not copy itself; it does not need to.",
     tell: "Software that asks for far more permission than its job requires; downloads from outside the official source.",
     needsVictim: true,
     series: 3,
@@ -198,7 +198,7 @@ export const THREATS: Threat[] = [
   {
     id: "phishing",
     name: "Phishing",
-    what: "An attempt to obtain sensitive information — usernames, passwords, card details — by pretending to be someone trustworthy.",
+    what: "An attempt to obtain sensitive information (usernames, passwords, card details) by pretending to be someone trustworthy.",
     how: "A message that looks like it comes from your bank or your school, with an urgent reason to click a link and log in on a page that is not theirs.",
     tell: "Urgency, a threat, a slightly wrong address, and a link whose text and destination disagree.",
     needsVictim: true,
@@ -240,7 +240,7 @@ export const PHISHING_SAMPLE: SampleMessage = {
           text: "<security@ridgeway-bank-verify.info>",
           clue: {
             id: "from",
-            why: "The display name says Ridgeway Bank, but the actual address is on ridgeway-bank-verify.info — a domain anyone could register. A bank's mail comes from the bank's own domain, and the display name is free text that the sender chooses.",
+            why: "The display name says Ridgeway Bank, but the actual address is on ridgeway-bank-verify.info, a domain anyone could register. A bank's mail comes from the bank's own domain, and the display name is free text that the sender chooses.",
           },
         },
       ],
@@ -265,7 +265,7 @@ export const PHISHING_SAMPLE: SampleMessage = {
           text: "Valued Customer",
           clue: {
             id: "greeting",
-            why: "Your bank knows your name — it is on the account. A generic greeting means the sender does not know who you are, because the same message went to thousands of addresses at once.",
+            why: "Your bank knows your name, because it is on the account. A generic greeting means the sender does not know who you are, because the same message went to thousands of addresses at once.",
           },
         },
         { text: ", we detected an unusual login to your account. To keep your account active you must " },
@@ -273,7 +273,7 @@ export const PHISHING_SAMPLE: SampleMessage = {
           text: "confirm your password and card PIN",
           clue: {
             id: "credentials",
-            why: "No bank, school or service will ever ask for your password or PIN — not by email, not by phone, not in person. They do not need it, because they can verify you in other ways. Any request for one is an attack.",
+            why: "No bank, school or service will ever ask for your password or PIN: not by email, not by phone, not in person. They do not need it, because they can verify you in other ways. Any request for one is an attack.",
           },
         },
         { text: " immediately. " },
@@ -294,7 +294,7 @@ export const PHISHING_SAMPLE: SampleMessage = {
           text: "www.ridgewaybank.lk/secure-login → 203.0.113.51/rb/login.php",
           clue: {
             id: "link",
-            why: "The text of the link and where it actually goes are two different things. Hovering over it reveals the real destination — here a bare IP address, not the bank at all. Always read the destination, never the text.",
+            why: "The text of the link and where it actually goes are two different things. Hovering over it reveals the real destination, here a bare IP address, not the bank at all. Always read the destination, never the text.",
           },
         },
       ],
@@ -333,7 +333,7 @@ export const GENUINE_SAMPLE: SampleMessage = {
         },
       ],
     },
-    { label: "Link", mono: true, runs: [{ text: "no link — you are asked to navigate there yourself" }] },
+    { label: "Link", mono: true, runs: [{ text: "no link; you are asked to navigate there yourself" }] },
     { label: "Attachment", mono: true, runs: [{ text: "none" }] },
   ],
 };
@@ -386,7 +386,7 @@ export const TRAFFIC_SAMPLES: TrafficSample[] = [
   { id: "t3", label: "An outsider probes for remote login", direction: "in", protocol: "TCP", port: 22, detail: "Nobody outside should be opening an SSH session into the school network." },
   { id: "t4", label: "An outsider tries the file-sharing port", direction: "in", protocol: "TCP", port: 445, detail: "A classic worm target. There is no reason for this to arrive from the Internet." },
   { id: "t5", label: "A DNS reply comes back", direction: "in", protocol: "UDP", port: 53, detail: "The answer to a lookup one of our own machines asked for." },
-  { id: "t6", label: "Malware phones home from a lab PC", direction: "out", protocol: "TCP", port: 6667, detail: "Outbound, so this rule set lets it through — a firewall alone cannot save an already-infected machine." },
+  { id: "t6", label: "Malware phones home from a lab PC", direction: "out", protocol: "TCP", port: 6667, detail: "Outbound, so this rule set lets it through. A firewall alone cannot save an already-infected machine." },
 ];
 
 export type FirewallVerdict = { action: "allow" | "deny"; rule: FirewallRule | null };
@@ -425,7 +425,7 @@ export const PROTECTIONS = [
     name: "Education and good practice",
     what: "Strong, unique passwords; suspicion of unexpected messages; updates installed promptly; backups kept separately.",
     stops: ["Phishing", "Trojans the user would otherwise install", "Password guessing"],
-    limit: "It depends on every person, every time — which is exactly why it needs to be taught rather than assumed.",
+    limit: "It depends on every person, every time, which is exactly why it needs to be taught rather than assumed.",
     series: 0,
   },
 ] as const;
@@ -438,7 +438,7 @@ export type PasswordStrength = {
   length: number;
   /** How many different characters an attacker must try per position. */
   pool: number;
-  /** log2(pool^length) — the number of bits of guessing needed. */
+  /** log2(pool^length), the number of bits of guessing needed. */
   bits: number;
   crackTime: string;
   verdict: "very weak" | "weak" | "reasonable" | "strong";

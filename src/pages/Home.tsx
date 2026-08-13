@@ -21,7 +21,7 @@ export function Home() {
               Data communication, drawn out.
             </h1>
             <p className="mt-3 max-w-[64ch] text-lg text-ink-2">
-              The whole of Competency 6, from a voltage on a wire to a web page in a browser — built around
+              The whole of Competency 6, from a voltage on a wire to a web page in a browser, built around
               instruments you can actually move. Drag a slider and the waveform answers, because a network is
               far easier to understand when you can bend it yourself than when it is a diagram in a textbook.
             </p>
@@ -120,7 +120,7 @@ export function Home() {
             },
             {
               t: "Syllabus wording kept",
-              d: "Each level lists its learning outcomes and contents exactly as they appear in the syllabus, so you can tick off your own coverage.",
+              d: "Each level lists its learning outcomes and contents exactly as they appear in the syllabus, so you can tick off your own coverage. Anything that goes further is marked “Beyond the syllabus”: worth reading, not worth memorising.",
             },
             {
               t: "Progress stays here",
@@ -201,7 +201,7 @@ function drawThumb(
     ctx.fill();
     ctx.restore();
   } else if (index === 5) {
-    // 6.6 — frames queued on a shared medium
+    // 6.6: frames queued on a shared medium
     const ctx = plot.ctx;
     const y = plot.h / 2;
     ctx.save();
@@ -221,7 +221,7 @@ function drawThumb(
     });
     ctx.restore();
   } else if (index === 6) {
-    // 6.7 — a routed path through a small mesh
+    // 6.7: a routed path through a small mesh
     const ctx = plot.ctx;
     const pts = [
       [0.1, 0.5],
@@ -257,7 +257,7 @@ function drawThumb(
     });
     ctx.restore();
   } else if (index === 7) {
-    // 6.8 — one stream fanning out to several ports
+    // 6.8: one stream fanning out to several ports
     const ctx = plot.ctx;
     const y = plot.h / 2;
     const mid = plot.w * 0.44;
@@ -283,7 +283,7 @@ function drawThumb(
     });
     ctx.restore();
   } else if (index === 8) {
-    // 6.9 — the DNS tree
+    // 6.9: the DNS tree
     const ctx = plot.ctx;
     const top = 8;
     const bottom = plot.h - 8;
@@ -316,7 +316,7 @@ function drawThumb(
     });
     ctx.restore();
   } else if (index === 9) {
-    // 6.10 — the stack of layers
+    // 6.10: the stack of layers
     const ctx = plot.ctx;
     const n = 4;
     const h = (plot.h - 12) / n;
@@ -332,7 +332,7 @@ function drawThumb(
     }
     ctx.restore();
   } else if (index === 10) {
-    // 6.11 — a padlock
+    // 6.11: a padlock
     const ctx = plot.ctx;
     const cx = plot.w / 2;
     const bodyH = plot.h * 0.42;
@@ -353,7 +353,7 @@ function drawThumb(
     ctx.fill();
     ctx.restore();
   } else {
-    // 6.12 — three private addresses funnelling into one public one
+    // 6.12: three private addresses funnelling into one public one
     const ctx = plot.ctx;
     const midX = plot.w * 0.5;
     const midY = plot.h / 2;

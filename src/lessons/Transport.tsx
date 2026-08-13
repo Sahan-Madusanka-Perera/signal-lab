@@ -7,6 +7,7 @@ import {
   Badge,
   Button,
   Callout,
+  Extra,
   Legend,
   Panel,
   Readout,
@@ -14,7 +15,7 @@ import {
   Slider,
   Toggle,
 } from "../components/ui";
-import { TRANSPORTS, WELL_KNOWN_PORTS, type Transport } from "../lib/network";
+import { PORT_RANGES, TRANSPORTS, WELL_KNOWN_PORTS, type Transport } from "../lib/network";
 
 export function TransportLesson() {
   return (
@@ -48,7 +49,7 @@ function WhySection() {
             <p className="tnum mt-0.5 font-mono text-sm text-ink">to: 192.168.1.42</p>
           </div>
           <p className="mt-3 max-w-[58ch] text-sm text-ink-2">
-            The network layer has done its job — the packet is at the right machine. But three programs on that
+            The network layer has done its job: the packet is at the right machine. But three programs on that
             machine are all waiting for data, and nothing in the packet says which of them should get it. The
             operating system has no way to choose.
           </p>
@@ -71,7 +72,7 @@ function WhySection() {
 
       <Callout kind="exam" title="The vocabulary">
         Splitting one arriving stream of packets out to several processes by port number is called{" "}
-        <strong>multiplexing</strong> — or more precisely, sorting them on the way in is{" "}
+        <strong>multiplexing</strong>, or more precisely, sorting them on the way in is{" "}
         <em>demultiplexing</em>, and combining several processes' traffic onto one outgoing connection is{" "}
         <em>multiplexing</em>. The syllabus uses the single term for both directions.
       </Callout>
@@ -263,12 +264,46 @@ function PortSection() {
               </div>
             </div>
             <Readout label="Ports per machine" value="65 536" sub="16 bits, 0 to 65535" tone="brand" />
-            <Readout label="Well known range" value="0 – 1023" sub="reserved for standard services" />
           </div>
+        </div>
+
+        <div className="mt-4 border-t border-line pt-4">
+          <p className="mb-2 text-xs font-medium text-ink-2">The 65 536 numbers are split into three ranges</p>
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
+            {PORT_RANGES.map((r) => (
+              <div
+                key={r.name}
+                className="rounded-lg border px-3 py-2.5"
+                style={{
+                  borderColor: `color-mix(in oklab, var(--s${r.series + 1}) 35%, transparent)`,
+                  background: `color-mix(in oklab, var(--s${r.series + 1}) 6%, transparent)`,
+                }}
+              >
+                <p className="text-sm font-semibold" style={{ color: `var(--s${r.series + 1}-ink)` }}>
+                  {r.name}
+                </p>
+                <p className="tnum mt-0.5 font-mono text-sm font-semibold text-ink">
+                  {r.from.toLocaleString("en-GB")} – {r.to.toLocaleString("en-GB")}
+                </p>
+                <p className="mt-1 max-w-[34ch] text-2xs text-ink-2">{r.who}</p>
+                <p className="mt-1 text-2xs text-ink-3">{r.example}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 max-w-[74ch] text-sm text-ink-2">
+            This is why a conversation has two different kinds of port number at its two ends. Your browser is
+            given a temporary number from the dynamic range and connects <em>to</em> the server's well-known 80 or
+            443, so the server knows where to listen, and your machine knows which of its own windows the reply
+            belongs to.
+          </p>
         </div>
       </Panel>
 
-      <Panel title="Ports worth knowing" bodyClassName="p-0">
+      <Panel
+        title="Ports worth knowing"
+        bodyClassName="p-0"
+        actions={<Extra>HTTPS, SMTP and POP3</Extra>}
+      >
         <div className="overflow-x-auto">
           <table className="w-full min-w-[440px] border-collapse text-left text-sm">
             <thead>
@@ -361,7 +396,7 @@ function CompareSection() {
       <Callout kind="exam" title="How to choose between them">
         Ask what a lost packet costs. In a file or a web page a missing byte corrupts the whole thing, so the
         retransmission TCP provides is worth the delay. In a live voice call a packet that arrives late is
-        useless anyway — you would rather have a moment of crackle than a growing delay, so UDP wins. The rule of
+        useless anyway, and you would rather have a moment of crackle than a growing delay, so UDP wins. The rule of
         thumb: <strong>TCP when correctness matters, UDP when timeliness matters.</strong>
       </Callout>
     </Section>
@@ -369,7 +404,7 @@ function CompareSection() {
 }
 
 /* ================================================================== *
- * 4. Delivery race — TCP and UDP under the same loss
+ * 4. Delivery race: TCP and UDP under the same loss
  * ================================================================== */
 
 type Seg = {
@@ -413,7 +448,7 @@ function RaceSection() {
 
   const sim = useMemo(() => {
     // Tuned so that even at the maximum loss the TCP run finishes within a few
-    // seconds — the point is that it is slower, not that it is unwatchable.
+    // seconds. The point is that it is slower, not that it is unwatchable.
     const flight = 0.75; // seconds for one crossing
     const gap = 0.26; // spacing between sends
 
@@ -432,7 +467,7 @@ function RaceSection() {
     for (let i = 0; i < TOTAL; i++) {
       let attempt = 0;
       // Each lost attempt costs a timeout before the retry goes out. That delay
-      // is the whole cost of reliability, so it has to be visible — but capped,
+      // is the whole cost of reliability, so it has to be visible, but capped,
       // or a bad run would never finish on screen.
       while (isLost(i, attempt) && attempt < 3) {
         tcp.push({ id: i, sentAt: t, lost: true, attempt });
@@ -455,7 +490,7 @@ function RaceSection() {
     <Section
       id="race"
       title="The same lossy network, two different outcomes"
-      lead="Turn the loss up and watch what each protocol does about it. UDP sends each datagram once and moves on — what is lost stays lost. TCP waits for an acknowledgement, notices what never arrived, and sends it again, so everything gets through eventually. That word is the whole trade-off."
+      lead="Turn the loss up and watch what each protocol does about it. UDP sends each datagram once and moves on, so what is lost stays lost. TCP waits for an acknowledgement, notices what never arrived, and sends it again, so everything gets through eventually. That word is the whole trade-off."
     >
       <Panel
         title="Delivery race"
@@ -621,8 +656,8 @@ function RaceSection() {
 
         <p className="mt-3 max-w-[74ch] rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm text-ink-2">
           {loss === 0
-            ? "With a perfect network the two behave identically — and UDP gets there with less work, because it never had to wait for an acknowledgement it did not need."
-            : `At ${Math.round(loss * 100)} % loss, UDP simply ends up with holes in the data: whatever the network dropped is gone, and the application never finds out. TCP loses nothing, but every retransmission costs a timeout, so the same eight pieces take noticeably longer to arrive. Neither is better — they are different bargains.`}
+            ? "With a perfect network the two behave identically, and UDP gets there with less work, because it never had to wait for an acknowledgement it did not need."
+            : `At ${Math.round(loss * 100)} % loss, UDP simply ends up with holes in the data: whatever the network dropped is gone, and the application never finds out. TCP loses nothing, but every retransmission costs a timeout, so the same eight pieces take noticeably longer to arrive. Neither is better; they are different bargains.`}
         </p>
       </Panel>
 
@@ -675,7 +710,7 @@ const QUESTIONS: Question[] = [
       { label: "It uses port numbers" },
     ],
     explain:
-      "UDP is connectionless: each datagram is sent on its own with no handshake, no acknowledgement and no retransmission. Both protocols use port numbers — that is the transport layer's job regardless of which one you pick.",
+      "UDP is connectionless: each datagram is sent on its own with no handshake, no acknowledgement and no retransmission. Both protocols use port numbers, because that is the transport layer's job regardless of which one you pick.",
   },
   {
     id: "t4",
@@ -687,7 +722,7 @@ const QUESTIONS: Question[] = [
       { label: "UDP encrypts the query" },
     ],
     explain:
-      "A DNS query and its reply each fit in one small datagram. Setting up a TCP connection would take more round trips than the lookup itself, and if the answer does not come back the resolver can just ask again — so the reliability TCP offers is not worth its cost here.",
+      "A DNS query and its reply each fit in one small datagram. Setting up a TCP connection would take more round trips than the lookup itself, and if the answer does not come back the resolver can just ask again, so the reliability TCP offers is not worth its cost here.",
   },
   {
     id: "t5",
@@ -699,7 +734,7 @@ const QUESTIONS: Question[] = [
       { label: "SNMP network monitoring" },
     ],
     explain:
-      "A file must arrive complete and in order — a single missing byte corrupts it — so the acknowledgements and retransmissions of TCP are essential. Live video, DHCP and SNMP all favour UDP, because for them a late packet is worth less than a fast one.",
+      "A file must arrive complete and in order, because a single missing byte corrupts it, so the acknowledgements and retransmissions of TCP are essential. Live video, DHCP and SNMP all favour UDP, because for them a late packet is worth less than a fast one.",
   },
   {
     id: "t6",
@@ -711,6 +746,6 @@ const QUESTIONS: Question[] = [
       { label: "It chooses a route that never fails" },
     ],
     explain:
-      "TCP cannot change what IP does — routers still drop packets. What it adds is bookkeeping: the receiver acknowledges the segments it got, and the sender retransmits anything left unacknowledged, then puts everything back into the original order before handing it to the application.",
+      "TCP cannot change what IP does: routers still drop packets. What it adds is bookkeeping: the receiver acknowledges the segments it got, and the sender retransmits anything left unacknowledged, then puts everything back into the original order before handing it to the application.",
   },
 ];

@@ -7,6 +7,7 @@ import {
   Badge,
   Button,
   Callout,
+  Extra,
   Formula,
   Legend,
   Panel,
@@ -67,7 +68,7 @@ function NeedSection() {
     <Section
       id="need"
       title="Every router on the way can read it"
-      lead="Nothing in the last nine levels protects anything. A packet is handed from router to router, and each one has the whole message in front of it in plain text. The Internet delivers data — it makes no promise that the data was private on the way, and none that the sender is who the message says they are."
+      lead="Nothing in the last nine levels protects anything. A packet is handed from router to router, and each one has the whole message in front of it in plain text. The Internet delivers data, but it makes no promise that the data was private on the way, and none that the sender is who the message says they are."
     >
       <Panel
         title="One message, several strangers"
@@ -176,7 +177,7 @@ function NeedSection() {
           <div>
             <p className="text-2xs font-semibold text-ink-3">Confidentiality</p>
             <p className="mt-1 max-w-[46ch] text-sm text-ink-2">
-              Can anyone other than the intended reader understand this? Without encryption the answer is yes —
+              Can anyone other than the intended reader understand this? Without encryption the answer is yes:
               every device on the path, and anyone listening to the wireless link, sees the message exactly as
               you typed it.
             </p>
@@ -193,7 +194,7 @@ function NeedSection() {
 
       <Callout kind="exam" title="The exam sentence">
         The Internet provides <strong>neither confidentiality nor authentication</strong>. Both have to be added
-        by the communicating parties themselves — confidentiality by encryption, and authentication by digital
+        by the communicating parties themselves: confidentiality by encryption, and authentication by digital
         signatures. That is the whole reason this competency level exists.
       </Callout>
     </Section>
@@ -224,7 +225,7 @@ function KeysSection() {
     <Section
       id="keys"
       title="One key, or a pair of them"
-      lead="Encryption turns a message into something unreadable, and a key is what turns it back. The whole difference between the two families is whether the key that locks is the same one that unlocks — and that single change is what makes secure communication between strangers possible at all."
+      lead="Encryption turns a message into something unreadable, and a key is what turns it back. The whole difference between the two families is whether the key that locks is the same one that unlocks, and that single change is what makes secure communication between strangers possible at all."
     >
       <Panel
         title={mode === "symmetric" ? "Symmetric key encryption" : "Asymmetric key encryption"}
@@ -380,7 +381,7 @@ function KeysSection() {
           <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 lg:grid-cols-2">
             <div>
               <Slider
-                label="Shared key — how far each letter is shifted"
+                label="Shared key: how far each letter is shifted"
                 value={shift}
                 onChange={setShift}
                 min={1}
@@ -474,7 +475,7 @@ function KeysSection() {
                 <Formula note={`decrypting with the private key (d = ${DEMO_KEYS.d}) gets the letter back`}>
                   {row.cipher}²⁷ mod 55 = {row.recovered} = {row.letter}
                 </Formula>
-                <Formula note={`the public key cannot undo its own work — ${wrongResult}`}>
+                <Formula note={`the public key cannot undo its own work: ${wrongResult}`}>
                   {row.cipher}³ mod 55 = {wrongKey}
                 </Formula>
               </div>
@@ -503,6 +504,7 @@ function KeysSection() {
                   Never leaves Bob's machine. Only it can undo what the public key did.
                 </p>
               </div>
+              <Extra className="self-start" />
               <Reveal label="Where d comes from">
                 <p className="max-w-[40ch] text-sm">
                   Pick two primes, p = {DEMO_KEYS.p} and q = {DEMO_KEYS.q}. Then n = p × q = {DEMO_KEYS.n} and
@@ -519,7 +521,7 @@ function KeysSection() {
 
       <Callout kind="exam" title="Which key does which job">
         To send something <strong>confidentially</strong>, encrypt it with the{" "}
-        <strong>receiver's public key</strong> — then only the receiver's private key can open it. The keys are
+        <strong>receiver's public key</strong>, and then only the receiver's private key can open it. The keys are
         used the other way round for signing, and mixing the two up is the most common mistake in this topic.
       </Callout>
     </Section>
@@ -551,7 +553,7 @@ function SignSection() {
     <Section
       id="sign"
       title="Signing: the same maths, used backwards"
-      lead="A signature answers the other question — not 'can anyone else read this' but 'did this really come from you, and is it still exactly what you wrote'. The sender scrambles a digest of the message with their private key. Anyone can unscramble it with the matching public key, and only the real owner could have produced something that unscrambles correctly."
+      lead="A signature answers the other question: not 'can anyone else read this' but 'did this really come from you, and is it still exactly what you wrote'. The sender scrambles a digest of the message with their private key. Anyone can unscramble it with the matching public key, and only the real owner could have produced something that unscrambles correctly."
     >
       <Panel
         title="Signature workbench"
@@ -640,7 +642,7 @@ function SignSection() {
               arrow(colL + boxW / 2, rowY[1] + 38, rowY[2], palette.axis);
               chip(colL, rowY[2], "signed with the private key", String(signature), palette.series[2], true);
 
-              chip(rX, rowY[0], tampered ? "message as received — altered" : "message as received", received, tampered ? palette.series[4] : palette.series[0], tampered);
+              chip(rX, rowY[0], tampered ? "message as received (altered)" : "message as received", received, tampered ? palette.series[4] : palette.series[0], tampered);
               arrow(rX + boxW / 2, rowY[0] + 38, rowY[1], palette.axis);
               chip(rX, rowY[1], "digest recomputed here", String(check.hash), palette.series[1]);
               chip(rX, rowY[2], "opened with the public key", String(check.recovered), palette.series[3], true);
@@ -727,7 +729,7 @@ function SignSection() {
         <p className="mt-3 max-w-[74ch] rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm text-ink-2">
           {check.valid
             ? "The digest the receiver computes from the message matches the number recovered from the signature, so two things are proved at once: the message has not been altered, and it was signed by whoever holds the private key."
-            : "One word was changed on the way, so the receiver's digest no longer matches what the signature contains. The attacker cannot repair it — producing a matching signature would need the private key, which never left the sender."}
+            : "One word was changed on the way, so the receiver's digest no longer matches what the signature contains. The attacker cannot repair it, because producing a matching signature would need the private key, which never left the sender."}
         </p>
       </Panel>
 
@@ -760,7 +762,7 @@ function SignSection() {
 
         <Callout kind="exam" title="What a signature proves">
           A digital signature gives <strong>authentication</strong> (it came from the holder of that private key)
-          and <strong>integrity</strong> (not one character has changed). It does <em>not</em> hide the message —
+          and <strong>integrity</strong> (not one character has changed). It does <em>not</em> hide the message;
           the text still travels in the open. For secrecy as well, you encrypt the signed message too.
         </Callout>
       </div>
@@ -780,7 +782,7 @@ function ThreatsSection() {
     <Section
       id="threats"
       title="What is actually out there"
-      lead="The threats in the syllabus split neatly in two. Viruses, trojans and the rest of malware are programs that get onto a machine and do something you did not ask for. Phishing does not attack the machine at all — it attacks the person using it, and no software setting can fully close that door."
+      lead="The threats in the syllabus split neatly in two. Viruses, trojans and the rest of malware are programs that get onto a machine and do something you did not ask for. Phishing does not attack the machine at all; it attacks the person using it, and no software setting can fully close that door."
     >
       <Panel title="Four names to know apart" subtitle="Select one to see how it gets in and what gives it away.">
         <div className="flex flex-wrap gap-1.5">
@@ -917,7 +919,7 @@ function PhishingDrill() {
               <p className="text-2xs font-semibold text-ok">Nothing to find</p>
               <p className="mt-1 max-w-[38ch] text-sm text-ink-2">
                 It comes from the bank's own domain, it uses your name, it asks for nothing, it carries no link
-                and no attachment. Compare it with the other message — the differences are the lesson.
+                and no attachment. Compare it with the other message: the differences are the lesson.
               </p>
             </div>
           ) : clue ? (
@@ -942,7 +944,7 @@ function PhishingDrill() {
             <div className="rounded-lg border border-ok bg-ok-wash px-3.5 py-3" style={{ animation: "rise var(--dur) var(--ease-out-quart)" }}>
               <p className="text-2xs font-semibold text-ok">All {total} found</p>
               <p className="mt-1 max-w-[38ch] text-sm text-ink-2">
-                In real life you would never need all {total} — one is enough to stop and check by another route.
+                In real life you would never need all {total}; one is enough to stop and check by another route.
                 Never use a link in the message itself to do the checking.
               </p>
             </div>
@@ -977,15 +979,18 @@ function ProtectSection() {
     <Section
       id="protect"
       title="Three defences, none of them enough on its own"
-      lead="A firewall decides what may cross the boundary of the network. Antivirus software deals with what got in anyway. And the person at the keyboard decides whether either of those ever gets the chance to help — which is why the syllabus lists education alongside the software."
+      lead="A firewall decides what may cross the boundary of the network. Antivirus software deals with what got in anyway. And the person at the keyboard decides whether either of those ever gets the chance to help, which is why the syllabus lists education alongside the software."
     >
       <Panel
         title="Firewall rule tester"
         subtitle="Rules are checked from the top down, and the first one that matches decides. Anything not matched is blocked."
         actions={
-          <Badge tone={verdict.action === "allow" ? "ok" : "bad"}>
-            {verdict.action === "allow" ? "Allowed" : "Blocked"}
-          </Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Extra>rule tables</Extra>
+            <Badge tone={verdict.action === "allow" ? "ok" : "bad"}>
+              {verdict.action === "allow" ? "Allowed" : "Blocked"}
+            </Badge>
+          </div>
         }
       >
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_250px]">
@@ -1029,7 +1034,7 @@ function ProtectSection() {
                   ctx.restore();
                 });
 
-                // The wall itself — brick-ish, so it reads as a barrier.
+                // The wall itself, brick-ish, so it reads as a barrier.
                 const wallColour = allowed ? palette.series[2] : palette.bad;
                 ctx.save();
                 ctx.fillStyle = palette.bg;
@@ -1182,7 +1187,8 @@ function ProtectSection() {
 
       <Panel
         title="Password lab"
-        subtitle="Type an example — never a password you actually use. Nothing here leaves your browser."
+        subtitle="Type an example, never a password you actually use. Nothing here leaves your browser."
+        actions={<Extra>the arithmetic behind a strong password</Extra>}
       >
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
           <div className="min-w-0">
@@ -1248,7 +1254,7 @@ function ProtectSection() {
         <p className="mt-3 max-w-[74ch] text-sm text-ink-2">
           Length beats cleverness. Adding one character multiplies the work by the size of the character set,
           while swapping <span className="tnum font-mono">o</span> for{" "}
-          <span className="tnum font-mono">0</span> adds almost nothing — attackers try that substitution first.
+          <span className="tnum font-mono">0</span> adds almost nothing, since attackers try that substitution first.
           A long phrase you can remember is stronger than a short string you cannot.
         </p>
       </Panel>
@@ -1257,7 +1263,7 @@ function ProtectSection() {
         Keep software and antivirus definitions updated, because an out-of-date scanner cannot recognise what is
         current. Use a different password for every account, so one breach does not open the rest. Do not open
         attachments or links you were not expecting, even from a name you know. Back up anything you would mind
-        losing, and keep the backup disconnected — ransomware encrypts whatever it can reach.
+        losing, and keep the backup disconnected, because ransomware encrypts whatever it can reach.
       </Callout>
     </Section>
   );
@@ -1278,7 +1284,7 @@ const QUESTIONS: Question[] = [
       { label: "A key they agreed over the telephone" },
     ],
     explain:
-      "Anything encrypted with Kamala's public key can only be undone by the matching private key, which only she holds. That is what makes confidentiality possible between two people who have never met — the locking key can be published freely.",
+      "Anything encrypted with Kamala's public key can only be undone by the matching private key, which only she holds. That is what makes confidentiality possible between two people who have never met: the locking key can be published freely.",
   },
   {
     id: "s2",
@@ -1290,7 +1296,7 @@ const QUESTIONS: Question[] = [
       { label: "Recover the message if it is lost in transit" },
     ],
     explain:
-      "Only the holder of the private key could have produced a signature that opens correctly with the matching public key, and the digest inside it only matches if not one character has changed. That is authentication and integrity — but not secrecy, since the message itself still travels in the open.",
+      "Only the holder of the private key could have produced a signature that opens correctly with the matching public key, and the digest inside it only matches if not one character has changed. That is authentication and integrity, but not secrecy, since the message itself still travels in the open.",
   },
   {
     id: "s3",
@@ -1302,7 +1308,7 @@ const QUESTIONS: Question[] = [
       { label: "The key can be worked out from the ciphertext" },
     ],
     explain:
-      "Symmetric encryption is fast and perfectly strong — the problem is delivering the key. Sending it over the network you do not trust defeats the purpose, and the number of keys needed grows as n(n−1)/2 with the number of people.",
+      "Symmetric encryption is fast and perfectly strong; the problem is delivering the key. Sending it over the network you do not trust defeats the purpose, and the number of keys needed grows as n(n−1)/2 with the number of people.",
   },
   {
     id: "s4",
@@ -1314,19 +1320,19 @@ const QUESTIONS: Question[] = [
       { label: "Software that scans for and removes malicious code" },
     ],
     explain:
-      "A trojan gets in by deception rather than by spreading — it looks like something useful and the user installs it willingly. Copying itself into other files is what a virus does, and a fake message from a bank is phishing.",
+      "A trojan gets in by deception rather than by spreading: it looks like something useful and the user installs it willingly. Copying itself into other files is what a virus does, and a fake message from a bank is phishing.",
   },
   {
     id: "s5",
     prompt: "An email says your account will be closed in 24 hours unless you confirm your password on the linked page. What is happening?",
     options: [
       { label: "A virus has infected the mail server" },
-      { label: "Phishing — an attempt to get your credentials by pretending to be someone you trust", correct: true },
+      { label: "Phishing: an attempt to get your credentials by pretending to be someone you trust", correct: true },
       { label: "A firewall rule has blocked your account" },
       { label: "The bank is performing a routine security check" },
     ],
     explain:
-      "Urgency, a threat, and a request for a password are the signature of phishing. No genuine organisation asks for your password, because they never need it. If in doubt, reach the organisation the way you normally would — never through a link in the message.",
+      "Urgency, a threat, and a request for a password are the signature of phishing. No genuine organisation asks for your password, because they never need it. If in doubt, reach the organisation the way you normally would, never through a link in the message.",
   },
   {
     id: "s6",
@@ -1334,7 +1340,7 @@ const QUESTIONS: Question[] = [
     options: [
       { label: "The firewall was pointed the wrong way" },
       { label: "The antivirus software cannot scan encrypted traffic" },
-      { label: "The student was tricked into giving their password away — no software setting prevents that", correct: true },
+      { label: "The student was tricked into giving their password away, and no software setting prevents that", correct: true },
       { label: "The password was too long for the system" },
     ],
     explain:

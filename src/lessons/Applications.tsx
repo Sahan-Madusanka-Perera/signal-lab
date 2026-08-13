@@ -15,12 +15,15 @@ import {
 } from "../components/ui";
 import { TAU } from "../lib/signal";
 import {
+  APP_MODELS,
   DNS_RESOLUTION,
   DNS_TREE,
+  FTP_FACTS,
   HTTP_REQUEST,
   HTTP_RESPONSE,
   HTTP_STATUS,
   TOP_LEVEL_DOMAINS,
+  URL_PARTS,
   type DnsNode,
 } from "../lib/network";
 
@@ -48,7 +51,7 @@ function NamesSection() {
     <Section
       id="names"
       title="Nobody wants to remember 93.184.216.34"
-      lead="Every level so far has been about getting bits from one address to another. This one is about the layer people actually touch. Two problems appear the moment a human is involved: numeric addresses are impossible to remember, and they change — a site that moves to a new server would otherwise become unreachable to everyone who had memorised the old number."
+      lead="Every level so far has been about getting bits from one address to another. This one is about the layer people actually touch. Two problems appear the moment a human is involved: numeric addresses are impossible to remember, and they change, so a site that moves to a new server would otherwise become unreachable to everyone who had memorised the old number."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="What the machine needs">
@@ -77,7 +80,7 @@ function NamesSection() {
             {[
               "Memorable, and says something about who owns it",
               "Stays the same when the site moves to a different server",
-              "Means nothing to a router — it has to be translated first",
+              "Means nothing to a router, which has to translate it first",
             ].map((t) => (
               <li key={t} className="flex gap-2">
                 <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
@@ -90,7 +93,7 @@ function NamesSection() {
 
       <Callout kind="note" title="The Domain Name System is a translation service">
         DNS is the directory that turns a name people can remember into the address a router can use. It is not
-        part of getting the data there — by the time a packet is moving, only the IP address matters. DNS runs
+        part of getting the data there, because by the time a packet is moving, only the IP address matters. DNS runs
         first, as a separate lookup, and its answer is what the rest of the journey uses.
       </Callout>
     </Section>
@@ -110,7 +113,7 @@ function TreeSection() {
     <Section
       id="tree"
       title="A tree, and nobody owns all of it"
-      lead="Names are organised as an upside-down tree. Read a domain name from right to left and you are walking down from the root: the last part is a top-level domain, the part before it is a domain registered under that, and so on. Crucially, each level only manages the names directly beneath it — which is what lets the system be run by thousands of independent organisations rather than one."
+      lead="Names are organised as an upside-down tree. Read a domain name from right to left and you are walking down from the root: the last part is a top-level domain, the part before it is a domain registered under that, and so on. Crucially, each level only manages the names directly beneath it, which is what lets the system be run by thousands of independent organisations rather than one."
     >
       <Panel
         title="The name space"
@@ -252,7 +255,7 @@ function TreeSection() {
 
         <p className="mt-3 max-w-[72ch] text-sm text-ink-2">
           Read <span className="tnum font-mono text-ink">{selected}</span> backwards and you get the route down
-          the tree. The trailing dot for the root is almost always left off, but it is really there — every
+          the tree. The trailing dot for the root is almost always left off, but it is really there: every
           domain name is a path from the root.
         </p>
       </Panel>
@@ -291,10 +294,10 @@ function ResolveSection() {
     <Section
       id="resolve"
       title="Walking the tree to answer one question"
-      lead="No single server knows every name — that is the point of the hierarchy. A resolver starts at the root and is passed down the tree, each server saying not 'here is the answer' but 'ask this one instead', until it reaches the server that is actually authoritative for the domain."
+      lead="No single server knows every name, and that is the point of the hierarchy. A resolver starts at the root and is passed down the tree, each server saying not 'here is the answer' but 'ask this one instead', until it reaches the server that is actually authoritative for the domain."
     >
       <Panel
-        title={`Step ${step + 1} of ${DNS_RESOLUTION.length} — ${cur.to}`}
+        title={`Step ${step + 1} of ${DNS_RESOLUTION.length}: ${cur.to}`}
         subtitle={cur.detail}
         actions={
           <div className="flex gap-1.5">
@@ -396,8 +399,47 @@ function HttpSection() {
     <Section
       id="http"
       title="The request that fetches a page"
-      lead="Once the browser has an IP address it opens a TCP connection to port 80 and sends a request in plain text. HTTP is deliberately simple: a method, a path, some headers, a blank line — and the server answers in the same shape."
+      lead="Once the browser has an IP address it opens a TCP connection to port 80 and sends a request in plain text. HTTP is deliberately simple: a method, a path, some headers, a blank line, and the server answers in the same shape."
     >
+      <Panel
+        title="What you actually typed: the URL"
+        subtitle="A Uniform Resource Locator packs everything the browser needs into one line. Every part answers a different question."
+      >
+        <div className="overflow-x-auto rounded-lg border border-line bg-surface-2 p-3">
+          <p className="tnum flex min-w-max flex-wrap items-baseline font-mono text-sm">
+            {URL_PARTS.map((u) => (
+              <span
+                key={u.part}
+                className="rounded px-0.5"
+                style={{ color: `var(--s${u.series + 1}-ink)` }}
+                title={u.what}
+              >
+                {u.text}
+              </span>
+            ))}
+          </p>
+        </div>
+        <ul className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-1.5 sm:grid-cols-2">
+          {URL_PARTS.map((u) => (
+            <li key={u.part} className="flex gap-2 text-sm text-ink-2">
+              <span
+                className="mt-[9px] h-1 w-1 shrink-0 rounded-full"
+                style={{ background: `var(--s${u.series + 1})` }}
+              />
+              <span className="max-w-[46ch]">
+                <span className="font-medium text-ink">{u.part}</span>{" "}
+                <span className="tnum font-mono text-2xs text-ink-3">{u.text}</span>: {u.what}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 max-w-[74ch] text-sm text-ink-2">
+          Only the domain name goes to DNS. The scheme decides which protocol to speak, the port decides which
+          process to speak to, and the path is sent to that process inside the request itself, which is exactly
+          what the first line of the GET below contains.
+        </p>
+      </Panel>
+
       <Panel
         title={side === "request" ? "The client's request" : "The server's response"}
         subtitle="Click any line to see what it does."
@@ -492,6 +534,19 @@ function HttpSection() {
         </div>
       </Panel>
 
+      <Panel title="FTP: the other way to move a file" subtitle="Not everything on the Internet is a page to display.">
+        <p className="max-w-[74ch] text-sm text-ink-2">{FTP_FACTS.what}</p>
+        <p className="mt-2 max-w-[74ch] text-sm text-ink-2">{FTP_FACTS.ports}</p>
+        <ul className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-1.5 sm:grid-cols-3">
+          {FTP_FACTS.modes.map((m) => (
+            <li key={m} className="rounded-lg border border-line bg-surface-2 px-3 py-2 text-sm text-ink-2">
+              {m}
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 max-w-[74ch] text-2xs text-ink-3">{FTP_FACTS.note}</p>
+      </Panel>
+
       <Panel title="Client and server" subtitle="The model behind both DNS and HTTP.">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
           <div className="rounded-lg border border-line bg-surface-2 p-4">
@@ -515,10 +570,54 @@ function HttpSection() {
         </div>
         <p className="mt-3 max-w-[72ch] text-sm text-ink-2">
           The work is deliberately split: the resource lives in one place so it only has to be maintained once,
-          and the client supplies the screen, the keyboard and the person. Every application in this competency —
-          DNS, HTTP, mail, DHCP — follows this same shape.
+          and the client supplies the screen, the keyboard and the person. Every application in this competency,
+          from DNS and HTTP to mail and DHCP, follows this same shape.
         </p>
       </Panel>
+
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
+        {APP_MODELS.map((m) => (
+          <Panel key={m.name} title={m.name} subtitle={m.how}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <p className="text-2xs font-semibold" style={{ color: "var(--ok)" }}>
+                  Strengths
+                </p>
+                <ul className="mt-1 grid gap-1">
+                  {m.good.map((g) => (
+                    <li key={g} className="max-w-[32ch] text-2xs text-ink-2">
+                      {g}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-2xs font-semibold" style={{ color: "var(--bad)" }}>
+                  Weaknesses
+                </p>
+                <ul className="mt-1 grid gap-1">
+                  {m.bad.map((b) => (
+                    <li key={b} className="max-w-[32ch] text-2xs text-ink-2">
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="mt-3 border-t border-line pt-2.5 text-2xs text-ink-3">
+              <span className="font-semibold">Seen in: </span>
+              {m.example}
+            </p>
+          </Panel>
+        ))}
+      </div>
+
+      <Callout kind="exam" title="Which model to recommend">
+        The question is almost always about size and control. A handful of machines that trust each other and
+        have nobody to administer them suit <strong>peer-to-peer</strong>. Anything that needs central accounts,
+        backups, or must serve more than a few users at once suits <strong>client–server</strong>. In a
+        peer-to-peer network every machine is both client and server; in client–server the roles are fixed.
+      </Callout>
     </Section>
   );
 }
@@ -726,7 +825,7 @@ const QUESTIONS: Question[] = [
       { label: "Open a new connection on port 53" },
     ],
     explain:
-      "GET means 'give me this resource'. It is a read-only request — the server should return the resource and change nothing. It is the method behind nearly every ordinary page load.",
+      "GET means 'give me this resource'. It is a read-only request: the server should return the resource and change nothing. It is the method behind nearly every ordinary page load.",
   },
   {
     id: "a5",
@@ -750,6 +849,30 @@ const QUESTIONS: Question[] = [
       { label: "The router between them" },
     ],
     explain:
-      "The server waits, listening on a known port, and only ever answers. The client is the side that knows what it wants and asks for it. This holds for both DNS and HTTP — and it is why servers need well-known port numbers but clients do not.",
+      "The server waits, listening on a known port, and only ever answers. The client is the side that knows what it wants and asks for it. This holds for both DNS and HTTP, and it is why servers need well-known port numbers but clients do not.",
+  },
+  {
+    id: "a7",
+    prompt: "Four machines in a small office share a printer and a folder directly with each other, with no dedicated server. Which model is that?",
+    options: [
+      { label: "Client\u2013server" },
+      { label: "Peer-to-peer", correct: true },
+      { label: "Multicast" },
+      { label: "Best effort delivery" },
+    ],
+    explain:
+      "In peer-to-peer every machine is both client and server: each offers resources to the others and uses theirs. It is cheap and has no single point of failure, but there is no central control of security and no single place to back up \u2014 which is why it stops being workable as the number of machines grows.",
+  },
+  {
+    id: "a8",
+    prompt: "In https://www.example.com:80/notes/unit6.html, which part does DNS translate?",
+    options: [
+      { label: "https" },
+      { label: "www.example.com", correct: true },
+      { label: ":80" },
+      { label: "/notes/unit6.html" },
+    ],
+    explain:
+      "Only the domain name is looked up. The scheme says which protocol to speak, the port says which process on that server to speak to, and the path is sent to that process inside the request itself \u2014 it never reaches DNS at all.",
   },
 ];

@@ -15,7 +15,7 @@ export type DrawArgs = {
 type Options = {
   bounds: Bounds;
   insets?: Partial<Insets>;
-  /** Run a rAF loop. Off by default — static plots redraw only on dependency change. */
+  /** Run a rAF loop. Off by default, since static plots redraw only on dependency change. */
   animate?: boolean;
   /** Values that should force a redraw. */
   deps?: unknown[];

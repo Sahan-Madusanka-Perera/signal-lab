@@ -122,7 +122,7 @@ function GrowthSection() {
     <Section
       id="growth"
       title="Why you cannot just connect everything to everything"
-      lead="Point-to-point works perfectly for two devices. The obvious next step is to run a cable between every pair — and it collapses almost immediately. Drag the slider and watch the cable count run away from you."
+      lead="Point-to-point works perfectly for two devices. The obvious next step is to run a cable between every pair, and it collapses almost immediately. Drag the slider and watch the cable count run away from you."
     >
       <Panel
         title="All-to-all growth"
@@ -208,7 +208,7 @@ function GrowthSection() {
         <p className="mt-4 max-w-[72ch] text-sm text-ink-2">
           A classroom of thirty machines would need{" "}
           <strong className="font-semibold text-ink">{meshLinks(30)} cables</strong> and twenty-nine network ports
-          in the back of every single computer. It is not merely expensive — it is physically impossible to build.
+          in the back of every single computer. It is not merely expensive; it is physically impossible to build.
           Every topology that follows exists to avoid this.
         </p>
       </Panel>
@@ -220,7 +220,7 @@ function GrowthSection() {
  * 2. Topology explorer
  * ================================================================== */
 
-type Topo = "bus" | "star" | "ring" | "mesh";
+type Topo = "bus" | "star" | "ring" | "mesh" | "tree" | "hybrid";
 
 const TOPO_INFO: Record<
   Topo,
@@ -231,7 +231,7 @@ const TOPO_INFO: Record<
     how: "One shared backbone cable with a terminator at each end. Every device taps onto the same cable.",
     pros: ["Uses the least cable of any topology", "Simple and cheap to lay", "Easy to add another device"],
     cons: [
-      "Only one device can transmit at a time — the media access problem",
+      "Only one device can transmit at a time: the media access problem",
       "A break anywhere in the backbone takes down the whole network",
       "Hard to fault-find, because everything shares one cable",
     ],
@@ -251,7 +251,7 @@ const TOPO_INFO: Record<
   ring: {
     name: "Ring",
     how: "Each device connects to exactly two neighbours, forming a closed loop. Data passes through every device in between.",
-    pros: ["No central device needed", "Orderly access — no collisions", "Performs predictably under heavy load"],
+    pros: ["No central device needed", "Orderly access, with no collisions", "Performs predictably under heavy load"],
     cons: [
       "One broken link can break the whole ring",
       "Data may pass through many machines to reach its destination",
@@ -262,9 +262,39 @@ const TOPO_INFO: Record<
   mesh: {
     name: "Mesh",
     how: "Devices are joined point-to-point. In a full mesh every host connects directly to every other host.",
-    pros: ["Extremely resilient — many alternative paths", "No contention between pairs", "Traffic is private to each link"],
+    pros: ["Extremely resilient, with many alternative paths", "No contention between pairs", "Traffic is private to each link"],
     cons: ["Cabling grows as n(n − 1)/2", "Every host needs many ports", "Expensive to build and to maintain"],
     links: (n) => `${meshLinks(n)} cables`,
+  },
+  tree: {
+    name: "Tree",
+    how: "Stars stacked into a hierarchy. A root device feeds branch devices, and the hosts hang off the branches, which is the shape almost every real building network takes.",
+    pros: [
+      "Scales easily: add another branch rather than rewiring",
+      "Groups can be managed, and faults isolated, one branch at a time",
+      "Traffic within a branch never reaches the rest of the network",
+    ],
+    cons: [
+      "If the root fails, the branches are cut off from each other",
+      "More cable and more devices than a single star",
+      "Traffic between distant branches must climb the whole way up and back down",
+    ],
+    links: (n) => `${n} + 3 cables`,
+  },
+  hybrid: {
+    name: "Hybrid",
+    how: "Any two or more topologies joined together, here two stars linked by a bus backbone. Real networks are almost always hybrids, because different parts of a site have different needs.",
+    pros: [
+      "Each part of the site can use whichever layout suits it",
+      "Grows by bolting on another section, not by redesigning",
+      "A fault is usually confined to the section it happened in",
+    ],
+    cons: [
+      "The most complex to design, document and fault-find",
+      "The links joining the sections are critical points",
+      "Costly, because it needs the equipment of every topology it mixes",
+    ],
+    links: (n) => `${n} + 2 cables`,
   },
 };
 
@@ -278,7 +308,7 @@ function TopologyExplorer() {
     <Section
       id="topologies"
       title="Topology explorer"
-      lead="Four ways of wiring the same devices together. The orange dot is one message travelling from device 1 to device 4 — watch how differently it gets there in each layout."
+      lead="Six ways of wiring the same devices together: four basic layouts, and the two ways they get combined in practice. The orange dot is one message travelling from device 1 to device 4; watch how differently it gets there in each layout."
     >
       <Panel
         title={`${info.name} topology`}
@@ -413,7 +443,7 @@ function drawTopology(
       ctx.moveTo(x0, y);
       ctx.lineTo(x1, y);
     });
-    // Terminators — the detail that identifies a bus in an exam answer.
+    // Terminators, the detail that identifies a bus in an exam answer.
     [x0, x1].forEach((x) => {
       ctx.save();
       ctx.strokeStyle = palette.series[4];
@@ -453,7 +483,7 @@ function drawTopology(
         i === src ? "sending" : i === dst ? (arrived ? "receiving" : "idle") : arrived ? "ignoring" : "idle";
       drawNode(plot, palette, x, nodeY, String(i + 1), state);
     });
-    plot.text(w / 2, h - 16, "every device sees every frame — only device 4 keeps it", palette.inkFaint, {
+    plot.text(w / 2, h - 16, "every device sees every frame, but only device 4 keeps it", palette.inkFaint, {
       size: 10,
       align: "center",
     });
@@ -535,6 +565,115 @@ function drawTopology(
     return;
   }
 
+  if (topo === "tree" || topo === "hybrid") {
+    // Hosts are grouped so that the destination always sits in the far group,
+    // which is what makes the climb up the hierarchy visible.
+    const leftCount = Math.min(3, n - 1);
+    const left = Array.from({ length: leftCount }, (_, i) => i);
+    const right = Array.from({ length: n - leftCount }, (_, i) => leftCount + i);
+    const dstT = leftCount;
+
+    const hostY = h * 0.8;
+    const spread = (group: number[], x0: number, x1: number) =>
+      group.map((idx, i) => ({
+        idx,
+        x: group.length === 1 ? (x0 + x1) / 2 : x0 + ((x1 - x0) * i) / (group.length - 1),
+      }));
+    const lefts = spread(left, 40, w * 0.42);
+    const rights = spread(right, w * 0.58, w - 40);
+
+    const tree = topo === "tree";
+    const swY = tree ? h * 0.46 : h * 0.44;
+    const swL = { x: w * 0.27, y: swY };
+    const swR = { x: w * 0.73, y: swY };
+    // Tree: a root above the two branch switches. Hybrid: a bus between them.
+    const root = { x: w / 2, y: h * 0.14 };
+    const busY = h * 0.16;
+
+    if (tree) {
+      cable(() => {
+        ctx.moveTo(root.x, root.y);
+        ctx.lineTo(swL.x, swL.y);
+        ctx.moveTo(root.x, root.y);
+        ctx.lineTo(swR.x, swR.y);
+      });
+    } else {
+      cable(() => {
+        ctx.moveTo(40, busY);
+        ctx.lineTo(w - 40, busY);
+      });
+      [40, w - 40].forEach((x) => {
+        ctx.save();
+        ctx.strokeStyle = palette.series[4];
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x, busY - 8);
+        ctx.lineTo(x, busY + 8);
+        ctx.stroke();
+        ctx.restore();
+      });
+      cable(() => {
+        ctx.moveTo(swL.x, busY);
+        ctx.lineTo(swL.x, swL.y);
+        ctx.moveTo(swR.x, busY);
+        ctx.lineTo(swR.x, swR.y);
+      }, palette.gridMajor, 1.8);
+      plot.text(w / 2, busY - 16, "bus backbone", palette.inkFaint, { size: 9, align: "center" });
+    }
+
+    [...lefts.map((p2) => [p2, swL] as const), ...rights.map((p2) => [p2, swR] as const)].forEach(([host, sw]) =>
+      cable(() => {
+        ctx.moveTo(host.x, hostY);
+        ctx.lineTo(sw.x, sw.y);
+      }, palette.gridMajor, 1.6),
+    );
+
+    // Four legs: host → its switch → the join → the far switch → host.
+    const srcPt = { x: lefts[0].x, y: hostY };
+    const dstPt = { x: rights[0].x, y: hostY };
+    const join = tree ? root : { x: w / 2, y: busY };
+    const path = tree
+      ? [srcPt, swL, join, swR, dstPt]
+      : [srcPt, swL, { x: swL.x, y: busY }, { x: swR.x, y: busY }, swR, dstPt];
+    const legs = path.length - 1;
+    const travelled = p * legs;
+    const leg = Math.min(legs - 1, Math.floor(travelled));
+    const u = travelled - leg;
+    const px = path[leg].x + (path[leg + 1].x - path[leg].x) * u;
+    const py = path[leg].y + (path[leg + 1].y - path[leg].y) * u;
+
+    ctx.save();
+    ctx.strokeStyle = palette.series[0];
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(path[0].x, path[0].y);
+    for (let i = 1; i <= leg; i++) ctx.lineTo(path[i].x, path[i].y);
+    ctx.lineTo(px, py);
+    ctx.stroke();
+    ctx.restore();
+
+    if (tree) drawBox(plot, palette, root.x, root.y, 62, 28, "root", palette.series[2]);
+    drawBox(plot, palette, swL.x, swL.y, 58, 26, "switch", palette.series[1]);
+    drawBox(plot, palette, swR.x, swR.y, 58, 26, "switch", palette.series[1]);
+
+    [...lefts, ...rights].forEach((host) => {
+      const state: NodeState =
+        host.idx === 0 ? "sending" : host.idx === dstT ? (p >= 0.98 ? "receiving" : "idle") : "idle";
+      drawNode(plot, palette, host.x, hostY, String(host.idx + 1), state, 13);
+    });
+    packet(px, py);
+
+    plot.text(
+      w / 2,
+      h - 12,
+      tree ? "branch to branch means climbing to the root" : "the backbone joins the two stars",
+      palette.inkFaint,
+      { size: 10, align: "center" },
+    );
+    return;
+  }
+
   // Mesh
   const cx = w / 2;
   const cy = h / 2;
@@ -569,7 +708,7 @@ function drawTopology(
 }
 
 /* ================================================================== *
- * 3. Sharing the bus — the media access problem
+ * 3. Sharing the bus: the media access problem
  * ================================================================== */
 
 type Frame = { id: number; from: number; start: number; colour: number };
@@ -608,7 +747,7 @@ function CollisionSection() {
     <Section
       id="collision"
       title="The price of sharing one cable"
-      lead="A bus is beautifully simple until two devices talk at once. Their signals overlap on the shared medium and both are destroyed — a collision. Press two send buttons in quick succession and watch it happen."
+      lead="A bus is beautifully simple until two devices talk at once. Their signals overlap on the shared medium and both are destroyed, which is a collision. Press two send buttons in quick succession and watch it happen."
     >
       <Panel
         title="Media access on a bus"
@@ -758,7 +897,7 @@ function CollisionSection() {
             </div>
             <p className="mt-2.5 max-w-[64ch] text-2xs text-ink-3">
               {csma
-                ? "With carrier sense on, the second transmission is held back until the bus is quiet — so the collision never happens. This is the idea behind CSMA, the access method real Ethernet buses used."
+                ? "With carrier sense on, the second transmission is held back until the bus is quiet, so the collision never happens. This is the idea behind CSMA, the access method real Ethernet buses used."
                 : "With no access control, any two overlapping transmissions destroy each other. Both senders must detect the collision, back off for a random time and try again."}
             </p>
           </div>
@@ -771,8 +910,8 @@ function CollisionSection() {
       </Panel>
 
       <Callout kind="exam" title="The bus's defining weakness">
-        Every device shares one medium, so only one may transmit at a time. Controlling who gets to use the bus —
-        the <strong>media access problem</strong> — is the price of the bus's simplicity. A star built around a{" "}
+        Every device shares one medium, so only one may transmit at a time. Controlling who gets to use the bus,
+        the <strong>media access problem</strong>, is the price of the bus's simplicity. A star built around a{" "}
         <em>switch</em> avoids it entirely, because each device has a link of its own.
       </Callout>
     </Section>
@@ -789,9 +928,9 @@ function HubVsSwitch() {
 
   const rows = [
     ["What it does with an incoming frame", "Copies it to every other port", "Sends it only to the destination's port"],
-    ["Does it learn addresses?", "No — it has no idea who is where", "Yes — it builds a table of which device is on which port"],
-    ["Simultaneous conversations", "None — the whole hub is one shared medium", "Many, as long as the pairs differ"],
-    ["Collisions", "Yes — all ports share one collision domain", "No — each port is its own collision domain"],
+    ["Does it learn addresses?", "No, it has no idea who is where", "Yes, it builds a table of which device is on which port"],
+    ["Simultaneous conversations", "None, since the whole hub is one shared medium", "Many, as long as the pairs differ"],
+    ["Collisions", "Yes, all ports share one collision domain", "No, each port is its own collision domain"],
     ["Privacy", "Every device receives every frame", "Only the intended recipient receives it"],
     ["Cost and intelligence", "Cheap, dumb, obsolete", "Costlier, but standard everywhere today"],
   ];
@@ -799,11 +938,11 @@ function HubVsSwitch() {
   return (
     <Section
       id="hubswitch"
-      title="Hub or switch — the same wiring, very different behaviour"
+      title="Hub or switch: the same wiring, very different behaviour"
       lead="Both sit at the centre of a star and both tidy up the cabling. The difference is what happens to a frame once it arrives. Send a frame below and watch where it goes."
     >
       <Panel
-        title={device === "hub" ? "Hub — floods every port" : "Switch — forwards to one port"}
+        title={device === "hub" ? "Hub: floods every port" : "Switch: forwards to one port"}
         subtitle={
           device === "hub"
             ? "A hub is an electrical repeater. It has no idea who is connected where, so it copies the frame to every other port and lets the devices sort it out."
@@ -1029,7 +1168,7 @@ const QUESTIONS: Question[] = [
       { label: "It requires a hub at the centre" },
     ],
     explain:
-      "Every device taps the same backbone cable, so two simultaneous transmissions collide and destroy each other. Controlling who may use the medium — the media access problem — is the cost of the bus's simplicity.",
+      "Every device taps the same backbone cable, so two simultaneous transmissions collide and destroy each other. Controlling who may use the medium, the media access problem, is the cost of the bus's simplicity.",
   },
   {
     id: "t3",
@@ -1077,6 +1216,18 @@ const QUESTIONS: Question[] = [
       { label: "Mesh" },
     ],
     explain:
-      "In a star, every device has one cable running back to a central hub or switch. A single damaged cable therefore isolates only that device — but the central device is a single point of failure for the whole network.",
+      "In a star, every device has one cable running back to a central hub or switch. A single damaged cable therefore isolates only that device, but the central device is a single point of failure for the whole network.",
+  },
+  {
+    id: "t7",
+    prompt: "A school wires each floor as a star and joins the floor switches to one switch in the server room. What topology is that?",
+    options: [
+      { label: "Bus" },
+      { label: "Ring" },
+      { label: "Tree", correct: true },
+      { label: "Full mesh" },
+    ],
+    explain:
+      "Stars arranged in a hierarchy make a tree: a root device feeding branch devices, with the hosts on the branches. It is how nearly every building network is actually laid out, because a new floor is added as another branch rather than by rewiring. If two topologies of different kinds were joined, say the floor stars linked by a bus backbone, it would be called a hybrid.",
   },
 ];

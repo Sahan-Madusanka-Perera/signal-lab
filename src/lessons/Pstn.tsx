@@ -7,6 +7,7 @@ import {
   Badge,
   Button,
   Callout,
+  Extra,
   Formula,
   Legend,
   Panel,
@@ -52,7 +53,7 @@ function PstnSection() {
     <Section
       id="pstn"
       title="A network built for one job: carrying a voice"
-      lead="The Public Switched Telephone Network was designed decades before home computers existed. When you dial, the exchanges switch a circuit through to the far end and hold it open for the whole call. That circuit carries one thing well — an analog signal in the narrow band of frequencies that human speech occupies."
+      lead="The Public Switched Telephone Network was designed decades before home computers existed. When you dial, the exchanges switch a circuit through to the far end and hold it open for the whole call. That circuit carries one thing well: an analog signal in the narrow band of frequencies that human speech occupies."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.1fr_1fr]">
         <Panel title="A switched circuit" subtitle="Dialling reserves a path; the path stays yours until you hang up.">
@@ -127,7 +128,7 @@ function PstnSection() {
           <ul className="mt-3 grid gap-1.5 text-sm text-ink-2">
             {[
               "The circuit is dedicated: nobody else uses it while your call is up.",
-              "It carries analog voice — a continuously varying voltage, not bits.",
+              "It carries analog voice, a continuously varying voltage, not bits.",
               "It is engineered for roughly 300 Hz to 3400 Hz, the band speech needs to stay intelligible.",
             ].map((t) => (
               <li key={t} className="flex gap-2">
@@ -171,7 +172,7 @@ function PstnSection() {
           <p className="mt-3 max-w-[62ch] text-sm text-ink-2">
             A computer's digital signal has sharp square edges, which need a very wide range of frequencies to
             survive. Put one straight onto a telephone line and the network throws almost all of it away. Something
-            has to translate — and that something is the modem.
+            has to translate, and that something is the modem.
           </p>
         </Panel>
       </div>
@@ -180,7 +181,7 @@ function PstnSection() {
 }
 
 /* ================================================================== *
- * 2. End-to-end link — the schematic students must be able to draw
+ * 2. End-to-end link: the schematic students must be able to draw
  * ================================================================== */
 
 /** Four bits only: the tap panels are narrow, and a denser carrier turns into a solid block. */
@@ -197,7 +198,7 @@ function LinkSection() {
       id: "pc-a",
       title: "Computer A",
       role: "Produces digital data",
-      tap: "Digital — square, two voltage levels",
+      tap: "Digital: square, two voltage levels",
       series: 2,
       kind: "digital" as const,
     },
@@ -205,7 +206,7 @@ function LinkSection() {
       id: "modem-a",
       title: "Modem A",
       role: "MODulates",
-      tap: `Analog — ${KEYING[scheme].long}`,
+      tap: `Analog: ${KEYING[scheme].long}`,
       series: 0,
       kind: "analog" as const,
     },
@@ -221,7 +222,7 @@ function LinkSection() {
       id: "modem-b",
       title: "Modem B",
       role: "DEModulates",
-      tap: "Digital — recovered bits",
+      tap: "Digital: recovered bits",
       series: 2,
       kind: "digital" as const,
     },
@@ -229,7 +230,7 @@ function LinkSection() {
       id: "pc-b",
       title: "Computer B",
       role: "Receives the data",
-      tap: "Digital — identical to the original",
+      tap: "Digital: identical to the original",
       series: 2,
       kind: "digital" as const,
     },
@@ -435,7 +436,7 @@ function ModulationLab() {
               </div>
             )}
 
-            <Scope height={showParts ? 208 : 300} caption="Modulated signal — this is what goes on the line">
+            <Scope height={showParts ? 208 : 300} caption="Modulated signal: this is what goes on the line">
               <ScopeCanvas
                 label={`${MODULATION[kind].long} of the message onto the carrier`}
                 deps={[kind, msgFreq, carrierFreq, depth]}
@@ -453,7 +454,7 @@ function ModulationLab() {
                     plot.trace(upper, palette.series[3], { width: 1.4, dash: [4, 4], alpha: 0.9 });
                     plot.trace(lower, palette.series[3], { width: 1.4, dash: [4, 4], alpha: 0.9 });
                   } else {
-                    // FM and PM keep constant amplitude — show that explicitly.
+                    // FM and PM keep constant amplitude, so show that explicitly.
                     plot.hLine(1, palette.series[3], { dash: [4, 4], alpha: 0.7 });
                     plot.hLine(-1, palette.series[3], { dash: [4, 4], alpha: 0.7 });
                   }
@@ -525,7 +526,7 @@ function ModulationLab() {
 
             {depth === 0 && (
               <p className="rounded-lg bg-warn-wash px-3 py-2 text-2xs text-ink">
-                With the deviation at zero the message has no effect at all — the output is just the bare carrier.
+                With the deviation at zero the message has no effect at all, and the output is just the bare carrier.
                 Nothing is being transmitted.
               </p>
             )}
@@ -564,7 +565,7 @@ function PcmSection() {
   return (
     <Section
       id="pcm"
-      title="Pulse Code Modulation — turning a voice into numbers"
+      title="Pulse Code Modulation: turning a voice into numbers"
       lead="PCM is the reverse trip: an analog signal becomes digital. Measure the waveform's height at regular instants, round each measurement to the nearest allowed level, and send those numbers. The receiver holds each number until the next arrives and rebuilds the shape."
     >
       <Panel
@@ -668,9 +669,14 @@ function PcmSection() {
                 nyquistOk ? "bg-ok-wash text-ink" : "bg-bad-wash text-ink",
               )}
             >
-              <p className="font-semibold" style={{ color: nyquistOk ? "var(--ok)" : "var(--bad)" }}>
-                {nyquistOk ? "Sampling fast enough" : "Sampling too slowly"}
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-semibold" style={{ color: nyquistOk ? "var(--ok)" : "var(--bad)" }}>
+                  {nyquistOk ? "Sampling fast enough" : "Sampling too slowly"}
+                </p>
+                {/* The syllabus asks only that sampling happens, not for the
+                    theorem that fixes the rate. */}
+                <Extra>Nyquist</Extra>
+              </div>
               <p className="mt-1 text-ink-2">
                 {nyquistOk
                   ? "The rate is more than twice the highest frequency in the signal, so the original shape can be recovered."
@@ -708,8 +714,8 @@ function PcmSection() {
         </Panel>
 
         <Callout kind="exam" title="Two different errors, two different fixes">
-          Sampling <strong>too slowly</strong> loses detail between the samples — the fix is a higher sampling
-          rate. Using <strong>too few bits</strong> per sample forces each measurement to be rounded a long way —
+          Sampling <strong>too slowly</strong> loses detail between the samples, and the fix is a higher sampling
+          rate. Using <strong>too few bits</strong> per sample forces each measurement to be rounded a long way, and
           the fix is more bits per sample. Turn each slider down on its own in the lab above and you can see the
           two faults look completely different.
         </Callout>
@@ -741,7 +747,7 @@ const QUESTIONS: Question[] = [
     options: [
       { label: "Only converts digital signals into analog signals" },
       { label: "Only converts analog signals into digital signals" },
-      { label: "Both — it modulates outgoing data and demodulates incoming data", correct: true },
+      { label: "Both: it modulates outgoing data and demodulates incoming data", correct: true },
       { label: "It amplifies the signal so it travels further" },
     ],
     explain:
@@ -754,7 +760,7 @@ const QUESTIONS: Question[] = [
       { label: "Frequency and phase", correct: true },
       { label: "Amplitude and frequency" },
       { label: "Amplitude and phase" },
-      { label: "None — all three change together" },
+      { label: "None, since all three change together" },
     ],
     explain:
       "AM varies only the carrier's amplitude in step with the message. Its frequency and phase are left alone, which is why the modulated waveform keeps the same cycle spacing throughout.",
@@ -765,7 +771,7 @@ const QUESTIONS: Question[] = [
     options: [
       { label: "One, at the sending end" },
       { label: "One, at the receiving end" },
-      { label: "Two — one at each end", correct: true },
+      { label: "Two, one at each end", correct: true },
       { label: "None, if the line is digital" },
     ],
     explain:
@@ -781,7 +787,7 @@ const QUESTIONS: Question[] = [
       { label: "The samples are transmitted down the line" },
     ],
     explain:
-      "Sampling is the measuring step; quantisation is the rounding step that follows it. Rounding is what makes the value expressible in a fixed number of bits — and it is also where quantisation error comes from.",
+      "Sampling is the measuring step; quantisation is the rounding step that follows it. Rounding is what makes the value expressible in a fixed number of bits, and it is also where quantisation error comes from.",
   },
   {
     id: "p6",
