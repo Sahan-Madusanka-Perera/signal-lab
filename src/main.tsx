@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import "./index.css";
 import { ThemeProvider } from "./lib/theme";
 import { ProgressProvider } from "./lib/progress";
@@ -23,5 +24,6 @@ createRoot(document.getElementById("root")!).render(
         </BrowserRouter>
       </ProgressProvider>
     </ThemeProvider>
+    <Analytics />
   </StrictMode>,
 );
