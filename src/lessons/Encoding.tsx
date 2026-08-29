@@ -260,7 +260,7 @@ function EncodingLab() {
             draw={({ plot, palette }) => {
               drawLanes(plot, palette, bits.length, lanes, {
                 bits,
-                midMarks: compare || code === "manchester" || code === "manchester-diff",
+                midMarks: compare || baudPerBit(code) === 2,
               });
             }}
           />
@@ -331,6 +331,52 @@ function EncodingLab() {
       </Panel>
 
       <Panel
+        title="Return to Zero: the third level"
+        subtitle="RZ is not on the syllabus, but it is worth one look because it solves the flat-line problem a different way from Manchester, and seeing both makes clear what the flat line actually costs."
+        actions={<Extra />}
+      >
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+          <Scope height={150}>
+            <ScopeCanvas
+              label="RZ sends a positive pulse for a one and a negative pulse for a zero, each lasting half a bit before the line returns to zero"
+              bounds={{ x0: 0, x1: 4, y0: 0, y1: 2 }}
+              insets={{ left: 84, right: 18, top: 26, bottom: 18 }}
+              draw={({ plot, palette }) => {
+                const demo = [1, 0, 0, 1];
+                drawLanes(plot, palette, 4, [{ label: "", series: 2, segs: encode(demo, "rz") }], {
+                  bits: demo,
+                  midMarks: true,
+                });
+                plot.gutterLabel(1.62, "+V", palette.inkFaint, 9);
+                plot.gutterLabel(1, "0", palette.inkFaint, 9);
+                plot.gutterLabel(0.38, "−V", palette.inkFaint, 9);
+              }}
+            />
+          </Scope>
+          <div className="max-w-[62ch] text-sm text-ink-2">
+            <p>
+              NRZ holds one of two levels for the whole bit. RZ adds a third level, zero, and uses it as a rest
+              position: a <strong className="font-semibold text-ink">positive pulse</strong> for a 1 and a{" "}
+              <strong className="font-semibold text-ink">negative pulse</strong> for a 0, each lasting half a
+              bit, after which the line returns to zero and waits for the next one.
+            </p>
+            <p className="mt-2.5">
+              That return is the point. Every bit now contains a guaranteed edge, whatever the data, so a long
+              run of zeros no longer produces a flat line and the receiver always has something to time itself
+              against. RZ is <strong className="font-semibold text-ink">self-clocking</strong> for the same
+              reason Manchester is, and it pays the same price: two signal elements per bit, so twice the
+              bandwidth.
+            </p>
+            <p className="mt-2.5">
+              What it does not get for free is the third level. The transmitter has to generate it and the
+              receiver has to distinguish it reliably from noise, and that is the practical reason Manchester,
+              which needs only two levels, is the one that ended up in Ethernet.
+            </p>
+          </div>
+        </div>
+      </Panel>
+
+      <Panel
         title="The two Manchester conventions"
         subtitle="Manchester was published twice with opposite polarity, and both names are in circulation. The waveforms are exact inverses of each other, so neither is 'wrong'; what is wrong is drawing one without saying which."
       >
@@ -385,7 +431,8 @@ function EncodingLab() {
         <Callout kind="warn" title="Try 'All zeros' with each scheme">
           With NRZ-L and NRZ-I a long run of zeros produces a flat line: nothing changes for eight whole bit
           times, and a receiver has nothing to lock on to. With Manchester the same run still transitions in the
-          middle of every bit. That is the problem the next two sections are about.
+          middle of every bit, and RZ still pulses in every bit. That is the problem the next two sections are
+          about.
         </Callout>
       </div>
     </Section>
@@ -422,6 +469,7 @@ function RateSection() {
             {([
               ["nrz-l", "var(--s1)", "var(--s1-ink)"],
               ["nrz-i", "var(--s2)", "var(--s2-ink)"],
+              ["rz", "var(--s3)", "var(--s3-ink)"],
               ["manchester", "var(--s4)", "var(--s4-ink)"],
             ] as [LineCode, string, string][]).map(([c, color, ink]) => {
               const baud = bitRate * baudPerBit(c);
@@ -433,6 +481,7 @@ function RateSection() {
                   <div className="flex min-w-0 items-center gap-2">
                     <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />
                     <span className="truncate text-sm font-medium text-ink">{LINE_CODES[c].name}</span>
+                    {!LINE_CODES[c].syllabus && <Extra />}
                   </div>
                   <div className="flex shrink-0 items-baseline gap-3">
                     <span className="tnum font-mono text-xs text-ink-3">×{baudPerBit(c)}</span>
@@ -449,7 +498,7 @@ function RateSection() {
             <Formula note="One signal element per bit, so the two numbers are equal.">
               NRZ: baud rate = bit rate
             </Formula>
-            <Formula note="Two signal elements per bit, so the medium must support twice the rate of change.">
+            <Formula note="Two signal elements per bit, so the medium must support twice the rate of change. RZ splits the bit cell the same way and lands on the same figure.">
               Manchester: baud rate = 2 × bit rate
             </Formula>
           </div>
@@ -537,6 +586,7 @@ function SyncSection() {
             onChange={setCode}
             options={[
               { value: "nrz-l", label: "NRZ-L" },
+              { value: "rz", label: "RZ" },
               { value: "manchester", label: "Manchester" },
             ]}
           />
@@ -551,7 +601,7 @@ function SyncSection() {
             draw={({ plot, palette }) => {
               drawLanes(plot, palette, bits.length, [{ label: "on the wire", series: 0, segs }], {
                 bits,
-                midMarks: code === "manchester",
+                midMarks: baudPerBit(code) === 2,
               });
 
               // Where the receiver actually looks.
@@ -559,7 +609,7 @@ function SyncSection() {
                 const wrong = s.bit !== bits[i];
                 const color = wrong ? palette.series[4] : palette.series[2];
                 plot.vLine(s.t, color, { dash: wrong ? undefined : [2, 3], alpha: wrong ? 0.9 : 0.6 });
-                plot.dot(s.t, s.level > 0 ? 1.62 : 0.38, color, 4);
+                plot.dot(s.t, s.level > 0 ? 1.62 : s.level < 0 ? 0.38 : 1, color, 4);
                 plot.text(plot.sx(s.t), plot.bottom + 6, s.bit === null ? "?" : String(s.bit), color, {
                   size: 10,
                   weight: 700,
@@ -651,10 +701,14 @@ function SyncSection() {
 function syncVerdict(drift: number, code: LineCode, errors: number, firstError: number): string {
   if (errors === 0 && Math.abs(drift - 1) < 0.001)
     return "Both clocks agree, so every sample lands squarely in the middle of its bit cell and all twelve bits arrive intact.";
+  if (errors === 0 && code === "rz")
+    return `The receiver is off by ${Math.round(Math.abs(drift - 1) * 100)}%, but its sampling points are still landing inside the half-bit pulses, so every value still reads correctly.`;
   if (errors === 0)
     return code === "manchester"
       ? `The receiver is ${Math.abs(drift - 1) > 0 ? "off by " + Math.round(Math.abs(drift - 1) * 100) + "%" : "off"}, but Manchester's mid-bit transition lets it re-align on every single bit, so nothing is lost yet.`
       : "The drift has not yet accumulated enough to push a sample out of its bit cell, but it is building up with every bit that passes.";
+  if (code === "rz")
+    return `The sampling points have slipped past the half-bit pulses into the resting half of the cell, where there is nothing to read. Bit ${firstError + 1} is the first casualty. A ? means the receiver found no pulse at all, which at least tells it something is wrong; ${errors} of ${12} bits are now missing or wrong.`;
   return `The sampling points have slipped out of their bit cells. Bit ${firstError + 1} is the first casualty, and because the error accumulates, every bit after it is suspect too. ${errors} of ${12} bits are wrong.`;
 }
 

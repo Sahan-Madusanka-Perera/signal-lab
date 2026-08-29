@@ -109,7 +109,7 @@ function trim(v: number, digits: number): string {
  * Digital line coding (6.3)
  * ------------------------------------------------------------------ */
 
-export type LineCode = "nrz-l" | "nrz-i" | "manchester" | "manchester-diff";
+export type LineCode = "nrz-l" | "nrz-i" | "rz" | "manchester" | "manchester-diff";
 
 export const LINE_CODES: Record<LineCode, { name: string; blurb: string; syllabus: boolean }> = {
   "nrz-l": {
@@ -121,6 +121,11 @@ export const LINE_CODES: Record<LineCode, { name: string; blurb: string; syllabu
     name: "NRZ-I",
     blurb: "A 1 causes a transition at the start of the bit; a 0 causes none.",
     syllabus: true,
+  },
+  rz: {
+    name: "RZ",
+    blurb: "Three levels. A pulse in the first half carries the value, then the line rests at zero.",
+    syllabus: false,
   },
   manchester: {
     name: "Manchester",
@@ -163,9 +168,10 @@ export const MANCHESTER_CONVENTIONS: Record<
 
 /**
  * A line-coded waveform as level segments in bit-time units.
- * `from`/`to` are in bits (0…bits.length), `level` is -1 or +1.
+ * `from`/`to` are in bits (0…bits.length). `level` is -1 or +1 for the
+ * two-level codes; RZ also uses 0, the resting level it returns to mid-bit.
  */
-export type Segment = { from: number; to: number; level: -1 | 1 };
+export type Segment = { from: number; to: number; level: -1 | 0 | 1 };
 
 export function encode(
   bits: number[],
@@ -184,6 +190,13 @@ export function encode(
       case "nrz-i":
         if (bit) last = last === 1 ? -1 : 1;
         segs.push({ from: i, to: i + 1, level: last });
+        break;
+
+      case "rz":
+        // Bipolar RZ: a positive pulse for a 1 and a negative one for a 0, each
+        // filling the first half of the bit cell before the line returns to zero.
+        segs.push({ from: i, to: i + 0.5, level: bit ? 1 : -1 });
+        segs.push({ from: i + 0.5, to: i + 1, level: 0 });
         break;
 
       case "manchester": {
@@ -221,10 +234,21 @@ export function clockSegments(nBits: number): Segment[] {
 
 /**
  * Signal elements (baud) per bit. This is the "how fast do the signal
- * elements change" comparison the syllabus asks students to make.
+ * elements change" comparison the syllabus asks students to make. A Record
+ * rather than a condition, so a new line code cannot be added without deciding
+ * its rate. Two elements per bit also means the bit cell is split in half,
+ * which is what the lessons use to decide whether to draw a mid-bit mark.
  */
+const BAUD_PER_BIT: Record<LineCode, number> = {
+  "nrz-l": 1,
+  "nrz-i": 1,
+  rz: 2,
+  manchester: 2,
+  "manchester-diff": 2,
+};
+
 export function baudPerBit(code: LineCode): number {
-  return code === "manchester" || code === "manchester-diff" ? 2 : 1;
+  return BAUD_PER_BIT[code];
 }
 
 /** Count of level changes in a coded waveform, the honest measure of transitions. */
@@ -273,7 +297,15 @@ export function sampleWithDrift(
   const isManchester = code === "manchester" || code === "manchester-diff";
 
   for (let i = 0; i < nBits; i++) {
-    if (isManchester) {
+    if (code === "rz") {
+      // RZ carries the value in the first half of the bit, so the receiver
+      // looks there. The second half is always at rest, so a sample that has
+      // drifted into it finds no pulse at all rather than the wrong one.
+      const t = (i + 0.25) * drift;
+      if (t >= nBits) break;
+      const lv = levelAt(segs, t);
+      out.push({ t, level: lv, bit: lv === 0 ? null : lv > 0 ? 1 : 0 });
+    } else if (isManchester) {
       // Manchester receivers sample either side of the mid-bit transition.
       const a = (i + 0.25) * drift;
       const b = (i + 0.75) * drift;

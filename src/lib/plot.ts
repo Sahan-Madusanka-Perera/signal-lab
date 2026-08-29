@@ -254,7 +254,10 @@ export class Plot {
     if (!segs.length) return;
     const high = opts.high ?? 1;
     const low = opts.low ?? -1;
-    const yOf = (lvl: number) => this.sy(lvl > 0 ? high : low);
+    // Level 0 is the resting level of a three-level code such as RZ, and it
+    // lands on the lane's own centre line rather than on either rail.
+    const zero = (high + low) / 2;
+    const yOf = (lvl: number) => this.sy(lvl > 0 ? high : lvl < 0 ? low : zero);
 
     ctx.save();
     ctx.beginPath();
