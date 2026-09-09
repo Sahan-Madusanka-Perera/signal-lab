@@ -83,9 +83,11 @@ function PstnSection() {
                 // The reserved circuit lights up along its whole length.
                 const grad = ctx.createLinearGradient(nodes[0].x, 0, nodes[3].x, 0);
                 const head = (time * 0.3) % 1.4;
-                grad.addColorStop(Math.max(0, head - 0.25), "transparent");
-                grad.addColorStop(Math.min(1, Math.max(0, head)), palette.series[0]);
-                grad.addColorStop(Math.min(1, head + 0.25), "transparent");
+                // An offset outside 0..1 makes addColorStop throw, which would end the frame loop.
+                const stop = (v: number) => Math.min(1, Math.max(0, v));
+                grad.addColorStop(stop(head - 0.25), "transparent");
+                grad.addColorStop(stop(head), palette.series[0]);
+                grad.addColorStop(stop(head + 0.25), "transparent");
                 ctx.strokeStyle = grad;
                 ctx.lineWidth = 2.5;
                 ctx.beginPath();
