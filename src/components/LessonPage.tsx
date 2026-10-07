@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import clsx from "clsx";
 import { LESSONS, lessonIndex, type LessonMeta } from "../lib/curriculum";
 import { useProgress } from "../lib/progress";
+import { useDocumentTitle } from "../lib/title";
 
 /**
  * Shared chrome for a competency level: title block, syllabus outcomes,
@@ -10,6 +11,7 @@ import { useProgress } from "../lib/progress";
  */
 export function LessonPage({ meta, children }: { meta: LessonMeta; children: ReactNode }) {
   const { markVisited } = useProgress();
+  useDocumentTitle(`${meta.code} ${meta.title}`);
   const active = useSectionSpy(meta.sections.map((s) => s.id));
 
   useEffect(() => {

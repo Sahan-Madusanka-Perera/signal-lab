@@ -3,7 +3,7 @@
 @import "@fontsource-variable/jetbrains-mono";
 
 /* ============================================================
-   SignalLab — design tokens
+   SignalLab design tokens
    Authored in OKLCH. Hue 75 (honey/amber) anchors the brand;
    neutrals carry 0.003–0.008 chroma toward that hue so the
    graphite never reads as dead grey.
@@ -15,7 +15,7 @@
 :root {
   color-scheme: light;
 
-  /* Surfaces — pure white body, per product register */
+  /* Surfaces: pure white body, per product register */
   --bg: oklch(1 0 0);
   --surface: oklch(0.985 0.002 75);
   --surface-2: oklch(0.964 0.004 75);
@@ -45,13 +45,13 @@
   --scope-axis: oklch(0.74 0.01 75);
   --scope-ink: oklch(0.45 0.009 75);
 
-  /* Data series — fixed order, never cycled.
+  /* Data series, fixed order, never cycled.
      Validated: lightness band / chroma floor / CVD ΔE / contrast (all pairs). */
-  --s1: #b08000; /* amber   — primary signal, modulated output */
-  --s2: #0088ad; /* teal    — carrier */
-  --s3: #00a35f; /* green   — clock / reference */
-  --s4: #7935c6; /* violet  — secondary trace */
-  --s5: #aa0731; /* crimson — error, noise, collision */
+  --s1: #b08000; /* amber:   primary signal, modulated output */
+  --s2: #0088ad; /* teal:    carrier */
+  --s3: #00a35f; /* green:   clock / reference */
+  --s4: #7935c6; /* violet:  secondary trace */
+  --s5: #aa0731; /* crimson: error, noise, collision */
 
   /* Text-safe variants of the same five hues. Series colours are tuned for
      strokes on the plot surface; when a hue has to label UI text it uses these,
@@ -62,7 +62,7 @@
   --s4-ink: #7d52bb;
   --s5-ink: #bd3838;
 
-  /* Status — reserved, never reused as a series colour */
+  /* Status: reserved, never reused as a series colour */
   --ok: oklch(0.515 0.14 152);
   --ok-wash: oklch(0.955 0.03 152);
   --warn: oklch(0.535 0.13 70);
@@ -225,7 +225,7 @@
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Fixed rem scale, ratio ~1.18 — product UI, not fluid display type */
+  /* Fixed rem scale, ratio ~1.18, product UI, not fluid display type */
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1rem;
   --text-xs: 0.75rem;
@@ -252,7 +252,7 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Semantic z-index scale — never arbitrary values */
+/* Semantic z-index scale, never arbitrary values */
 @layer base {
   :root {
     --z-base: 0;
@@ -375,7 +375,7 @@
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   }
 
-  /* Faint blueprint texture behind hero areas — carries the "lab" register
+  /* Faint blueprint texture behind hero areas, carries the "lab" register
      without a decorative image request. */
   .blueprint {
     background-image:

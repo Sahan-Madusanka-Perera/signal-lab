@@ -785,11 +785,13 @@ function BitRuler({
  * 5. Splitting a block
  * ================================================================== */
 
+/** The block every split on this page starts from. */
+const SPLIT_BASE = ipToInt("192.168.1.0")!;
+const SPLIT_BASE_PREFIX = 24;
+
 function SplitSection() {
   const [wanted, setWanted] = useState(4);
-  const base = ipToInt("192.168.1.0")!;
-  const basePrefix = 24;
-  const split = useMemo(() => splitBlock(base, basePrefix, wanted), [wanted]);
+  const split = useMemo(() => splitBlock(SPLIT_BASE, SPLIT_BASE_PREFIX, wanted), [wanted]);
   const [hostsNeeded, setHostsNeeded] = useState(50);
   const neededPrefix = prefixForHosts(hostsNeeded);
 

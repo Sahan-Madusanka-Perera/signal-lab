@@ -3,8 +3,10 @@ import { ScopeCanvas } from "../components/ScopeCanvas";
 import { LESSONS } from "../lib/curriculum";
 import { overallProgress, useProgress } from "../lib/progress";
 import { TAU } from "../lib/signal";
+import { useDocumentTitle } from "../lib/title";
 
 export function Home() {
+  useDocumentTitle(null);
   const { progress, totalQuestions, lessonScore, reset } = useProgress();
   const pct = Math.round(overallProgress(progress, totalQuestions) * 100);
   const started = progress.visited.length > 0;

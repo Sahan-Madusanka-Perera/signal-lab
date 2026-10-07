@@ -440,13 +440,13 @@ function RaceSection() {
     setTick(0);
   };
 
-  /** Deterministic loss, so the same segment number always suffers the same fate. */
-  const isLost = (id: number, attempt: number) => {
-    const x = Math.sin((id * 127.1 + attempt * 311.7) * 43758.5453);
-    return x - Math.floor(x) < loss;
-  };
-
   const sim = useMemo(() => {
+    /** Deterministic loss, so the same segment number always suffers the same fate. */
+    const isLost = (id: number, attempt: number) => {
+      const x = Math.sin((id * 127.1 + attempt * 311.7) * 43758.5453);
+      return x - Math.floor(x) < loss;
+    };
+
     // Tuned so that even at the maximum loss the TCP run finishes within a few
     // seconds. The point is that it is slower, not that it is unwatchable.
     const flight = 0.75; // seconds for one crossing

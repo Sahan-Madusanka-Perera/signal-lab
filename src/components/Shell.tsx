@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { LESSONS } from "../lib/curriculum";
 import { overallProgress, useProgress } from "../lib/progress";
 import { useTheme, type ThemeChoice } from "../lib/theme";
+import { SearchButton } from "./Search";
 
 export function Shell() {
   const [navOpen, setNavOpen] = useState(false);
@@ -164,6 +165,7 @@ function TopBar({ onMenu, navOpen }: { onMenu: () => void; navOpen: boolean }) {
         </NavLink>
 
         <div className="ml-auto flex items-center gap-2">
+          <SearchButton />
           <ThemeSwitch />
         </div>
       </div>

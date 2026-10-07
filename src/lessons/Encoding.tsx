@@ -557,13 +557,19 @@ function RateSection() {
  * 4. Synchronisation: the drift demo
  * ================================================================== */
 
+/** Fixed so the drift always bites at the same bit, which makes it explainable. */
+const SYNC_BITS = [1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0];
+
 function SyncSection() {
   const [drift, setDrift] = useState(1.0);
   const [code, setCode] = useState<LineCode>("nrz-l");
-  const bits = [1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0];
+  const bits = SYNC_BITS;
 
-  const segs = useMemo(() => encode(bits, code), [code]);
-  const samples = useMemo(() => sampleWithDrift(segs, bits.length, drift, code), [segs, drift, code]);
+  const segs = useMemo(() => encode(SYNC_BITS, code), [code]);
+  const samples = useMemo(
+    () => sampleWithDrift(segs, SYNC_BITS.length, drift, code),
+    [segs, drift, code],
+  );
   const decoded = samples.map((s) => s.bit);
   const errors = decoded.map((b, i) => b !== bits[i]).filter(Boolean).length;
   const firstError = decoded.findIndex((b, i) => b !== bits[i]);
@@ -716,10 +722,12 @@ function syncVerdict(drift: number, code: LineCode, errors: number, firstError: 
  * 5. Frequency and phase as signal elements
  * ================================================================== */
 
+const KEYING_BITS = [1, 0, 1, 1, 0, 0, 1, 0];
+
 function KeyingSection() {
   const [kind, setKind] = useState<Keying>("ask");
-  const bits = [1, 0, 1, 1, 0, 0, 1, 0];
-  const carrier = useMemo(() => keyedCarrier(bits, kind, 2000, 4), [kind]);
+  const bits = KEYING_BITS;
+  const carrier = useMemo(() => keyedCarrier(KEYING_BITS, kind, 2000, 4), [kind]);
 
   return (
     <Section

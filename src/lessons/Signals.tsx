@@ -109,6 +109,13 @@ function WhatIsASignal() {
           </div>
         </Panel>
       </div>
+
+      <Callout kind="exam" title="Every signal is a wave, but not every wave is a signal">
+        A wave is just energy travelling through something. Ripples on a pond are a wave, and they tell you
+        nothing. A wave becomes a <strong>signal</strong> only once someone deliberately varies it to carry
+        information, which is why the same radio wave is noise when it comes from a thunderstorm and a signal
+        when it comes from a transmitter. The wave is the carrier; the pattern you impose on it is the message.
+      </Callout>
     </Section>
   );
 }

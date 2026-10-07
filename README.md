@@ -14,7 +14,7 @@ diagrams.
 | Level | Topic | Interactive pieces |
 |---|---|---|
 | **6.1** | Signals and their properties | Wave lab (amplitude / frequency / phase, switchable between a time axis and a distance axis), rotating-phasor phase demo, analog-vs-digital quantiser, `v = f λ` solver with worked problems |
-| **6.2** | Signal transmission media | Guided / unguided animations, media catalogue, sorting drill, impairment lab (attenuation, noise, distortion, bandwidth, latency) with a live SNR readout, point-to-point link, simplex / half / full duplex animation, and a multiplexing lab covering TDM, FDM, WDM and CDM |
+| **6.2** | Signal transmission media | Guided / unguided animations, a nine-entry media catalogue (twisted pair, STP, coax, fibre, and radio / microwave / satellite / infrared / visible light with their spectrum bands), sorting drill, impairment lab (attenuation, noise, distortion, bandwidth, latency) with a live SNR readout, point-to-point link, simplex / half / full duplex animation, and a multiplexing lab covering TDM, FDM, WDM and CDM |
 | **6.3** | Encoding digital data | NRZ-L / NRZ-I / Manchester / differential Manchester encoder with a clock lane, switchable IEEE 802.3 and G. E. Thomas Manchester conventions, baud-vs-bit-rate comparison, clock-drift simulator that produces real bit errors, ASK / FSK / PSK lab, parity workbench |
 | **6.4** | PSTN and modems | Switched-circuit and voice-band diagrams, end-to-end modem schematic with a live signal tap at every stage, AM / FM / PM modulation lab, PCM sampling and quantisation |
 | **6.5** | Connecting many devices | All-to-all cable-growth demo, a six-way topology explorer (bus / star / ring / mesh / tree / hybrid) with packet animation, bus collision simulator with carrier sense, hub-vs-switch frame forwarding |
@@ -40,6 +40,7 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # type-check + production bundle into dist/
 npm run preview  # serve the built bundle
+npm run verify   # re-works the maths by hand and checks it matches
 ```
 
 ## Stack
@@ -77,8 +78,11 @@ src/
                     same CSS custom properties the DOM uses
     progress.tsx    localStorage-backed checkpoint progress
     curriculum.ts   syllabus metadata: outcomes and contents, quoted
+    glossary.ts     the hundred terms the paper expects a definition for,
+                    each pointing at the section that teaches it
   components/       Panel, Slider, Segmented, Toggle, BitTrain, Quiz, Shell,
                     LessonPage: one component vocabulary across all twelve levels
+                    Search: Ctrl/Cmd+K over levels, sections and glossary terms
   lessons/          one file per competency level, each lazily loaded so a
                     student downloads only the level they are reading
 ```
@@ -99,11 +103,28 @@ every panel background. Anything painting a hue onto text goes through
 Canvas code never hard-codes a colour. It reads the live custom properties
 through `usePalette()`, so a theme switch can't leave a plot on stale colours.
 
+## Deployment
+
+Vercel, as a static Vite build. `vercel.json` rewrites every path that is not a
+real file to `index.html`, which is what lets a deep link like `/lesson/mac` be
+reloaded or shared. Without it the platform looks for a file at that path, finds
+none and returns 404, while the home page keeps working. The rewrite deliberately
+excludes `/_vercel/`, which the platform serves itself for analytics.
+
 ## Checking it
 
 ```bash
+npm run verify           # no server needed
 node scripts/audit.mjs   # needs the dev server running
 ```
+
+`npm run verify` is the correctness net for a site whose whole claim is that the
+numbers are computed rather than typed in. It works the same problems
+independently (subnet boundaries and masks, class ranges, `v = f λ`, an RSA
+round-trip for every message under n, the ALOHA throughput peaks at 1/(2e) and
+1/e, transfer times) and checks that every glossary entry still points at a
+section that exists. 153 checks, and it needs no dependencies: Node strips the
+types itself.
 
 Sweeps all thirteen routes × both themes × 1440/768/390 px, 78 combinations,
 and reports horizontal overflow, WCAG AA text-contrast failures (OKLCH-aware and

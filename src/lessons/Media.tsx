@@ -145,7 +145,7 @@ function GuidedVsUnguided() {
             />
           </Scope>
           <ul className="mt-3 grid gap-1.5 text-sm text-ink-2">
-            {["Radio transmission", "Microwave links", "Satellite transmission", "Infrared"].map((x) => (
+            {["Radio waves", "Microwaves and satellite links", "Infrared", "Visible light (Li-Fi)"].map((x) => (
               <li key={x} className="flex gap-2">
                 <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--s4)" }} />
                 {x}
@@ -174,6 +174,9 @@ type MediumCard = {
   name: string;
   family: "guided" | "unguided";
   carries: string;
+  /** Where the medium sits in the spectrum. Unguided media only: the syllabus
+      quotes a wavelength and frequency range for each one. */
+  band?: string;
   bandwidth: string;
   distance: string;
   strengths: string[];
@@ -228,13 +231,42 @@ const MEDIA: MediumCard[] = [
   },
   {
     id: "radio",
-    name: "Radio and microwave",
+    name: "Radio waves",
     family: "unguided",
-    carries: "Electromagnetic waves through the air",
-    bandwidth: "Shared between everyone in range",
-    distance: "Metres to tens of kilometres",
-    strengths: ["No cable to lay", "Mobility", "Reaches places cable cannot"],
-    weaknesses: ["Interference from other transmitters", "Blocked or weakened by walls and weather", "Anyone in range can receive it"],
+    carries: "Electromagnetic waves radiated in every direction",
+    band: "1 cm to 100 km · 3 kHz to 1 GHz",
+    bandwidth: "Low, and shared between everyone in range",
+    distance: "Metres to hundreds of kilometres",
+    strengths: [
+      "Travel in all directions, so the antennas need no careful aiming",
+      "Pass through walls and buildings",
+      "Work indoors and outdoors, and while moving",
+    ],
+    weaknesses: [
+      "Easily interfered with by other transmitters on the same band",
+      "Low bandwidth compared with the higher-frequency media",
+      "Anyone in range can receive the signal",
+    ],
+    series: 4,
+  },
+  {
+    id: "microwave",
+    name: "Microwaves",
+    family: "unguided",
+    carries: "High-frequency electromagnetic waves in a narrow beam",
+    band: "1 mm to 100 mm · 1 GHz to 300 GHz",
+    bandwidth: "Higher than radio",
+    distance: "Tens of kilometres per hop, line of sight",
+    strengths: [
+      "More bandwidth than radio waves",
+      "Less prone to interference than radio",
+      "Pass through the atmosphere into space without being reflected",
+    ],
+    weaknesses: [
+      "Need a clear line of sight between the two antennas",
+      "Heavy rain, fog and cloud weaken the signal",
+      "Towers and antennas make installation expensive",
+    ],
     series: 4,
   },
   {
@@ -242,10 +274,51 @@ const MEDIA: MediumCard[] = [
     name: "Satellite",
     family: "unguided",
     carries: "Microwaves relayed via a spacecraft",
+    band: "Microwave band, uplink and downlink on different frequencies",
     bandwidth: "Moderate, shared",
     distance: "Intercontinental",
     strengths: ["Covers oceans and remote regions", "One hop reaches an enormous area"],
     weaknesses: ["Very high latency: the signal travels ~72 000 km", "Expensive", "Affected by heavy rain"],
+    series: 4,
+  },
+  {
+    id: "infrared",
+    name: "Infrared",
+    family: "unguided",
+    carries: "Light just beyond the red end of what the eye can see",
+    band: "700 nm to 1 mm · 300 GHz to 400 THz",
+    bandwidth: "Moderate",
+    distance: "A few metres, within one room",
+    strengths: [
+      "Unaffected by radio interference",
+      "Cheap and simple to build",
+      "Cannot pass through walls, so one room's signal never leaks into the next",
+    ],
+    weaknesses: [
+      "Needs line of sight, and solid objects block it completely",
+      "Short range only",
+      "Sunlight and strong room lighting degrade it",
+    ],
+    series: 4,
+  },
+  {
+    id: "visible",
+    name: "Visible light",
+    family: "unguided",
+    carries: "The light the eye can see, switched far too fast to notice",
+    band: "400 nm to 700 nm · 400 THz to 790 THz",
+    bandwidth: "Very high",
+    distance: "A room, within sight of the lamp",
+    strengths: [
+      "Enormous bandwidth, because the frequency is so high",
+      "Re-uses lighting that is already installed: this is Li-Fi",
+      "Contained by walls, so it is hard to eavesdrop on from outside",
+    ],
+    weaknesses: [
+      "Blocked by any obstacle, and will not pass through walls",
+      "Needs line of sight to the lamp",
+      "Competes with sunlight and other light sources",
+    ],
     series: 4,
   },
 ];
@@ -302,6 +375,11 @@ function MediaCatalogue() {
               <Readout label="Typical bandwidth" value={<span className="text-sm">{open.bandwidth}</span>} />
               <Readout label="Typical reach" value={<span className="text-sm">{open.distance}</span>} />
             </div>
+            {open.band ? (
+              <div className="mt-4">
+                <Readout label="Where it sits in the spectrum" value={<span className="text-sm">{open.band}</span>} />
+              </div>
+            ) : null}
 
             <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <div>
@@ -347,6 +425,8 @@ const DRILL_ITEMS = [
   { id: "d6", label: "Wi-Fi in a classroom", answer: "unguided" },
   { id: "d7", label: "Infrared remote control", answer: "unguided" },
   { id: "d8", label: "Telephone drop wire", answer: "guided" },
+  { id: "d9", label: "Li-Fi from a ceiling lamp", answer: "unguided" },
+  { id: "d10", label: "STP cable beside a factory motor", answer: "guided" },
 ] as const;
 
 function SortingDrill() {
@@ -1326,7 +1406,7 @@ const QUESTIONS: Question[] = [
       { label: "Single-mode optical fibre" },
     ],
     explain:
-      "Unguided means the signal is radiated into free space with no physical path steering it. Satellite, Wi-Fi, radio and infrared are unguided; every cable is guided.",
+      "Unguided means the signal is radiated into free space with no physical path steering it. Satellite, Wi-Fi, radio, microwave, infrared and visible light are unguided; every cable is guided. Light is the clearest case: inside a fibre it is guided, and coming off a Li-Fi lamp it is not.",
   },
   {
     id: "m2",

@@ -386,6 +386,36 @@ function ModulationLab() {
       title="Modulation lab"
       lead="Modulation means attaching a low-frequency message to a high-frequency carrier by changing one of the carrier's properties. The message decides how the carrier is bent; the carrier does the actual travelling."
     >
+      <Callout kind="exam" title="Why modulation is needed at all">
+        Encoding represents bits as voltage levels, which works only while there is a wire to carry the voltage.
+        Three things break that, and modulation answers all three.
+        <ul className="mt-2 grid gap-1.5">
+          <li className="flex gap-2">
+            <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
+            <span>
+              <strong className="font-semibold text-ink">No wire, no voltage.</strong> A voltage needs a closed
+              circuit. Air and light offer no such path, so something has to travel through free space instead.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
+            <span>
+              <strong className="font-semibold text-ink">Distance.</strong> A raw voltage weakens and collects
+              noise over a long run, even on cable. A high-frequency carrier travels further and is easier to
+              pick out again at the far end.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
+            <span>
+              <strong className="font-semibold text-ink">Sharing.</strong> Many devices may need the same
+              channel at once, and raw voltages give no way to tell them apart. Give each one a different
+              carrier frequency and they coexist without interfering, which is exactly what FDM does in 6.2.
+            </span>
+          </li>
+        </ul>
+      </Callout>
+
       <Panel
         title={MODULATION[kind].long}
         subtitle={MODULATION[kind].note}
