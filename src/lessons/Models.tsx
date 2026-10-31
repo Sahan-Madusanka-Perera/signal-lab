@@ -750,7 +750,7 @@ function FlowSection() {
                   : {
                       x: cur.side === "sender" ? laneL : laneR,
                       y: rowY(cur.layer ?? 0) + boxH / 2,
-                      size: cur.side === "sender" ? (cur.layer ?? 0) : (cur.layer ?? 0) - 1,
+                      size: cur.layer ?? 0,
                     };
 
               const p = posRef.current;
