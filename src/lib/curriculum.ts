@@ -307,7 +307,6 @@ export const LESSONS: LessonMeta[] = [
     sections: [
       { id: "why", label: "Why layers" },
       { id: "stack", label: "The two models" },
-      { id: "example", label: "A worked example" },
       { id: "units", label: "Data units" },
       { id: "flow", label: "Data flow" },
       { id: "devices", label: "Devices by layer" },

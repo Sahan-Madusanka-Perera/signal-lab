@@ -1,26 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import { Section } from "../components/LessonPage";
 import { ScopeCanvas } from "../components/ScopeCanvas";
 import { Quiz, type Question } from "../components/Quiz";
 import {
   Badge,
-  Button,
   Callout,
-  Extra,
   Legend,
   Panel,
   Readout,
-  Reveal,
   Scope,
   Segmented,
   Slider,
 } from "../components/ui";
-import { useReducedMotion } from "../lib/theme";
-import { ExampleSection } from "./ModelsExample";
+import { ExampleSection, UnitNamesPanel } from "./ModelsExample";
 import {
-  ENCAP_STEPS,
-  FLOW,
   NETWORK_DEVICES,
   MODEL_DIFFERENCES,
   MODEL_MAP,
@@ -36,9 +30,8 @@ export function ModelsLesson() {
     <>
       <WhySection />
       <StackSection />
-      <ExampleSection />
       <UnitsSection />
-      <FlowSection />
+      <ExampleSection />
       <DevicesSection />
       <Section id="check" title="Check yourself">
         <Quiz lessonId="models" questions={QUESTIONS} />
@@ -528,331 +521,14 @@ function UnitsSection() {
         </p>
       </Panel>
 
-      <Panel title="The name at each layer" bodyClassName="p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-line">
-                <th className="px-4 py-2.5 text-2xs font-semibold tracking-wide text-ink-3">Layer</th>
-                <th className="px-4 py-2.5 text-2xs font-semibold tracking-wide text-ink-3">Unit is called</th>
-                <th className="px-4 py-2.5 text-2xs font-semibold tracking-wide text-ink-3">What that layer adds</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ENCAP_STEPS.map((s) => (
-                <tr key={s.layer} className="border-b border-line last:border-0">
-                  <td className="px-4 py-2.5 align-top">
-                    <span className="text-sm font-medium" style={{ color: `var(--s${s.series + 1}-ink)` }}>
-                      {s.layer}
-                    </span>
-                  </td>
-                  <td className="tnum px-4 py-2.5 align-top font-mono text-sm font-semibold text-ink">
-                    {s.unit}
-                    {s.headerBytes > 0 && (
-                      <span className="ml-1.5 font-sans text-2xs font-normal text-ink-3">
-                        +{s.headerBytes + s.trailerBytes} B
-                      </span>
-                    )}
-                  </td>
-                  <td className="max-w-[46ch] px-4 py-2.5 align-top text-ink-2">{s.adds}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Panel>
+      <UnitNamesPanel />
 
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
-        <Callout kind="exam" title="Three names to learn">
-          The network layer unit is a <strong>packet</strong>, the data link layer unit is a{" "}
-          <strong>frame</strong>, and the physical layer deals in <strong>bits</strong>. Above them, the
-          transport layer unit is a <strong>segment</strong> in TCP and a datagram in UDP. Those names are what
-          the exam asks for; the byte counts above are here to make the idea clear, and you do not need to learn them.
-        </Callout>
-
-        <Panel
-          title="Why the smallest messages are the most expensive"
-          actions={<Extra>frame padding and efficiency</Extra>}
-        >
-          <Reveal label="Work it out">
-            <p className="max-w-[58ch]">
-              A one-byte keystroke gets a 20-byte TCP header and a 20-byte IP header, which is still only 41
-              bytes, below Ethernet's 46-byte minimum payload, so five bytes of padding are added. With the
-              14-byte Ethernet header and the 4-byte FCS the frame is 64 bytes, of which one byte is yours:
-              an efficiency of 1.6 %. At the other end of the slider, 1460 bytes of data travel in a 1518-byte
-              frame, or 96.2 %.
-            </p>
-          </Reveal>
-        </Panel>
-      </div>
-    </Section>
-  );
-}
-
-/* ================================================================== *
- * 4. Data flow
- * ================================================================== */
-
-function FlowSection() {
-  const [step, setStep] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const reduced = useReducedMotion();
-  const posRef = useRef({ x: 0, y: 0, size: 0 });
-  const cur = FLOW[step];
-
-  useEffect(() => {
-    if (!playing) return;
-    const id = setInterval(() => setStep((s) => (s + 1) % FLOW.length), 2000);
-    return () => clearInterval(id);
-  }, [playing]);
-
-  return (
-    <Section
-      id="flow"
-      title="Down one stack, across, and up the other"
-      lead="Here is the whole model, animated. Data goes down the sender's stack and gets a new header at each layer. It crosses the medium as bits only. Then it goes up the receiver's stack, and each layer removes the header that the same layer at the sender added. Each layer only reads what the same layer at the other end wrote."
-    >
-      <Panel
-        title={`Step ${step + 1} of ${FLOW.length}: ${cur.title}`}
-        subtitle={cur.detail}
-        actions={
-          <div className="flex flex-wrap gap-1.5">
-            <Button size="sm" onClick={() => setPlaying((p) => !p)}>
-              {playing ? "Pause" : "Play"}
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                setPlaying(false);
-                setStep((s) => Math.max(0, s - 1));
-              }}
-              disabled={step === 0}
-            >
-              Back
-            </Button>
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={() => {
-                setPlaying(false);
-                setStep((s) => (s + 1) % FLOW.length);
-              }}
-            >
-              {step === FLOW.length - 1 ? "Start again" : "Next"}
-            </Button>
-          </div>
-        }
-      >
-        <Scope height={292}>
-          <ScopeCanvas
-            label={`Data flow between two hosts using the TCP/IP model. Step ${step + 1}: ${cur.title}. The unit is currently a ${cur.unit}.`}
-            animate={!reduced}
-            deps={[step, reduced]}
-            bounds={{ x0: 0, x1: 1, y0: 0, y1: 1 }}
-            insets={{ left: 0, right: 0, top: 0, bottom: 0 }}
-            draw={({ plot, ctx, palette, w }) => {
-              const narrow = w < 520;
-              const boxW = narrow ? 96 : 132;
-              const boxH = 34;
-              const gapY = 12;
-              const top = 28;
-              const senderX = narrow ? 12 : 28;
-              const recvX = w - boxW - (narrow ? 12 : 28);
-              const rowY = (i: number) => top + i * (boxH + gapY);
-              const wireY = rowY(3) + boxH + 40;
-
-              // The unit travels in a lane beside each stack rather than over it,
-              // so a layer's name is never hidden by the thing passing through it.
-              const bandW = narrow ? 8 : 13;
-              const unitBase = narrow ? 26 : 40;
-              const halfMax = (unitBase + 3 * bandW) / 2;
-              const laneL = Math.min(senderX + boxW + halfMax + 4, w / 2 - halfMax - 6);
-              const laneR = Math.max(recvX - halfMax - 4, w / 2 + halfMax + 6);
-
-              plot.text(senderX + boxW / 2, 10, "Sender", palette.inkFaint, { size: 10, weight: 700, align: "center" });
-              plot.text(recvX + boxW / 2, 10, "Receiver", palette.inkFaint, { size: 10, weight: 700, align: "center" });
-
-              // Peer-to-peer links: the layer a layer really talks to.
-              TCPIP_LAYERS.forEach((l, i) => {
-                const lit = cur.layer === i;
-                ctx.save();
-                ctx.strokeStyle = lit ? palette.series[l.series] : palette.grid;
-                ctx.lineWidth = lit ? 1.6 : 1;
-                ctx.setLineDash([4, 4]);
-                ctx.globalAlpha = lit ? 0.9 : 0.5;
-                ctx.beginPath();
-                ctx.moveTo(senderX + boxW + 4, rowY(i) + boxH / 2);
-                ctx.lineTo(recvX - 4, rowY(i) + boxH / 2);
-                ctx.stroke();
-                ctx.restore();
-              });
-
-              // The stacks.
-              const drawStack = (x: number, side: "sender" | "receiver") => {
-                TCPIP_LAYERS.forEach((l, i) => {
-                  const active = cur.side === side && cur.layer === i;
-                  const colour = palette.series[l.series];
-                  const y = rowY(i);
-                  ctx.save();
-                  if (active && palette.isDark) {
-                    ctx.shadowColor = colour;
-                    ctx.shadowBlur = 14;
-                  }
-                  ctx.fillStyle = palette.bg;
-                  ctx.strokeStyle = active ? colour : palette.axis;
-                  ctx.lineWidth = active ? 2.2 : 1.3;
-                  ctx.beginPath();
-                  ctx.roundRect(x, y, boxW, boxH, 6);
-                  ctx.fill();
-                  ctx.stroke();
-                  ctx.shadowBlur = 0;
-                  ctx.font = `${active ? 700 : 600} ${narrow ? 8.5 : 10}px "JetBrains Mono Variable", ui-monospace, monospace`;
-                  ctx.fillStyle = active ? colour : palette.ink;
-                  ctx.textAlign = "center";
-                  ctx.textBaseline = "middle";
-                  ctx.fillText(l.name, x + boxW / 2, y + boxH / 2);
-                  ctx.restore();
-                });
-              };
-              drawStack(senderX, "sender");
-              drawStack(recvX, "receiver");
-
-              // The path the data physically takes: down one side, across the
-              // medium, and up the other.
-              ctx.save();
-              ctx.strokeStyle = palette.gridMajor;
-              ctx.lineWidth = 2.4;
-              ctx.lineJoin = "round";
-              ctx.beginPath();
-              ctx.moveTo(laneL, rowY(0));
-              ctx.lineTo(laneL, wireY);
-              ctx.lineTo(laneR, wireY);
-              ctx.lineTo(laneR, rowY(0));
-              ctx.stroke();
-              ctx.lineWidth = 1;
-              ctx.setLineDash([2, 3]);
-              ctx.globalAlpha = 0.7;
-              TCPIP_LAYERS.forEach((_, i) => {
-                ctx.beginPath();
-                ctx.moveTo(senderX + boxW, rowY(i) + boxH / 2);
-                ctx.lineTo(laneL, rowY(i) + boxH / 2);
-                ctx.moveTo(recvX, rowY(i) + boxH / 2);
-                ctx.lineTo(laneR, rowY(i) + boxH / 2);
-                ctx.stroke();
-              });
-              ctx.restore();
-              plot.text((laneL + laneR) / 2, wireY + 12, "the medium: bits only", palette.inkFaint, {
-                size: 9,
-                align: "center",
-              });
-
-              // Where the unit should be for this step, and how big it is.
-              const target =
-                cur.side === "wire"
-                  ? { x: (laneL + laneR) / 2, y: wireY, size: 3 }
-                  : {
-                      x: cur.side === "sender" ? laneL : laneR,
-                      y: rowY(cur.layer ?? 0) + boxH / 2,
-                      size: cur.layer ?? 0,
-                    };
-
-              const p = posRef.current;
-              const k = reduced ? 1 : 0.16;
-              // Snap on a first paint, then ease, so a step change reads as movement.
-              if (p.x === 0 && p.y === 0) Object.assign(p, target);
-              p.x += (target.x - p.x) * k;
-              p.y += (target.y - p.y) * k;
-              p.size += (target.size - p.size) * k;
-
-              // The unit itself: one band per header it is currently carrying.
-              const bands = Math.max(0, Math.round(p.size));
-              const unitW = unitBase + bands * bandW;
-              const colour = palette.series[cur.side === "wire" ? 3 : TCPIP_LAYERS[cur.layer ?? 0].series];
-              ctx.save();
-              if (palette.isDark) {
-                ctx.shadowColor = colour;
-                ctx.shadowBlur = 14;
-              }
-              ctx.fillStyle = colour;
-              ctx.beginPath();
-              ctx.roundRect(p.x - unitW / 2, p.y - 10, unitW, 20, 5);
-              ctx.fill();
-              ctx.shadowBlur = 0;
-              // Header stripes stack up on the left as the unit descends.
-              for (let i = 0; i < bands; i++) {
-                ctx.fillStyle = palette.bg;
-                ctx.globalAlpha = 0.34;
-                ctx.fillRect(p.x - unitW / 2 + 3 + i * bandW, p.y - 7, bandW - 3, 14);
-              }
-              ctx.globalAlpha = 1;
-              ctx.font = `700 ${narrow ? 8 : 9}px "JetBrains Mono Variable", ui-monospace, monospace`;
-              ctx.fillStyle = palette.bg;
-              ctx.textAlign = "center";
-              ctx.textBaseline = "middle";
-              ctx.fillText(cur.unit, p.x + (bands * bandW) / 2, p.y + 0.5);
-              ctx.restore();
-            }}
-          />
-        </Scope>
-
-        <ol className="mt-4 flex flex-wrap gap-1.5">
-          {FLOW.map((f, i) => (
-            <li key={f.title}>
-              <button
-                type="button"
-                onClick={() => {
-                  setPlaying(false);
-                  setStep(i);
-                }}
-                aria-label={`Step ${i + 1}: ${f.title}`}
-                aria-current={i === step}
-                className={clsx(
-                  "tnum h-6 w-6 rounded-md font-mono text-2xs font-semibold transition-colors",
-                  i === step
-                    ? "bg-brand text-brand-ink"
-                    : i < step
-                      ? "bg-ok-wash text-ok"
-                      : "bg-surface-2 text-ink-3 hover:text-ink",
-                )}
-              >
-                {i + 1}
-              </button>
-            </li>
-          ))}
-        </ol>
-
-        <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 sm:grid-cols-3">
-          <Readout label="Where" value={cur.side === "wire" ? "On the medium" : cur.side === "sender" ? "Sending host" : "Receiving host"} />
-          <Readout
-            label="Layer"
-            value={cur.layer === null ? "—" : TCPIP_LAYERS[cur.layer].name}
-            tone="brand"
-            sub={cur.layer === null ? "between the two hosts" : `TCP/IP layer ${TCPIP_LAYERS[cur.layer].n}`}
-          />
-          <Readout label="Unit is called" value={cur.unit} sub="its name at this point" />
-        </div>
-      </Panel>
-
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
-        <Callout kind="note" title="Two conversations at once">
-          The dotted lines are the conversation each layer <em>thinks</em> it is having: TCP at one end appears
-          to talk straight to TCP at the other. The solid path down, across and up is what physically happens.
-          Both descriptions are correct, and the model lets you use whichever one helps more.
-        </Callout>
-
-        <Panel title="The rule that decides what a device can do">
-          <p className="max-w-[52ch] text-sm text-ink-2">
-            A device can only act on what it can read. A repeater sees voltages, so all it can do is make them
-            stronger. A switch reads MAC addresses, so it can decide which port a frame belongs on, but only
-            within one network. A router reads IP addresses, so it can move a packet between networks that have
-            nothing else in common.
-          </p>
-          <p className="mt-2 max-w-[52ch] text-sm text-ink-2">
-            If you know the layer a device works at, you know what it can do. The next section
-            places every device in this competency on that ladder.
-          </p>
-        </Panel>
-      </div>
+      <Callout kind="exam" title="Three names to learn">
+        The network layer unit is a <strong>packet</strong>, the data link layer unit is a{" "}
+        <strong>frame</strong>, and the physical layer deals in <strong>bits</strong>. Above them, the
+        transport layer unit is a <strong>segment</strong> in TCP and a datagram in UDP. Those names are what
+        the exam asks for; the byte counts above are here to make the idea clear, and you do not need to learn them.
+      </Callout>
     </Section>
   );
 }

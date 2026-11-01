@@ -101,14 +101,14 @@ export function ExampleSection() {
 
   return (
     <Section
-      id="example"
+      id="flow"
       title="One click, followed all the way"
       lead={
         <>
           You open <span className="font-mono text-ink">www.example.com</span> on your laptop. Below, that one
           request is followed through every layer, from your laptop to the web server, with the real values each
           layer writes. Watch two things: the envelopes being added and removed, and the name of the thing
-          changing as they are.
+          changing as they are. Each layer only reads the header that the same layer wrote at the other end.
         </>
       }
     >
@@ -218,40 +218,6 @@ export function ExampleSection() {
         </ol>
       </Panel>
 
-      <Panel
-        title="Five names, five questions"
-        subtitle="Each name goes with exactly one question about the message. If you know the question, you know the name."
-        bodyClassName="p-0"
-      >
-        <ul>
-          {UNIT_QUESTIONS.map((u) => {
-            const n = u.unit === "Bits" ? null : u.series;
-            return (
-              <li
-                key={u.unit}
-                className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-3 border-b border-line px-4 py-3 last:border-0 sm:grid-cols-[6.5rem_minmax(0,1fr)_11rem]"
-              >
-                <div>
-                  <span
-                    className="inline-block rounded-md px-1.5 py-0.5 font-mono text-xs font-semibold"
-                    style={{ background: wash(series(n), 12), color: seriesInk(n) }}
-                  >
-                    {u.unit}
-                  </span>
-                  <p className="mt-1 text-2xs text-ink-3">{u.layer}</p>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-ink">{u.question}</p>
-                  <p className="text-sm text-ink-2">{u.answer}</p>
-                </div>
-                <p className="col-start-2 truncate font-mono text-2xs text-ink-3 sm:col-start-3 sm:pt-0.5 sm:text-right">
-                  {u.example}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
-      </Panel>
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="Four things students often mix up">
@@ -282,6 +248,46 @@ export function ExampleSection() {
         </Callout>
       </div>
     </Section>
+  );
+}
+
+/** The five unit names, each with the one question its wrapper answers. */
+export function UnitNamesPanel() {
+  return (
+  <Panel
+    title="Five names, five questions"
+    subtitle="Each name goes with exactly one question about the message. If you know the question, you know the name. The examples come from the web request followed in the next section."
+    bodyClassName="p-0"
+  >
+    <ul>
+      {UNIT_QUESTIONS.map((u) => {
+        const n = u.unit === "Bits" ? null : u.series;
+        return (
+          <li
+            key={u.unit}
+            className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-3 border-b border-line px-4 py-3 last:border-0 sm:grid-cols-[6.5rem_minmax(0,1fr)_11rem]"
+          >
+            <div>
+              <span
+                className="inline-block rounded-md px-1.5 py-0.5 font-mono text-xs font-semibold"
+                style={{ background: wash(series(n), 12), color: seriesInk(n) }}
+              >
+                {u.unit}
+              </span>
+              <p className="mt-1 text-2xs text-ink-3">{u.layer}</p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-ink">{u.question}</p>
+              <p className="text-sm text-ink-2">{u.answer}</p>
+            </div>
+            <p className="col-start-2 truncate font-mono text-2xs text-ink-3 sm:col-start-3 sm:pt-0.5 sm:text-right">
+              {u.example}
+            </p>
+          </li>
+        );
+      })}
+    </ul>
+  </Panel>
   );
 }
 
