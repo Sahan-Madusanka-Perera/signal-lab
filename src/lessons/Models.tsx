@@ -567,7 +567,7 @@ function UnitsSection() {
           The network layer unit is a <strong>packet</strong>, the data link layer unit is a{" "}
           <strong>frame</strong>, and the physical layer deals in <strong>bits</strong>. Above them, the
           transport layer unit is a <strong>segment</strong> in TCP and a datagram in UDP. Those names are what
-          the paper asks for; the byte counts above are here to make the idea clear, and you do not need to learn them.
+          the exam asks for; the byte counts above are here to make the idea clear, and you do not need to learn them.
         </Callout>
 
         <Panel
