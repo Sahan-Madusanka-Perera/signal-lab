@@ -290,7 +290,7 @@ export const LESSONS: LessonMeta[] = [
     title: "Reference models",
     tagline: "The map of the whole stack: seven layers, or four, what each adds, and where every device sits.",
     periods: 4,
-    questions: 7,
+    questions: 9,
     outcomes: [
       "Describes the functions of layers of TCP/IP and OSI models",
       "Describes the data units in different layers (packet, frame and bit)",
@@ -307,6 +307,7 @@ export const LESSONS: LessonMeta[] = [
     sections: [
       { id: "why", label: "Why layers" },
       { id: "stack", label: "The two models" },
+      { id: "example", label: "A worked example" },
       { id: "units", label: "Data units" },
       { id: "flow", label: "Data flow" },
       { id: "devices", label: "Devices by layer" },

@@ -17,6 +17,7 @@ import {
   Slider,
 } from "../components/ui";
 import { useReducedMotion } from "../lib/theme";
+import { ExampleSection } from "./ModelsExample";
 import {
   ENCAP_STEPS,
   FLOW,
@@ -35,6 +36,7 @@ export function ModelsLesson() {
     <>
       <WhySection />
       <StackSection />
+      <ExampleSection />
       <UnitsSection />
       <FlowSection />
       <DevicesSection />
@@ -1095,5 +1097,29 @@ const QUESTIONS: Question[] = [
     ],
     explain:
       "A switch works at the data link layer, so it can read the destination MAC address and send the frame only to the port that address is on. A hub and a repeater work at the physical layer and can do nothing but copy the signal onward; a modem only changes the signal's form.",
+  },
+  {
+    id: "m8",
+    prompt: "Your request passes through a router on its way to a web server. What does the router replace?",
+    options: [
+      { label: "The destination IP address" },
+      { label: "The source and destination MAC addresses", correct: true },
+      { label: "The port numbers" },
+      { label: "Nothing; it passes the frame on untouched" },
+    ],
+    explain:
+      "A frame only lives for one hop. The router throws it away, reads the IP address in the packet inside, and builds a new frame with new MAC addresses for the next link. The destination IP address stays the same from end to end, and a router never reads the ports at all.",
+  },
+  {
+    id: "m9",
+    prompt: "On the receiving computer, what does the Internet layer hand up to the transport layer?",
+    options: [
+      { label: "A frame" },
+      { label: "A packet" },
+      { label: "A segment", correct: true },
+      { label: "Bits" },
+    ],
+    explain:
+      "The Internet layer receives a packet, checks that the destination IP address is its own, and removes the IP header. What is left, and what goes up to TCP, is the segment: the TCP header plus the data.",
   },
 ];

@@ -552,3 +552,255 @@ export const NETWORK_DEVICES: Device[] = [
     reads: "Addresses, protocols and ports",
   },
 ];
+
+/* ================================================================== *
+ * A worked example: one web request, followed all the way
+ *
+ * The same request the Applications lesson uses (www.example.com, port 80),
+ * with every address and port filled in, so a student can watch the actual
+ * values each layer writes and reads. The addresses are made up but shaped
+ * like real ones; 203.0.113.0/24 is the range set aside for examples.
+ * ================================================================== */
+
+/** The request the browser writes. 41 bytes, which the scaled diagram can reuse. */
+export const EXAMPLE_REQUEST = "GET / HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
+
+export const EXAMPLE_HOSTS = {
+  laptop: { name: "Your laptop", ip: "192.168.1.42", mac: "a4:5e:60:c2:19:7e" },
+  router: { name: "Home router", ip: "192.168.1.1", lanMac: "3c:52:82:1a:00:01", wanMac: "3c:52:82:1a:00:02" },
+  server: { name: "Web server", ip: "93.184.216.34", mac: "00:1a:4b:9c:5d:10" },
+  publicIp: "203.0.113.7",
+  srcPort: 51234,
+  dstPort: 80,
+};
+
+/**
+ * The frame is rebuilt on every link, so its MAC addresses depend on which hop
+ * it is on. The packet inside keeps its destination the whole way; only the
+ * TTL ticks down, and the home router's NAT swaps the private source address.
+ */
+export const EXAMPLE_HOPS = [
+  { macFrom: EXAMPLE_HOSTS.laptop.mac, macTo: EXAMPLE_HOSTS.router.lanMac, ipFrom: EXAMPLE_HOSTS.laptop.ip, ttl: 64 },
+  { macFrom: EXAMPLE_HOSTS.router.wanMac, macTo: "00:25:9e:4b:71:c3", ipFrom: EXAMPLE_HOSTS.publicIp, ttl: 63 },
+  { macFrom: "e8:1c:ba:30:7f:22", macTo: EXAMPLE_HOSTS.server.mac, ipFrom: EXAMPLE_HOSTS.publicIp, ttl: 52 },
+] as const;
+
+/** Routers between the home router and the server's own network. */
+export const EXAMPLE_MIDDLE_ROUTERS = EXAMPLE_HOPS[1].ttl - EXAMPLE_HOPS[2].ttl;
+
+export type ExampleHeader = "tcp" | "ip" | "eth";
+export type ExampleField = "macFrom" | "macTo" | "ipFrom" | "ttl";
+export type ExamplePlace = "laptop" | "wire1" | "router" | "wire2" | "server";
+
+export type ExampleStep = {
+  at: ExamplePlace;
+  /** Index into TCPIP_LAYERS, or null while the unit is on the medium. */
+  layer: number | null;
+  title: string;
+  /** What happens, in plain words. */
+  plain: string;
+  /** The same step as posting a letter. */
+  analogy: string;
+  unit: "Data" | "Segment" | "Packet" | "Frame" | "Bits";
+  /** How many headers the unit is carrying: 0 is bare data, 3 is a frame. */
+  depth: 0 | 1 | 2 | 3;
+  /** Which hop's addresses are written in the headers. */
+  hop: 0 | 1 | 2;
+  /** The part of the unit this layer writes or reads. */
+  focus?: ExampleHeader | "data";
+  /** What this layer is doing to its header. */
+  verb: "writes" | "adds" | "reads" | "removes" | "rebuilds" | "sends";
+  /** A header that came off in the step before, shown leaving. */
+  removed?: ExampleHeader;
+  /** Fields whose values have just changed. */
+  changed?: ExampleField[];
+  /** Marks a detail that goes beyond the syllabus. */
+  extra?: string;
+};
+
+export const EXAMPLE_STEPS: ExampleStep[] = [
+  {
+    at: "laptop",
+    layer: 0,
+    title: "You press Enter, and the browser writes a request",
+    plain:
+      "You typed www.example.com. The browser is an application, and it writes a short text message asking the web server for its home page. That text is the data. Nothing has been added to it yet.",
+    analogy: "You write a letter.",
+    unit: "Data",
+    depth: 0,
+    hop: 0,
+    focus: "data",
+    verb: "writes",
+  },
+  {
+    at: "laptop",
+    layer: 1,
+    title: "Transport adds the port numbers",
+    plain:
+      "TCP puts a header in front of the data. Its key fields are two port numbers. Port 80 means “give this to the web server program”, and port 51234 is the browser tab that is waiting for the answer. Data plus a TCP header is a segment.",
+    analogy: "You put the letter in an envelope and write on it which person in the house it is for.",
+    unit: "Segment",
+    depth: 1,
+    hop: 0,
+    focus: "tcp",
+    verb: "adds",
+  },
+  {
+    at: "laptop",
+    layer: 2,
+    title: "The Internet layer adds IP addresses",
+    plain:
+      "IP wraps the segment in a header with two IP addresses: the laptop’s, and the server’s 93.184.216.34, which DNS found earlier. An IP address picks out one computer anywhere in the world, so routers can pass the unit towards it. A segment plus an IP header is a packet.",
+    analogy: "You put that envelope inside a bigger one and write the full street address of the house on it.",
+    unit: "Packet",
+    depth: 2,
+    hop: 0,
+    focus: "ip",
+    verb: "adds",
+  },
+  {
+    at: "laptop",
+    layer: 3,
+    title: "Host to network wraps it in a frame for the first hop",
+    plain:
+      "The laptop cannot reach the server directly. All it can reach is the home router. So the frame header carries MAC addresses for this one short hop, from the laptop’s Wi-Fi card to the router, and a checksum (the FCS) goes on the end so damage can be spotted. A packet plus this header and trailer is a frame.",
+    analogy: "You hand it to a courier in a bag labelled only “to the post office down the road”.",
+    unit: "Frame",
+    depth: 3,
+    hop: 0,
+    focus: "eth",
+    verb: "adds",
+  },
+  {
+    at: "wire1",
+    layer: null,
+    title: "The frame leaves as bits",
+    plain:
+      "The Wi-Fi card turns the whole frame, every header included, into 0s and 1s and sends them as radio waves. Nothing new is added. “Bits” is not another wrapper: it is the same frame, written as a signal.",
+    analogy: "The courier drives down the road. The road does not care what is in the bag.",
+    unit: "Bits",
+    depth: 3,
+    hop: 0,
+    verb: "sends",
+  },
+  {
+    at: "router",
+    layer: 3,
+    title: "The home router opens the frame",
+    plain:
+      "The router turns the bits back into a frame. The destination MAC address is its own and the FCS checks out, so the frame has done its job. The router throws the frame header and trailer away and passes the packet up.",
+    analogy: "The post office opens the courier bag. The bag was only for getting here.",
+    unit: "Frame",
+    depth: 3,
+    hop: 0,
+    focus: "eth",
+    verb: "removes",
+  },
+  {
+    at: "router",
+    layer: 2,
+    title: "The router reads the IP address",
+    plain:
+      "93.184.216.34 is not on the home network, so the packet has to go out to the ISP. The router lowers the TTL by one, from 64 to 63. A router never looks inside at the ports or the data; for a router, the Internet layer is the top.",
+    analogy: "The post office reads the street address, sees it is in another town, and sends it on that way.",
+    unit: "Packet",
+    depth: 2,
+    hop: 1,
+    focus: "ip",
+    verb: "reads",
+    removed: "eth",
+    changed: ["ipFrom", "ttl"],
+    extra:
+      "A home router also swaps the private “from” address 192.168.1.42 for your home’s public address, 203.0.113.7, so the reply can find its way back. This is NAT, covered in 6.12.",
+  },
+  {
+    at: "router",
+    layer: 3,
+    title: "A brand new frame for the next hop",
+    plain:
+      "The router builds a new frame around the same packet, addressed from the router to the ISP’s router. Both MAC addresses are new. The server’s IP address inside has not changed at all.",
+    analogy: "The envelope goes into a new courier bag for the next post office. New bag, same envelope.",
+    unit: "Frame",
+    depth: 3,
+    hop: 1,
+    focus: "eth",
+    verb: "rebuilds",
+    changed: ["macFrom", "macTo"],
+  },
+  {
+    at: "wire2",
+    layer: null,
+    title: `Across the Internet, one hop at a time`,
+    plain: `The bits cross about ${EXAMPLE_MIDDLE_ROUTERS} more routers. Each one does exactly what your home router just did: turn the bits into a frame, throw the frame away, read the IP address, lower the TTL, and build a new frame for the next link. The packet inside travels the whole way.`,
+    analogy: "The envelope changes bags at every post office, but no post office opens the envelope.",
+    unit: "Bits",
+    depth: 3,
+    hop: 2,
+    verb: "sends",
+    changed: ["macFrom", "macTo", "ttl"],
+  },
+  {
+    at: "server",
+    layer: 3,
+    title: "The server’s network card opens the frame",
+    plain:
+      "The bits become a frame again. The destination MAC address belongs to this server and the FCS is correct, so the frame header and trailer come off and the packet goes up.",
+    analogy: "The last courier delivers the bag to the right house, and the bag is opened.",
+    unit: "Frame",
+    depth: 3,
+    hop: 2,
+    focus: "eth",
+    verb: "removes",
+  },
+  {
+    at: "server",
+    layer: 2,
+    title: "The Internet layer: this packet is for me",
+    plain:
+      "The destination IP address, 93.184.216.34, is this server’s own. The journey across networks is over, so the IP header comes off and the segment goes up to TCP.",
+    analogy: "The street address is right. The outer envelope comes off.",
+    unit: "Packet",
+    depth: 2,
+    hop: 2,
+    focus: "ip",
+    verb: "removes",
+    removed: "eth",
+  },
+  {
+    at: "server",
+    layer: 1,
+    title: "Transport reads the port: which program?",
+    plain:
+      "Destination port 80 belongs to the web server program. TCP checks that nothing is missing and everything is in order, sends an acknowledgement back, and removes its header.",
+    analogy: "The inner envelope says which person in the house it is for, so it is handed to them.",
+    unit: "Segment",
+    depth: 1,
+    hop: 2,
+    focus: "tcp",
+    verb: "removes",
+    removed: "ip",
+  },
+  {
+    at: "server",
+    layer: 0,
+    title: "The web server reads exactly what the browser wrote",
+    plain:
+      "Every header added on the way down has been removed on the way up, so the server sees the same 41 bytes of text the browser wrote. It now writes a reply, the web page, which goes down the server’s stack and back to you the same way, with every “from” and “to” swapped.",
+    analogy: "The person reads exactly the letter you wrote, and writes a reply.",
+    unit: "Data",
+    depth: 0,
+    hop: 2,
+    focus: "data",
+    verb: "reads",
+    removed: "tcp",
+  },
+];
+
+/** The five names, and the one question each wrapper answers. */
+export const UNIT_QUESTIONS = [
+  { unit: "Data", layer: "Application", question: "What do I want to say?", answer: "The message itself", example: "GET / HTTP/1.1", series: 0 },
+  { unit: "Segment", layer: "Transport", question: "Which program is it for?", answer: "Port numbers", example: "51234 → 80", series: 1 },
+  { unit: "Packet", layer: "Internet", question: "Which computer, anywhere in the world?", answer: "IP addresses", example: "→ 93.184.216.34", series: 2 },
+  { unit: "Frame", layer: "Host to network", question: "Which device next, on this link?", answer: "MAC addresses", example: "→ 3c:52:82:1a:00:01", series: 3 },
+  { unit: "Bits", layer: "Physical medium", question: "How does it travel?", answer: "0s and 1s as a signal", example: "00111100 01010010…", series: 4 },
+] as const;
