@@ -53,10 +53,10 @@ function PstnSection() {
     <Section
       id="pstn"
       title="A network built for one job: carrying a voice"
-      lead="The Public Switched Telephone Network was designed decades before home computers existed. When you dial, the exchanges switch a circuit through to the far end and hold it open for the whole call. That circuit carries one thing well: an analog signal in the narrow band of frequencies that human speech occupies."
+      lead="The Public Switched Telephone Network was designed decades before home computers existed. When you dial, the telephone exchanges connect a circuit to the other phone and keep it open for the whole call. That circuit is good at carrying one thing: an analog signal in the narrow range of frequencies used by human speech."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.1fr_1fr]">
-        <Panel title="A switched circuit" subtitle="Dialling reserves a path; the path stays yours until you hang up.">
+        <Panel title="A switched circuit" subtitle="Dialling reserves a path, and the path stays yours until you end the call.">
           <Scope height={148}>
             <ScopeCanvas
               label="A telephone circuit switched through two exchanges between a caller and a receiver"
@@ -129,9 +129,9 @@ function PstnSection() {
           </Scope>
           <ul className="mt-3 grid gap-1.5 text-sm text-ink-2">
             {[
-              "The circuit is dedicated: nobody else uses it while your call is up.",
+              "The circuit is dedicated: nobody else uses it during your call.",
               "It carries analog voice, a continuously varying voltage, not bits.",
-              "It is engineered for roughly 300 Hz to 3400 Hz, the band speech needs to stay intelligible.",
+              "It is designed for about 300 Hz to 3400 Hz, the range of frequencies needed to understand speech.",
             ].map((t) => (
               <li key={t} className="flex gap-2">
                 <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
@@ -172,9 +172,9 @@ function PstnSection() {
             />
           </Scope>
           <p className="mt-3 max-w-[62ch] text-sm text-ink-2">
-            A computer's digital signal has sharp square edges, which need a very wide range of frequencies to
-            survive. Put one straight onto a telephone line and the network throws almost all of it away. Something
-            has to translate, and that something is the modem.
+            A computer's digital signal has sharp square edges, which need a very wide range of
+            frequencies to keep their shape. If you put one straight onto a telephone line, the network removes
+            most of it. Something has to convert the signal, and that is the job of the modem.
           </p>
         </Panel>
       </div>
@@ -242,7 +242,7 @@ function LinkSection() {
     <Section
       id="link"
       title="Two computers, two modems, one telephone line"
-      lead="This is the schematic the syllabus asks you to be able to draw. Follow one byte across it: it leaves computer A as a square digital signal, is turned into an analog tone by modem A, crosses the PSTN as sound the network is happy to carry, and is turned back into bits by modem B."
+      lead="This is the schematic the syllabus asks you to be able to draw. Follow one byte across it: it leaves computer A as a square digital signal, is turned into an analog tone by modem A, crosses the PSTN as a sound the network can carry, and is turned back into bits by modem B."
     >
       <Panel
         title="End-to-end link"
@@ -340,7 +340,7 @@ function LinkSection() {
             <p className="mt-1 max-w-[46ch] text-sm text-ink-2">
               Digital in, analog out. The modem takes the bits and varies the{" "}
               <strong className="font-semibold text-ink">{KEYING[scheme].varies}</strong> of a carrier tone that
-              sits comfortably inside the voice band.
+              is well inside the voice band.
             </p>
           </div>
           <div>
@@ -384,33 +384,33 @@ function ModulationLab() {
     <Section
       id="modulation"
       title="Modulation lab"
-      lead="Modulation means attaching a low-frequency message to a high-frequency carrier by changing one of the carrier's properties. The message decides how the carrier is bent; the carrier does the actual travelling."
+      lead="Modulation means putting a low-frequency message onto a high-frequency carrier by changing one of the carrier's properties. The message decides how the carrier is changed; the carrier is what actually travels."
     >
       <Callout kind="exam" title="Why modulation is needed at all">
         Encoding represents bits as voltage levels, which works only while there is a wire to carry the voltage.
-        Three things break that, and modulation answers all three.
+        There are three problems with this, and modulation solves all three.
         <ul className="mt-2 grid gap-1.5">
           <li className="flex gap-2">
             <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
             <span>
               <strong className="font-semibold text-ink">No wire, no voltage.</strong> A voltage needs a closed
-              circuit. Air and light offer no such path, so something has to travel through free space instead.
+              circuit. Air gives no such path, so something else has to travel through free space instead.
             </span>
           </li>
           <li className="flex gap-2">
             <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
             <span>
-              <strong className="font-semibold text-ink">Distance.</strong> A raw voltage weakens and collects
-              noise over a long run, even on cable. A high-frequency carrier travels further and is easier to
-              pick out again at the far end.
+              <strong className="font-semibold text-ink">Distance.</strong> A plain voltage gets
+              weaker and picks up noise over a long distance, even on cable. A high-frequency carrier travels
+              further and is easier to detect at the receiver.
             </span>
           </li>
           <li className="flex gap-2">
             <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
             <span>
               <strong className="font-semibold text-ink">Sharing.</strong> Many devices may need the same
-              channel at once, and raw voltages give no way to tell them apart. Give each one a different
-              carrier frequency and they coexist without interfering, which is exactly what FDM does in 6.2.
+              channel at once, and plain voltages give no way to tell them apart. Give each one a different
+              carrier frequency and they can share the channel without interfering, which is exactly what FDM does in 6.2.
             </span>
           </li>
         </ul>
@@ -540,7 +540,7 @@ function ModulationLab() {
               step={0.05}
               readout={`${Math.round(depth * 100)}%`}
               accent="var(--s1)"
-              hint="How strongly the message bends the carrier."
+              hint="How much the message changes the carrier."
             />
 
             <div className="border-t border-line pt-3">
@@ -598,7 +598,7 @@ function PcmSection() {
     <Section
       id="pcm"
       title="Pulse Code Modulation: turning a voice into numbers"
-      lead="PCM is the reverse trip: an analog signal becomes digital. Measure the waveform's height at regular instants, round each measurement to the nearest allowed level, and send those numbers. The receiver holds each number until the next arrives and rebuilds the shape."
+      lead="PCM works in the opposite direction: an analog signal becomes digital. Measure the waveform's height at regular instants, round each measurement to the nearest allowed level, and send those numbers. The receiver holds each number until the next arrives and rebuilds the shape."
     >
       <Panel
         title="Sampling and quantisation"
@@ -712,7 +712,7 @@ function PcmSection() {
               <p className="mt-1 text-ink-2">
                 {nyquistOk
                   ? "The rate is more than twice the highest frequency in the signal, so the original shape can be recovered."
-                  : "Below twice the highest frequency, detail is lost for good. Notice the reconstruction missing whole wiggles."}
+                  : "Below twice the highest frequency, detail is lost and cannot be recovered. Notice that the reconstruction misses whole peaks and troughs."}
               </p>
             </div>
 
@@ -731,8 +731,9 @@ function PcmSection() {
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="Why 8000 samples a second?">
           <p className="max-w-[62ch] text-sm text-ink-2">
-            The telephone voice band tops out near 3400 Hz. To capture a signal faithfully you must sample at more
-            than twice its highest frequency, so 8000 samples per second was chosen with a little margin to spare.
+            The telephone voice band goes up to about 3400 Hz. To record a signal accurately you
+            must sample at more than twice its highest frequency, so 8000 samples per second was chosen, which
+            leaves a small safety margin.
             Each sample is coded in 8 bits, which is where the familiar 64 kbit/s digital voice channel comes from.
           </p>
           <div className="mt-3 grid gap-2">
@@ -747,7 +748,7 @@ function PcmSection() {
 
         <Callout kind="exam" title="Two different errors, two different fixes">
           Sampling <strong>too slowly</strong> loses detail between the samples, and the fix is a higher sampling
-          rate. Using <strong>too few bits</strong> per sample forces each measurement to be rounded a long way, and
+          rate. Using <strong>too few bits</strong> per sample means each measurement has to be rounded by a large amount, and
           the fix is more bits per sample. Turn each slider down on its own in the lab above and you can see the
           two faults look completely different.
         </Callout>
@@ -766,12 +767,12 @@ const QUESTIONS: Question[] = [
     prompt: "Why can a computer's digital signal not simply be put straight onto a PSTN line?",
     options: [
       { label: "The line has no electricity in it" },
-      { label: "The PSTN is engineered to carry analog signals in the narrow voice band, not sharp digital edges", correct: true },
+      { label: "The PSTN is designed to carry analog signals in the narrow voice band, not sharp digital edges", correct: true },
       { label: "The line is too slow for any kind of data" },
       { label: "Digital signals travel faster than the line allows" },
     ],
     explain:
-      "The PSTN was built to carry analog voice across roughly 300–3400 Hz. A square digital waveform needs a far wider range of frequencies to keep its shape, so the network would filter it into uselessness.",
+      "The PSTN was built to carry analog voice across roughly 300–3400 Hz. A square digital waveform needs a far wider range of frequencies to keep its shape, so the network would filter out so much of it that it could no longer be read.",
   },
   {
     id: "p2",
@@ -795,7 +796,7 @@ const QUESTIONS: Question[] = [
       { label: "None, since all three change together" },
     ],
     explain:
-      "AM varies only the carrier's amplitude in step with the message. Its frequency and phase are left alone, which is why the modulated waveform keeps the same cycle spacing throughout.",
+      "AM changes only the carrier's amplitude, following the message. Its frequency and phase do not change, which is why the modulated waveform keeps the same cycle spacing throughout.",
   },
   {
     id: "p4",
@@ -819,7 +820,7 @@ const QUESTIONS: Question[] = [
       { label: "The samples are transmitted down the line" },
     ],
     explain:
-      "Sampling is the measuring step; quantisation is the rounding step that follows it. Rounding is what makes the value expressible in a fixed number of bits, and it is also where quantisation error comes from.",
+      "Sampling is the measuring step; quantisation is the rounding step that follows it. Rounding is what makes it possible to store the value in a fixed number of bits, and it is also where quantisation error comes from.",
   },
   {
     id: "p6",

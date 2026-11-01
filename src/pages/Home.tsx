@@ -20,12 +20,12 @@ export function Home() {
           <div className="relative">
             <p className="text-xs font-medium text-brand">GCE Advanced Level · ICT · Competency 6</p>
             <h1 className="mt-2 max-w-[16ch] text-4xl font-semibold tracking-tight text-ink">
-              Data communication, drawn out.
+              Data communication you can see.
             </h1>
             <p className="mt-3 max-w-[64ch] text-lg text-ink-2">
-              The whole of Competency 6, from a voltage on a wire to a web page in a browser, built around
-              instruments you can actually move. Drag a slider and the waveform answers, because a network is
-              far easier to understand when you can bend it yourself than when it is a diagram in a textbook.
+              All of Competency 6, from a voltage on a wire to a web page in a browser, with diagrams you can
+              control. Move a slider and the waveform changes. A network is much easier to understand when you
+              can change it yourself than when it is a fixed diagram in a textbook.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -118,15 +118,15 @@ export function Home() {
           {[
             {
               t: "Everything is live",
-              d: "No pre-rendered diagrams. Every waveform on the site is computed from the same equations you are asked to use in the paper.",
+              d: "Nothing is drawn in advance. Every waveform on the site is calculated from the same equations you use in the exam paper.",
             },
             {
               t: "Syllabus wording kept",
-              d: "Each level lists its learning outcomes and contents exactly as they appear in the syllabus, so you can tick off your own coverage. Anything that goes further is marked “Beyond the syllabus”: worth reading, not worth memorising.",
+              d: "Each level lists its learning outcomes and contents exactly as they appear in the syllabus, so you can tick off your own coverage. Anything extra is marked “Beyond the syllabus”: it is useful to read, but you do not need to learn it for the exam.",
             },
             {
               t: "Progress stays here",
-              d: "Answers are stored in this browser alone. There is no account, nothing is uploaded, and clearing your browser data clears them.",
+              d: "Your answers are saved only in this browser. There is no account and nothing is uploaded. If you clear your browser data, your answers are deleted too.",
             },
           ].map((c) => (
             <div key={c.t}>

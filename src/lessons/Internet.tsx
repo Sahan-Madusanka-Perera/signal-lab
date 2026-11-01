@@ -66,7 +66,7 @@ function GatewaySection() {
     <Section
       id="gateway"
       title="A LAN can only reach its own members"
-      lead="A MAC address identifies an interface on one local network and nothing beyond it. Put an Ethernet LAN next to a Wi-Fi LAN and neither has any way to name a machine on the other. Joining them needs a device sitting in both (a gateway) and an addressing scheme that works the same way on either side."
+      lead="A MAC address identifies an interface on one local network and nothing beyond it. Put an Ethernet LAN next to a Wi-Fi LAN and neither has any way to name a machine on the other. To join them you need a device that is part of both networks (a gateway), and an addressing scheme that works the same way on both sides."
     >
       <Panel
         title="Two LANs, one gateway"
@@ -175,8 +175,8 @@ function GatewaySection() {
             <ul className="mt-1.5 grid gap-1.5 text-sm text-ink-2">
               {[
                 "Belongs to both networks, with a separate address on each side.",
-                "Receives a frame on one network, strips the frame header, and builds a new one for the other network.",
-                "Decides, from the destination IP address, which side a packet should leave by.",
+                "Receives a frame on one network, removes the frame header, and builds a new one for the other network.",
+                "Decides, from the destination IP address, which side a packet should be sent out on.",
               ].map((t) => (
                 <li key={t} className="flex gap-2">
                   <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand" />
@@ -188,8 +188,9 @@ function GatewaySection() {
           <Callout kind="exam" title="Why MAC addresses are not enough">
             MAC addresses have no structure. Nothing in <span className="tnum font-mono">B8:27:EB:1A:2C:9F</span>{" "}
             tells you where in the world that card is. A router would need an entry for every interface on Earth.
-            IP addresses are <strong>hierarchical</strong>: the front of the address names the network, so a router
-            can forward on that alone and needs to know only about networks, not machines.
+            IP addresses are <strong>hierarchical</strong>: the first part of the address identifies
+            the network, so a router can forward using that part only. It needs to know only about networks, not
+            about every machine.
           </Callout>
         </div>
       </Panel>
@@ -209,7 +210,7 @@ function ScaleSection() {
     <Section
       id="scale"
       title="Networks come in sizes, and the name follows the size"
-      lead="Once networks can be joined to other networks there is no longer one kind of network. The names are simply labels for how much ground a network covers, and usually for who owns it. They are not different technologies; a WAN is built from the same frames and packets as the LAN in your house."
+      lead="Once networks can be joined to other networks there is no longer one kind of network. The names simply describe how large an area a network covers, and usually who owns it. They are not different technologies; a WAN is built from the same frames and packets as the LAN in your house."
     >
       <Panel title="From a pair of earphones to the whole Internet" subtitle="Select a size to see what it covers.">
         <Scope height={168}>
@@ -258,7 +259,7 @@ function ScaleSection() {
                 });
               });
 
-              plot.text(x0, h - 15, "each bar is the ground that size of network covers", palette.inkFaint, {
+              plot.text(x0, h - 15, "each bar is the area that size of network covers", palette.inkFaint, {
                 size: 9,
               });
             }}
@@ -339,8 +340,8 @@ function AddressSection() {
   return (
     <Section
       id="address"
-      title="Thirty-two bits, written to be readable"
-      lead="An IPv4 address is a single 32-bit number. Writing it as thirty-two ones and zeros is unusable for humans, so it is split into four groups of eight bits, called octets, and each is written as a decimal number from 0 to 255, separated by dots. Move any octet below and watch the binary follow."
+      title="Thirty-two bits, written so people can read them"
+      lead="An IPv4 address is a single 32-bit number. Thirty-two ones and zeros are too hard for people to read and write, so it is split into four groups of eight bits, called octets, and each is written as a decimal number from 0 to 255, separated by dots. Change any octet below and see the binary change too."
     >
       <Panel title="Dotted decimal notation" subtitle="The same number, three ways.">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-4">
@@ -409,25 +410,25 @@ function AddressSection() {
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="How many addresses is 32 bits?">
-          <Formula note="Just over four billion, which sounded limitless in 1981 and does not now.">
+          <Formula note="Just over four billion. In 1981 that seemed more than enough, but today it is not.">
             2³² = 4 294 967 296
           </Formula>
           <p className="mt-3 max-w-[62ch] text-sm text-ink-2">
             There are more phones, laptops, servers, cameras and sensors wanting an address than there are
-            addresses to hand out. Two responses followed: <strong className="font-semibold text-ink">private
+            addresses to give out. There were two solutions: <strong className="font-semibold text-ink">private
             addressing</strong>, which lets a whole household share one public address, and{" "}
-            <strong className="font-semibold text-ink">IPv6</strong>, which widens the address to 128 bits.
+            <strong className="font-semibold text-ink">IPv6</strong>, which makes the address 128 bits long.
           </p>
           <div className="mt-3">
-            <Formula note="IPv6. Enough for every grain of sand on Earth to have its own network many times over.">
+            <Formula note="IPv6. This is far more than the number of grains of sand on Earth.">
               2¹²⁸ ≈ 3.4 × 10³⁸
             </Formula>
           </div>
         </Panel>
 
-        <Callout kind="warn" title="An octet stops at 255">
+        <Callout kind="warn" title="An octet cannot be more than 255">
           Eight bits can count from 00000000 to 11111111, which is 0 to 255. An address written with any number
-          above 255 in it, such as 192.300.1.1, is not a valid IPv4 address at all. This is a favourite exam trap.
+          above 255 in it, such as 192.300.1.1, is not a valid IPv4 address at all. Exam questions often test this.
         </Callout>
       </div>
     </Section>
@@ -448,9 +449,9 @@ function ClassSection() {
     <Section
       id="classes"
       title="The first octet decides the class"
-      lead="Before subnetting existed, the split between the network part and the host part of an address was fixed by the address itself. You can read the class straight off the leading bits of the first octet, and that is still how the syllabus asks you to identify one."
+      lead="Before subnetting existed, the split between the network part and the host part of an address was fixed by the address itself. You can find the class directly from the first few bits of the first octet, and that is still how the syllabus asks you to identify one."
     >
-      <Panel title="Class identifier" subtitle="Change the first octet and watch the class change with it.">
+      <Panel title="Class identifier" subtitle="Change the first octet and see the class change.">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5">
@@ -593,7 +594,7 @@ function SubnetSection() {
     <Section
       id="subnet"
       title="The mask says where the network ends"
-      lead="A subnet mask is 32 bits laid alongside the address: a one wherever the bit belongs to the network, a zero wherever it belongs to the host. The router ANDs the two together and what falls out is the network address. Everything in this section is that one operation."
+      lead="A subnet mask is 32 bits placed under the address: a 1 wherever the bit belongs to the network part, and a 0 wherever it belongs to the host part. The router combines the two with a bitwise AND, and the result is the network address. Everything in this section uses this one operation."
     >
       <Panel
         title="Subnet calculator"
@@ -700,7 +701,7 @@ function SubnetSection() {
                 <ul className="grid gap-1.5">
                   <li>
                     The address with <strong className="font-semibold text-ink">all host bits 0</strong> names the
-                    network itself. Routers use it; no machine may take it.
+                    network itself. Routers use it; it cannot be given to any machine.
                   </li>
                   <li>
                     The address with <strong className="font-semibold text-ink">all host bits 1</strong> is the
@@ -882,7 +883,7 @@ function SplitSection() {
               />
             </div>
             <p className="mt-3 max-w-[56ch] text-2xs text-ink-3">
-              Host bits only come in whole powers of two, so you always round up. Needing 50 hosts means taking a
+              The number of addresses in a block is always a power of two, so you always round up. Needing 50 hosts means taking a
               block of 64 and leaving 12 addresses unused.
             </p>
           </Panel>
@@ -922,11 +923,11 @@ function SplitSection() {
           </Panel>
 
           <Callout kind="note" title="CIDR: dropping the classes entirely">
-            Classful addressing wasted enormous amounts of space: an organisation needing 300 addresses had to be
-            given a whole class B block of 65 534. <strong>Classless Inter-Domain Routing</strong> abandons the
-            fixed class boundaries and lets a block of any prefix length be allocated, written as{" "}
-            <span className="tnum font-mono">address/prefix</span>. It also lets neighbouring blocks be summarised
-            into one routing entry, which is what keeps routing tables from exploding.
+            Classful addressing wasted a very large number of addresses: an organisation needing 300 addresses had to be
+            given a whole class B block of 65 534. <strong>Classless Inter-Domain Routing</strong> removes
+            the fixed class boundaries and lets a block of any prefix length be allocated, written as{" "}
+            <span className="tnum font-mono">address/prefix</span>. It also lets neighbouring blocks
+            be combined into one routing table entry, which stops routing tables from growing too large.
           </Callout>
         </div>
       </div>
@@ -947,7 +948,7 @@ function PrivateSection() {
     <Section
       id="private"
       title="Private addresses, and getting one automatically"
-      lead="Three blocks of the address space are reserved for use inside private networks. They are not routed on the Internet, so the same 192.168.1.5 can exist in millions of homes at once, which is what makes four billion addresses stretch as far as it has."
+      lead="Three blocks of the address space are reserved for use inside private networks. They are not routed on the Internet, so the same 192.168.1.5 can be used in millions of homes at once. This is how four billion addresses have been enough for so many devices."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[1.1fr_1fr]">
         <Panel title="The three private ranges" bodyClassName="p-0">
@@ -1111,8 +1112,8 @@ function PrivateSection() {
           </ol>
 
           <p className="mt-3 max-w-[60ch] text-2xs text-ink-3">
-            Notice the first three messages are broadcast. The client has no address yet, so it cannot be spoken
-            to directly, and the only way to reach it is to address the whole LAN.
+            Notice the first three messages are broadcast. The client has no address yet, so nothing
+            can send to it directly, and the only way to reach it is to address the whole LAN.
           </p>
         </Panel>
       </div>
@@ -1155,7 +1156,7 @@ function PrivateSection() {
       </div>
 
       <Panel
-        title="A private network stretched over a public one"
+        title="A private network carried over a public one"
         subtitle="A VPN is what happens when the two ends of a private network are in different cities."
       >
         <p className="max-w-[74ch] text-sm text-ink-2">{VPN_FACTS.what}</p>
@@ -1234,8 +1235,8 @@ function RoutingSection() {
   return (
     <Section
       id="routing"
-      title="Packets find their own way, and nobody promises they arrive"
-      lead="A message is not sent as one lump. It is chopped into packets, each carrying the destination address in its own header, and each forwarded independently. Routers pass a packet on towards the destination using their routing tables, and if a link fails, later packets simply take a different path."
+      title="Each packet finds its own way, and arrival is not guaranteed"
+      lead="A message is not sent as one large piece. It is divided into packets, each carrying the destination address in its own header, and each forwarded independently. Routers pass a packet on towards the destination using their routing tables, and if a link fails, later packets simply take a different path."
     >
       <Panel
         title="Packet switching"
@@ -1380,7 +1381,7 @@ function RoutingSection() {
               step={0.05}
               readout={`${Math.round(loss * 100)}% dropped`}
               accent="var(--s5)"
-              hint="A router with a full queue simply discards packets. IP does not apologise or retry."
+              hint="A router with a full queue simply discards packets. IP does not report the loss or send them again."
             />
           </div>
         </div>
@@ -1392,7 +1393,7 @@ function RoutingSection() {
             {[
               "Keep a routing table: a list of destination networks and which neighbour to send them towards.",
               "Read only the destination network part of the address, not the host part, and not the payload.",
-              "Exchange tables with neighbouring routers periodically, so the tables stay current when a link fails.",
+              "Exchange tables with neighbouring routers regularly, so the tables stay up to date when a link fails.",
               "Forward each packet independently. A router has no memory of the packets before it.",
             ].map((t) => (
               <li key={t} className="flex gap-2">
@@ -1429,7 +1430,7 @@ const QUESTIONS: Question[] = [
       { label: "MAC addresses only work on wireless networks" },
     ],
     explain:
-      "A MAC address is flat: it identifies an interface but says nothing about where it is. IP addresses are hierarchical: the leading bits name the network, so a router can forward on that alone and needs to know about networks rather than individual machines.",
+      "A MAC address has no structure: it identifies an interface but says nothing about where it is. IP addresses are hierarchical: the leading bits identify the network, so a router can forward using that part only and needs to know about networks rather than individual machines.",
   },
   {
     id: "ip2",
@@ -1489,7 +1490,7 @@ const QUESTIONS: Question[] = [
       { label: "To test whether the network is working" },
     ],
     explain:
-      "A host with no address cannot be the source of a normal unicast conversation, and it has not been told where any DHCP server is. Broadcasting to the whole LAN is the only way to reach a server it cannot yet name.",
+      "A host with no address cannot be the source of a normal unicast conversation, and it has not been told where any DHCP server is. Broadcasting to the whole LAN is the only way to reach a server whose address it does not know yet.",
   },
   {
     id: "ip7",
@@ -1525,13 +1526,13 @@ const QUESTIONS: Question[] = [
       { label: "A WAN" },
     ],
     explain:
-      "A Metropolitan Area Network spans a city, larger than a LAN, which covers a single site, and smaller than a WAN, which crosses regions and countries. It usually involves a service provider, because the links between the sites cross public ground.",
+      "A Metropolitan Area Network spans a city, larger than a LAN, which covers a single site, and smaller than a WAN, which crosses regions and countries. It usually involves a service provider, because the links between the sites cross public land.",
   },
   {
     id: "ip10",
     prompt: "A branch office reaches head office's internal servers over the Internet as though it were on the same network. What makes that possible?",
     options: [
-      { label: "A VPN, which tunnels the private traffic across the public Internet inside an encrypted wrapper", correct: true },
+      { label: "A VPN, which carries the private traffic across the public Internet in encrypted form", correct: true },
       { label: "A gateway, which converts one private network into another" },
       { label: "DHCP, which gives both offices the same address range" },
       { label: "A subnet mask wide enough to cover both sites" },

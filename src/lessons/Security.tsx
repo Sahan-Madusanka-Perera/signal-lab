@@ -68,10 +68,10 @@ function NeedSection() {
     <Section
       id="need"
       title="Every router on the way can read it"
-      lead="Nothing in the last nine levels protects anything. A packet is handed from router to router, and each one has the whole message in front of it in plain text. The Internet delivers data, but it makes no promise that the data was private on the way, and none that the sender is who the message says they are."
+      lead="Nothing in the last nine levels keeps data safe. A packet is passed from router to router, and each one can read the whole message, because it is in plain text. The Internet delivers data, but it makes no promise that the data was private on the way, and none that the sender is who the message says they are."
     >
       <Panel
-        title="One message, several strangers"
+        title="One message, many unknown machines"
         subtitle="The routers between you and the far end are machines you do not own."
         actions={
           <Toggle
@@ -195,7 +195,7 @@ function NeedSection() {
       <Callout kind="exam" title="The exam sentence">
         The Internet provides <strong>neither confidentiality nor authentication</strong>. Both have to be added
         by the communicating parties themselves: confidentiality by encryption, and authentication by digital
-        signatures. That is the whole reason this competency level exists.
+        signatures. That is why this competency level exists.
       </Callout>
     </Section>
   );
@@ -225,7 +225,7 @@ function KeysSection() {
     <Section
       id="keys"
       title="One key, or a pair of them"
-      lead="Encryption turns a message into something unreadable, and a key is what turns it back. The whole difference between the two families is whether the key that locks is the same one that unlocks, and that single change is what makes secure communication between strangers possible at all."
+      lead="Encryption turns a message into something unreadable, and a key is what turns it back. The difference between the two types is whether the key that locks (encrypts) is the same key that unlocks (decrypts). This one difference is what makes secure communication possible between people who have never met."
     >
       <Panel
         title={mode === "symmetric" ? "Symmetric key encryption" : "Asymmetric key encryption"}
@@ -368,7 +368,7 @@ function KeysSection() {
                   align: "center",
                 });
               } else {
-                plot.text(w / 2, y + 50, "the public key can be shouted from the rooftops", palette.inkFaint, {
+                plot.text(w / 2, y + 50, "the public key can be shared with everyone", palette.inkFaint, {
                   size: 9,
                   align: "center",
                 });
@@ -388,25 +388,25 @@ function KeysSection() {
                 max={25}
                 readout={`+${shift}`}
                 accent="var(--s1)"
-                hint="A shift cipher is a toy, but the shape is right: one number both sides must know."
+                hint="A shift cipher is very simple, but the idea is the same: one number that both sides must know."
               />
               <div className="mt-3 grid gap-1.5">
                 <Formula note="plaintext, as typed">{PLAIN_MESSAGE}</Formula>
-                <Formula note={`each letter moved on by ${shift}`}>{shiftCipher(PLAIN_MESSAGE, shift)}</Formula>
+                <Formula note={`each letter moved forward by ${shift}`}>{shiftCipher(PLAIN_MESSAGE, shift)}</Formula>
                 <Formula note="decrypted with the same key">
                   {shiftCipher(shiftCipher(PLAIN_MESSAGE, shift), -shift)}
                 </Formula>
               </div>
             </div>
             <div className="lg:border-l lg:border-line lg:pl-4">
-              <p className="text-sm font-semibold text-ink">Fast, but there is a catch</p>
+              <p className="text-sm font-semibold text-ink">Fast, but there is a problem</p>
               <p className="mt-1 max-w-[52ch] text-sm text-ink-2">
-                Symmetric encryption is quick and is what actually protects the bulk of your traffic. The
+                Symmetric encryption is fast, and it is what protects most of your traffic. The
                 difficulty is the key itself: both sides must have the same one before they can exchange
-                anything, and sending the key over the very network you do not trust defeats the purpose.
+                anything, and sending the key over the same network you do not trust would make the encryption pointless.
               </p>
               <p className="mt-2 max-w-[52ch] text-sm text-ink-2">
-                It gets worse with numbers. Ten people who all want to talk privately in pairs need forty-five
+                The problem grows with the number of people. Ten people who all want to talk privately in pairs need forty-five
                 different shared keys; a hundred people need almost five thousand.
               </p>
               <Readout className="mt-3" label="Keys needed for n people" value="n(n−1)/2" sub="45 keys for 10 people" />
@@ -511,7 +511,7 @@ function KeysSection() {
                   φ = (p−1)(q−1) = {DEMO_KEYS.phi}. Choose e = {DEMO_KEYS.e}, which shares no factor with φ, and
                   find d such that e × d leaves remainder 1 when divided by φ: {DEMO_KEYS.e} × {DEMO_KEYS.d} ={" "}
                   {DEMO_KEYS.e * DEMO_KEYS.d}, and {DEMO_KEYS.e * DEMO_KEYS.d} mod {DEMO_KEYS.phi} = 1. Real keys
-                  use primes hundreds of digits long, which is what makes working d out from e and n hopeless.
+                  use primes hundreds of digits long, which makes it practically impossible to work out d from e and n.
                 </p>
               </Reveal>
             </div>
@@ -553,11 +553,11 @@ function SignSection() {
     <Section
       id="sign"
       title="Signing: the same maths, used backwards"
-      lead="A signature answers the other question: not 'can anyone else read this' but 'did this really come from you, and is it still exactly what you wrote'. The sender scrambles a digest of the message with their private key. Anyone can unscramble it with the matching public key, and only the real owner could have produced something that unscrambles correctly."
+      lead="A signature answers the other question: not 'can anyone else read this' but 'did this really come from you, and is it still exactly what you wrote'. The sender encrypts a digest (a short summary) of the message with their private key. Anyone can decrypt it with the matching public key, and only the real owner could have produced something that decrypts correctly."
     >
       <Panel
         title="Signature workbench"
-        subtitle="Change the message, or alter it in transit, and watch the check succeed or fail."
+        subtitle="Change the message, or alter it in transit, and see whether the check passes or fails."
         actions={
           <Toggle
             checked={tampered}
@@ -781,10 +781,10 @@ function ThreatsSection() {
   return (
     <Section
       id="threats"
-      title="What is actually out there"
-      lead="The threats in the syllabus split neatly in two. Viruses, trojans and the rest of malware are programs that get onto a machine and do something you did not ask for. Phishing does not attack the machine at all; it attacks the person using it, and no software setting can fully close that door."
+      title="The threats you need to know"
+      lead="The threats in the syllabus fall into two groups. Viruses, trojans and the rest of malware are programs that get onto a machine and do something you did not ask for. Phishing does not attack the machine at all; it attacks the person using it, and no software setting can fully protect against that."
     >
-      <Panel title="Four names to know apart" subtitle="Select one to see how it gets in and what gives it away.">
+      <Panel title="Four threats to tell apart" subtitle="Select one to see how it gets in and its warning signs.">
         <div className="flex flex-wrap gap-1.5">
           {THREATS.map((t) => (
             <button
@@ -825,10 +825,10 @@ function ThreatsSection() {
             <p className="mt-1 max-w-[42ch] text-sm text-ink-2">{threat.how}</p>
           </div>
           <div>
-            <p className="text-2xs font-semibold text-ink-3">What gives it away</p>
+            <p className="text-2xs font-semibold text-ink-3">Warning signs</p>
             <p className="mt-1 max-w-[42ch] text-sm text-ink-2">{threat.tell}</p>
             <Badge className="mt-2" tone={threat.needsVictim ? "warn" : "neutral"}>
-              {threat.needsVictim ? "needs a person to be fooled" : "an umbrella term"}
+              {threat.needsVictim ? "needs a person to be fooled" : "a general name"}
             </Badge>
           </div>
         </div>
@@ -919,7 +919,7 @@ function PhishingDrill() {
               <p className="text-2xs font-semibold text-ok">Nothing to find</p>
               <p className="mt-1 max-w-[38ch] text-sm text-ink-2">
                 It comes from the bank's own domain, it uses your name, it asks for nothing, it carries no link
-                and no attachment. Compare it with the other message: the differences are the lesson.
+                and no attachment. Compare it with the other message: the differences are what you should learn.
               </p>
             </div>
           ) : clue ? (
@@ -928,13 +928,13 @@ function PhishingDrill() {
               className="rounded-lg border border-line bg-surface-2 px-3.5 py-3"
               style={{ animation: "rise var(--dur) var(--ease-out-quart)" }}
             >
-              <p className="text-2xs font-semibold text-warn">Why this is a giveaway</p>
+              <p className="text-2xs font-semibold text-warn">Why this is a warning sign</p>
               <p className="mt-1 max-w-[38ch] text-sm text-ink-2">{clue.why}</p>
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-line-strong px-3.5 py-3">
               <p className="max-w-[38ch] text-sm text-ink-2">
-                {total} things in this message should stop you. Click any part that looks wrong and the reason
+                {total} things in this message should make you suspicious. Click any part that looks wrong and the reason
                 appears here.
               </p>
             </div>
@@ -944,7 +944,7 @@ function PhishingDrill() {
             <div className="rounded-lg border border-ok bg-ok-wash px-3.5 py-3" style={{ animation: "rise var(--dur) var(--ease-out-quart)" }}>
               <p className="text-2xs font-semibold text-ok">All {total} found</p>
               <p className="mt-1 max-w-[38ch] text-sm text-ink-2">
-                In real life you would never need all {total}; one is enough to stop and check by another route.
+                In real life you would never need all {total}; one is enough to make you stop and check in a different way.
                 Never use a link in the message itself to do the checking.
               </p>
             </div>
@@ -979,7 +979,7 @@ function ProtectSection() {
     <Section
       id="protect"
       title="Three defences, none of them enough on its own"
-      lead="A firewall decides what may cross the boundary of the network. Antivirus software deals with what got in anyway. And the person at the keyboard decides whether either of those ever gets the chance to help, which is why the syllabus lists education alongside the software."
+      lead="A firewall decides what may cross the boundary of the network. Antivirus software deals with anything that still gets in. And the person using the computer decides whether either of these can help at all, which is why the syllabus lists education alongside the software."
     >
       <Panel
         title="Firewall rule tester"
@@ -1160,8 +1160,8 @@ function ProtectSection() {
 
         <p className="mt-3 max-w-[74ch] rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm text-ink-2">
           Notice the last sample. Traffic <em>leaving</em> the network matches the first rule and is allowed, so
-          malware already running inside can still reach the Internet. A firewall guards the boundary; it does
-          nothing about what is already on the wrong side of it.
+          malware already running inside can still reach the Internet. A firewall protects the
+          boundary; it cannot do anything about malware that is already inside.
         </p>
       </Panel>
 
@@ -1252,18 +1252,18 @@ function ProtectSection() {
         </div>
 
         <p className="mt-3 max-w-[74ch] text-sm text-ink-2">
-          Length beats cleverness. Adding one character multiplies the work by the size of the character set,
+          Length matters more than clever tricks. Adding one character multiplies the work by the size of the character set,
           while swapping <span className="tnum font-mono">o</span> for{" "}
           <span className="tnum font-mono">0</span> adds almost nothing, since attackers try that substitution first.
           A long phrase you can remember is stronger than a short string you cannot.
         </p>
       </Panel>
 
-      <Callout kind="warn" title="Good practice, in the order it matters">
+      <Callout kind="warn" title="Good practice, most important first">
         Keep software and antivirus definitions updated, because an out-of-date scanner cannot recognise what is
-        current. Use a different password for every account, so one breach does not open the rest. Do not open
-        attachments or links you were not expecting, even from a name you know. Back up anything you would mind
-        losing, and keep the backup disconnected, because ransomware encrypts whatever it can reach.
+        current. Use a different password for every account, so if one password is stolen, your other accounts are still safe. Do not open
+        attachments or links you were not expecting, even from a name you know. Back up anything you do
+        not want to lose, and keep the backup disconnected, because ransomware encrypts whatever it can reach.
       </Callout>
     </Section>
   );
@@ -1308,7 +1308,7 @@ const QUESTIONS: Question[] = [
       { label: "The key can be worked out from the ciphertext" },
     ],
     explain:
-      "Symmetric encryption is fast and perfectly strong; the problem is delivering the key. Sending it over the network you do not trust defeats the purpose, and the number of keys needed grows as n(n−1)/2 with the number of people.",
+      "Symmetric encryption is fast and perfectly strong; the problem is delivering the key. Sending it over the network you do not trust would make it pointless, and the number of keys needed grows as n(n−1)/2 with the number of people.",
   },
   {
     id: "s4",
@@ -1332,7 +1332,7 @@ const QUESTIONS: Question[] = [
       { label: "The bank is performing a routine security check" },
     ],
     explain:
-      "Urgency, a threat, and a request for a password are the signature of phishing. No genuine organisation asks for your password, because they never need it. If in doubt, reach the organisation the way you normally would, never through a link in the message.",
+      "Urgency, a threat, and a request for a password are typical signs of phishing. No genuine organisation asks for your password, because they never need it. If you are not sure, contact the organisation in the way you normally would, never through a link in the message.",
   },
   {
     id: "s6",

@@ -54,13 +54,13 @@ function LanSection() {
     <Section
       id="lan"
       title="A LAN is a set of machines sharing one medium"
-      lead="A Local Area Network connects computers within a limited area: a room, a building, a campus. Level 6.5 gave us the wiring. What it did not give us is any way for a station to say which machine a particular set of bits is meant for, or any rule about when it may start talking. Those two gaps are what this level fills."
+      lead="A Local Area Network connects computers within a limited area: a room, a building, a campus. Level 6.5 showed how to wire computers together. But it gave a station no way to say which machine some bits are meant for, and no rule about when it may start sending. This level adds those two things."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3">
         {[
           {
             t: "Who is this for?",
-            d: "On a shared medium every station hears everything. Without a name for each interface, no station can tell whether the bits arriving are its business.",
+            d: "On a shared medium every station hears everything. Without a name for each interface, no station can tell whether the arriving bits are meant for it.",
             a: "Addresses",
           },
           {
@@ -70,7 +70,7 @@ function LanSection() {
           },
           {
             t: "When may I talk?",
-            d: "If two stations transmit at once on a bus, both are destroyed. Something has to decide who goes when.",
+            d: "If two stations transmit at once on a bus, both are destroyed. There must be a rule that decides who sends, and when.",
             a: "A MAC protocol",
           },
         ].map((c) => (
@@ -108,11 +108,11 @@ function MacAddressSection() {
     <Section
       id="mac"
       title="Every interface carries a 48-bit name"
-      lead="A MAC address is burned into the network interface when it is manufactured. It is 48 bits long, written as six blocks of two hexadecimal digits, and because each hex digit stands for exactly four bits, the whole address is really twelve nibbles. Click a block below to open it up."
+      lead="A MAC address is permanently stored in the network interface when it is made. It is 48 bits long, written as six blocks of two hexadecimal digits, and because each hex digit stands for exactly four bits, the whole address is twelve groups of four bits (called nibbles). Click a block below to see its bits."
     >
       <Panel
         title="Address anatomy"
-        subtitle="The first three bytes name the manufacturer; the last three name the individual card."
+        subtitle="The first three bytes identify the manufacturer; the last three identify the individual card."
         actions={
           <Segmented
             label="Example address"
@@ -219,9 +219,9 @@ function MacAddressSection() {
         {vendor && (
           <p className="mt-3 text-sm text-ink-2">
             The vendor half, <span className="tnum font-mono text-ink">{ouiKey}</span>, is registered to{" "}
-            <strong className="font-semibold text-ink">{vendor}</strong>. Because these blocks are handed out by a
-            central authority and the card half is assigned by the manufacturer, no two interfaces in the world
-            should ever share an address.
+            <strong className="font-semibold text-ink">{vendor}</strong>. Because the first half is
+            given out by a central organisation and the second half is chosen by the manufacturer, no two
+            interfaces in the world should have the same address.
           </p>
         )}
       </Panel>
@@ -256,7 +256,7 @@ function FrameSection() {
     <Section
       id="frame"
       title="Data travels wrapped in a frame"
-      lead="A frame is the unit of transmission on a LAN. The data link layer takes the data handed down to it, puts a header in front carrying the destination and source MAC addresses, and adds a checksum on the end. The header is what makes delivery possible; without it the bits are anonymous."
+      lead="A frame is the unit of transmission on a LAN. The data link layer takes the data handed down to it, puts a header in front carrying the destination and source MAC addresses, and adds a checksum on the end. The header is what makes delivery possible: without it, nobody would know who the bits are from or who they are for."
     >
       <Panel
         title="Ethernet frame layout"
@@ -330,7 +330,7 @@ function FrameSection() {
             hint="Ethernet allows 46 to 1500 bytes of data. Anything shorter is padded up to 46."
           />
           <div className="flex gap-6 lg:justify-end">
-            <Readout label="Header + checksum" value={`${overhead} B`} sub="the cost of delivery" />
+            <Readout label="Header + checksum" value={`${overhead} B`} sub="extra bytes needed for delivery" />
             <Readout
               label="Efficiency"
               value={`${efficiency.toFixed(1)}%`}
@@ -343,8 +343,8 @@ function FrameSection() {
         {payload <= 60 && (
           <p className="mt-3 rounded-lg bg-warn-wash px-3.5 py-2.5 text-sm text-ink">
             With a payload this small, most of what goes on the wire is header. Sending one keystroke costs 26
-            bytes of overhead to carry a single byte of data, which is exactly why protocols batch small pieces
-            of data together where they can.
+            bytes of overhead to carry a single byte of data. This is why protocols try to group
+            small pieces of data together when they can.
           </p>
         )}
       </Panel>
@@ -378,7 +378,7 @@ function AccessSection() {
     <Section
       id="access"
       title="From ALOHA to Ethernet"
-      lead="On a shared medium two stations that transmit at the same moment destroy each other's frames. The history of local networking is the history of getting better at avoiding that. Raise the traffic below and watch each protocol cope, or fail to."
+      lead="On a shared medium two stations that transmit at the same moment destroy each other's frames. Local networking has developed by finding better ways to avoid this. Increase the traffic below and see how well each protocol works."
     >
       <Panel
         title={info.long}
@@ -499,7 +499,7 @@ function AccessSection() {
               step={0.05}
               readout={`${load.toFixed(2)}`}
               accent="var(--s1)"
-              hint="How much traffic the stations want to send, as a multiple of what the medium can carry. G = 1 means they are collectively trying to use it exactly 100 % of the time."
+              hint="How much traffic the stations want to send, as a multiple of what the medium can carry. G = 1 means all the stations together are trying to use it exactly 100 % of the time."
             />
             <div className="mt-2 flex flex-wrap gap-1.5">
               <Button size="sm" onClick={() => setLoad(0.2)}>
@@ -619,15 +619,15 @@ function AccessSection() {
               <ul className="grid gap-1.5">
                 <li>
                   <strong className="font-semibold text-ink">G</strong> is the offered load: how much traffic the
-                  stations are collectively trying to send.
+                  stations are trying to send, all together.
                 </li>
                 <li>
                   <strong className="font-semibold text-ink">S</strong> is throughput: how much actually gets
                   through. The rest is destroyed in collisions.
                 </li>
                 <li>
-                  Push G past its peak and S <em>falls</em>: the extra traffic causes more collisions than it
-                  delivers frames. The network works harder and carries less.
+                  Increase G past its peak and S <em>falls</em>: the extra traffic causes more
+                  collisions than it delivers frames. The network is busier but carries less.
                 </li>
               </ul>
             </Reveal>
@@ -640,7 +640,7 @@ function AccessSection() {
           <strong> Multiple Access</strong>: many stations share the one medium.
           <strong> Collision Detection</strong>: keep listening while sending. If a collision does happen (two
           stations that both heard silence and started together), detect it within microseconds, stop
-          immediately instead of wasting the whole frame time, and retry after a random backoff. Set the
+          immediately instead of wasting the whole frame time, and try again after waiting a random time (called backoff). Set the
           protocol to Ethernet above and compare the width of a red bar with the ALOHA ones.
         </Callout>
       </div>
@@ -651,20 +651,20 @@ function AccessSection() {
 function accessVerdict(protocol: MacProtocol, load: number, throughput: number): string {
   if (protocol === "csma-cd") {
     return load > 1
-      ? "Even overloaded, Ethernet keeps the medium busy with real frames. Stations queue behind whoever is transmitting instead of talking over them, so the throughput holds up where ALOHA would have collapsed."
-      : "Almost every frame gets through. Stations that find the medium busy simply wait, and the blue edge marks a deferred start, so collisions only happen in the tiny window before a signal has reached everybody.";
+      ? "Even with too much traffic, Ethernet keeps the medium busy with useful frames. Stations wait for whoever is sending to finish, instead of sending at the same time, so the throughput stays high where ALOHA would have failed."
+      : "Almost every frame gets through. Stations that find the medium busy simply wait, and the blue edge shows where a station waited before starting, so collisions only happen in the tiny window before a signal has reached everybody.";
   }
   if (load < 0.3) {
     return `With traffic this light, collisions are rare simply because two stations seldom want the medium at the same moment. ${
       protocol === "slotted" ? "Slotted ALOHA" : "Even pure ALOHA"
-    } copes fine, and the weakness only shows as the load rises.`;
+    } works well, and the weakness only appears as the load rises.`;
   }
   if (throughput < 0.12) {
-    return "The medium is in chaos. So much is colliding that raising the load further would make things worse, not better: every retry adds to the pile-up. This is precisely the failure that carrier sense was invented to prevent.";
+    return "The medium is overloaded. So many frames are colliding that raising the load further would make things worse, not better: every retry causes more collisions. Carrier sense was invented to prevent exactly this problem.";
   }
   return protocol === "slotted"
     ? "Slotted ALOHA is doing better than pure ALOHA would at the same load, because a frame can now only be destroyed by something starting in the same slot, not by something that started halfway through the one before."
-    : "Collisions are eating a serious share of the medium. Notice that a frame is destroyed both by transmissions starting during it and by ones that started just before, so the vulnerable window is two frame times wide.";
+    : "Collisions are wasting a large part of the medium's capacity. Notice that a frame is destroyed both by transmissions starting during it and by ones that started just before, so the vulnerable window is two frame times wide.";
 }
 
 /* ================================================================== *
@@ -906,9 +906,9 @@ function DeliverySection() {
 
             <p className="text-2xs text-ink-3">
               {mode === "broadcast"
-                ? "Broadcasts are how a station finds something it cannot yet name: a DHCP server, or the MAC address behind an IP. Useful, but every broadcast costs every machine on the LAN a little work."
+                ? "Broadcasts are how a station finds something it cannot yet name: a DHCP server, or the MAC address behind an IP. Broadcasts are useful, but each one makes every machine on the LAN do a little extra work."
                 : mode === "multicast"
-                  ? "Multicast is what makes live video to many viewers affordable: one copy on the wire however many are watching, instead of one copy per viewer. In IPv4 the group addresses are class D, 224.0.0.0 to 239.255.255.255."
+                  ? "Multicast makes it cheaper to send live video to many viewers: only one copy goes on the wire, however many people are watching, instead of one copy for each viewer. In IPv4 the group addresses are class D, 224.0.0.0 to 239.255.255.255."
                   : "A switch takes this one step further: because it knows which port each address is on, it does not even send the frame down the other cables. See level 6.5."}
             </p>
           </div>
@@ -969,7 +969,7 @@ const QUESTIONS: Question[] = [
       { label: "Each station is given its own frequency" },
     ],
     explain:
-      "Slotted ALOHA still transmits blindly and adds no listening. It only requires transmissions to begin on a slot boundary, which halves the vulnerable window from two frame times to one and so doubles the peak throughput to 36.8 %.",
+      "Slotted ALOHA still sends without listening first. It only requires transmissions to begin on a slot boundary, which halves the vulnerable window from two frame times to one and so doubles the peak throughput to 36.8 %.",
   },
   {
     id: "mac5",
@@ -981,7 +981,7 @@ const QUESTIONS: Question[] = [
       { label: "It decides which station may transmit next" },
     ],
     explain:
-      "Carrier sense stops most collisions, but two stations that both hear silence can still start together. Collision Detection means a station keeps listening while it sends, so it notices this within microseconds, stops at once to free the medium, and retries after a random backoff.",
+      "Carrier sense stops most collisions, but two stations that both hear silence can still start together. Collision Detection means a station keeps listening while it sends, so it notices this within microseconds, stops at once to free the medium, and tries again after waiting a random time.",
   },
   {
     id: "mac6",

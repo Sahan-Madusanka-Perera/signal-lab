@@ -254,20 +254,20 @@ export function ExampleSection() {
       </Panel>
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
-        <Panel title="Four things that trip people up">
+        <Panel title="Four things students often mix up">
           <ol className="grid gap-3">
             <Trip n={1} title="It is the same message the whole time.">
               Data, segment, packet and frame are not different messages. They are the same 41 bytes in more or
               fewer envelopes, and the name tells you how many envelopes are on.
             </Trip>
-            <Trip n={2} title="Segment or packet? Look for the address.">
+            <Trip n={2} title="Segment or packet? Look at the addresses.">
               A segment has port numbers, so it knows which <em>program</em>. A packet adds IP addresses, so it
               knows which <em>computer</em>.
             </Trip>
             <Trip n={3} title="Bits are not one more wrapper.">
-              Nothing is added at the bottom. Bits are the finished frame, header and all, turned into a signal.
+              Nothing is added at the bottom. Bits are the finished frame, with all its headers, turned into a signal.
             </Trip>
-            <Trip n={4} title="A router only goes halfway up.">
+            <Trip n={4} title="A router only goes up to the Internet layer.">
               It opens the frame and reads the IP address, but never the ports or the data. That is why a router
               is called a network-layer (Internet-layer) device.
             </Trip>

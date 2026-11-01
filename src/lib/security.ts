@@ -181,7 +181,7 @@ export const THREATS: Threat[] = [
     id: "trojan",
     name: "Trojan horse",
     what: "A malicious program that invades a computer by misleading users about what it is.",
-    how: "Pretends to be something useful (a free utility, a codec, a cracked game) so the user installs it willingly. It does not copy itself; it does not need to.",
+    how: "Pretends to be something useful (a free tool, a video player, a pirated game) so the user installs it willingly. It does not copy itself, because the user installs it.",
     tell: "Software that asks for far more permission than its job requires; downloads from outside the official source.",
     needsVictim: true,
     series: 3,
@@ -189,7 +189,7 @@ export const THREATS: Threat[] = [
   {
     id: "malware",
     name: "Malware",
-    what: "The umbrella term: any software written for a malicious purpose.",
+    what: "The general name for any software written for a malicious purpose.",
     how: "Viruses, trojans, worms, spyware and ransomware are all malware. The word describes the intent, not the technique.",
     tell: "Unexpected pop-ups, an unfamiliar browser home page, network activity when you are doing nothing.",
     needsVictim: false,
@@ -252,7 +252,7 @@ export const PHISHING_SAMPLE: SampleMessage = {
           text: "URGENT: your account will be closed within 24 hours",
           clue: {
             id: "urgency",
-            why: "Manufactured urgency is the core trick. A deadline stops you checking, and the fear of losing access is what makes an otherwise careful person click. Real institutions do not close accounts by email in a day.",
+            why: "Creating false urgency is the main trick. A deadline stops you from checking carefully, and the fear of losing access makes even a careful person click. Real institutions do not close accounts by email in a day.",
           },
         },
       ],
@@ -281,7 +281,7 @@ export const PHISHING_SAMPLE: SampleMessage = {
           text: "Failure to responde will result in permanant suspension.",
           clue: {
             id: "spelling",
-            why: "'Responde' and 'permanant' are both misspelt. Messages from a real organisation are proofread; sloppy language is a strong signal that the sender is not who they claim.",
+            why: "'Responde' and 'permanant' are both misspelt. Messages from a real organisation are proofread; careless mistakes are a strong sign that the sender is not who they say they are.",
           },
         },
       ],
@@ -294,7 +294,7 @@ export const PHISHING_SAMPLE: SampleMessage = {
           text: "www.ridgewaybank.lk/secure-login → 203.0.113.51/rb/login.php",
           clue: {
             id: "link",
-            why: "The text of the link and where it actually goes are two different things. Hovering over it reveals the real destination, here a bare IP address, not the bank at all. Always read the destination, never the text.",
+            why: "The text of the link and where it actually goes are two different things. If you move the mouse over it without clicking, you can see the real destination: here a bare IP address, not the bank at all. Always read the destination, never the text.",
           },
         },
       ],
@@ -333,7 +333,7 @@ export const GENUINE_SAMPLE: SampleMessage = {
         },
       ],
     },
-    { label: "Link", mono: true, runs: [{ text: "no link; you are asked to navigate there yourself" }] },
+    { label: "Link", mono: true, runs: [{ text: "no link; you are asked to go to the website yourself" }] },
     { label: "Attachment", mono: true, runs: [{ text: "none" }] },
   ],
 };
@@ -383,10 +383,10 @@ export type TrafficSample = {
 export const TRAFFIC_SAMPLES: TrafficSample[] = [
   { id: "t1", label: "A student loads a web page", direction: "out", protocol: "TCP", port: 443, detail: "Started from inside the network, so it is ordinary use." },
   { id: "t2", label: "Someone visits our web server", direction: "in", protocol: "TCP", port: 80, detail: "The server exists to be reached, so port 80 must be open." },
-  { id: "t3", label: "An outsider probes for remote login", direction: "in", protocol: "TCP", port: 22, detail: "Nobody outside should be opening an SSH session into the school network." },
-  { id: "t4", label: "An outsider tries the file-sharing port", direction: "in", protocol: "TCP", port: 445, detail: "A classic worm target. There is no reason for this to arrive from the Internet." },
+  { id: "t3", label: "An outsider tries to log in remotely", direction: "in", protocol: "TCP", port: 22, detail: "Nobody outside should be opening an SSH session into the school network." },
+  { id: "t4", label: "An outsider tries the file-sharing port", direction: "in", protocol: "TCP", port: 445, detail: "Worms often attack this port. There is no reason for this to arrive from the Internet." },
   { id: "t5", label: "A DNS reply comes back", direction: "in", protocol: "UDP", port: 53, detail: "The answer to a lookup one of our own machines asked for." },
-  { id: "t6", label: "Malware phones home from a lab PC", direction: "out", protocol: "TCP", port: 6667, detail: "Outbound, so this rule set lets it through. A firewall alone cannot save an already-infected machine." },
+  { id: "t6", label: "Malware on a lab PC contacts its attacker", direction: "out", protocol: "TCP", port: 6667, detail: "Outbound, so this rule set lets it through. A firewall alone cannot protect a machine that is already infected." },
 ];
 
 export type FirewallVerdict = { action: "allow" | "deny"; rule: FirewallRule | null };
@@ -416,16 +416,16 @@ export const PROTECTIONS = [
   },
   {
     name: "Antivirus software",
-    what: "Scans files and running programs for known malicious code, then quarantines or removes what it finds.",
+    what: "Scans files and running programs for known malicious code, then isolates (quarantines) or removes what it finds.",
     stops: ["Known viruses, trojans and other malware", "Infected files arriving by mail or USB"],
-    limit: "It can only recognise what its database describes, so an out-of-date scanner is close to useless.",
+    limit: "It can only recognise what its database describes, so an out-of-date scanner is almost useless.",
     series: 2,
   },
   {
     name: "Education and good practice",
-    what: "Strong, unique passwords; suspicion of unexpected messages; updates installed promptly; backups kept separately.",
+    what: "Strong, unique passwords; being careful with unexpected messages; updates installed promptly; backups kept separately.",
     stops: ["Phishing", "Trojans the user would otherwise install", "Password guessing"],
-    limit: "It depends on every person, every time, which is exactly why it needs to be taught rather than assumed.",
+    limit: "It depends on every person, every time, which is why it must be taught, not just expected.",
     series: 0,
   },
 ] as const;
