@@ -84,12 +84,12 @@ export type FrameField = {
 
 /** The IEEE 802.3 frame, in the order the bits go onto the wire. */
 export const FRAME_FIELDS: FrameField[] = [
-  { name: "Preamble + SFD", bytes: 8, what: "A fixed bit pattern that lets the receiver lock its clock onto the incoming signal.", series: 2 },
+  { name: "Preamble + SFD", bytes: 8, what: "A fixed bit pattern that lets the receiver set its clock to match the incoming signal.", series: 2 },
   { name: "Destination MAC", bytes: 6, what: "Who the frame is for. All ones means every station on the LAN.", series: 0 },
   { name: "Source MAC", bytes: 6, what: "Which interface sent it, so a reply can be addressed back.", series: 3 },
   { name: "Type / Length", bytes: 2, what: "What the payload contains: 0x0800 for an IPv4 packet.", series: 1 },
   { name: "Payload", bytes: [46, 1500], what: "The data being carried, usually an IP packet. Padded up to 46 bytes if it is shorter.", series: 4 },
-  { name: "FCS", bytes: 4, what: "A checksum over the whole frame. If it does not match, the frame is silently discarded.", series: 2 },
+  { name: "FCS", bytes: 4, what: "A checksum over the whole frame. If it does not match, the frame is thrown away without any message.", series: 2 },
 ];
 
 /* ================================================================== *
@@ -105,7 +105,7 @@ export const MAC_PROTOCOLS: Record<MacProtocol, { name: string; long: string; ru
   aloha: {
     name: "ALOHA",
     long: "Pure ALOHA",
-    rule: "Transmit the moment you have something to send. If it collides, wait a random time and try again.",
+    rule: "Send as soon as you have something to send. If it collides, wait a random time and try again.",
     peak: "18.4 %",
   },
   slotted: {
@@ -117,7 +117,7 @@ export const MAC_PROTOCOLS: Record<MacProtocol, { name: string; long: string; ru
   "csma-cd": {
     name: "Ethernet",
     long: "Ethernet: CSMA/CD",
-    rule: "Listen before you talk. If the medium is busy, wait. Keep listening while sending, and if you hear a collision, stop immediately and back off.",
+    rule: "Listen before sending. If the medium is busy, wait. Keep listening while sending, and if you hear a collision, stop immediately and wait a random time before trying again.",
     peak: "over 90 %",
   },
 };
@@ -371,7 +371,7 @@ export const DHCP_STEPS = [
     step: "Discover",
     from: "Client",
     to: "Broadcast",
-    detail: "The new host has no address yet, so it shouts to the whole LAN: is there a DHCP server out there?",
+    detail: "The new host has no address yet, so it sends a broadcast to the whole LAN: is there a DHCP server here?",
     src: "0.0.0.0",
     dst: "255.255.255.255",
   },
@@ -379,7 +379,7 @@ export const DHCP_STEPS = [
     step: "Offer",
     from: "Server",
     to: "Client",
-    detail: "A DHCP server replies with an address it is willing to lend, plus the subnet mask, gateway and DNS server.",
+    detail: "A DHCP server replies with an address it offers to lend, plus the subnet mask, gateway and DNS server.",
     src: "192.168.1.1",
     dst: "255.255.255.255",
   },
@@ -387,7 +387,7 @@ export const DHCP_STEPS = [
     step: "Request",
     from: "Client",
     to: "Broadcast",
-    detail: "The client formally asks for that address. It broadcasts again so any other server that made an offer knows to withdraw it.",
+    detail: "The client formally asks for that address. It broadcasts again so any other server that made an offer knows that its offer was not accepted.",
     src: "0.0.0.0",
     dst: "255.255.255.255",
   },
@@ -443,7 +443,7 @@ export const TRANSPORTS: Record<
     name: "UDP",
     long: "User Datagram Protocol",
     blurb:
-      "Connectionless. Each datagram is fired off on its own with no handshake, no acknowledgement and no retransmission. Fast and simple, but the application must cope with loss and reordering itself.",
+      "Connectionless. Each datagram is sent on its own with no handshake, no acknowledgement and no retransmission. Fast and simple, but the application itself must deal with lost or out-of-order data.",
     traits: [
       { label: "Sets up a connection first", has: false },
       { label: "Acknowledges every segment", has: false },
@@ -531,7 +531,7 @@ export const DNS_RESOLUTION = [
     to: "Back to the client",
     ask: "—",
     answer: "93.184.216.34, cached for next time.",
-    detail: "The resolver caches the answer so the next lookup for this name skips the whole walk.",
+    detail: "The resolver caches the answer so the next lookup for this name does not need to go through the tree again.",
   },
 ];
 
@@ -542,7 +542,7 @@ export const DNS_RESOLUTION = [
 export const HTTP_REQUEST = [
   { line: "GET /index.html HTTP/1.1", note: "The method, the resource wanted, and the protocol version." },
   { line: "Host: www.example.com", note: "Which site. One server can host many, so this is required in HTTP/1.1." },
-  { line: "User-Agent: Mozilla/5.0", note: "What is asking. Servers sometimes vary the response on this." },
+  { line: "User-Agent: Mozilla/5.0", note: "Which program is asking. Servers sometimes send a different response depending on this." },
   { line: "Accept: text/html", note: "What formats the client can handle." },
   { line: "", note: "A blank line marks the end of the headers." },
 ];
@@ -569,15 +569,15 @@ export const HTTP_STATUS = [
 export const ISP_SERVICES = [
   {
     name: "A path to the rest of the Internet",
-    what: "The ISP is already connected to other networks, so buying a connection to the ISP buys reachability to everything they can reach.",
+    what: "The ISP is already connected to other networks, so when you pay for a connection to the ISP, you can reach everything the ISP can reach.",
   },
   {
     name: "A public IP address",
-    what: "Addresses are allocated in blocks to ISPs, who lend one to each customer. Without it your traffic has no return address the Internet can route to.",
+    what: "Addresses are given in blocks to ISPs, and the ISP lends one to each customer. Without one, your traffic has no return address, so replies could not reach you.",
   },
   {
     name: "Name resolution",
-    what: "A DNS resolver, handed to your router automatically, so names can be turned into addresses.",
+    what: "A DNS resolver, given to your router automatically, so names can be turned into addresses.",
   },
   {
     name: "Extra services",
@@ -608,7 +608,7 @@ export const ACCESS_LINKS: AccessLink[] = [
     up: 33_600,
     alwaysOn: false,
     voice: "The line is busy, so nobody can call in or out",
-    how: "The modem dials the ISP's number, and the data is modulated into the same 300 Hz – 3.4 kHz band a voice would occupy. The exchange treats it as an ordinary call.",
+    how: "The modem dials the ISP's number, and the data is modulated into the same 300 Hz – 3.4 kHz band a voice would use. The exchange treats it as an ordinary call.",
     series: 4,
   },
   {
@@ -619,7 +619,7 @@ export const ACCESS_LINKS: AccessLink[] = [
     up: 1_000_000,
     alwaysOn: true,
     voice: "Unaffected, because voice and data use different frequencies on the same pair",
-    how: "The copper pair can carry far more than the 4 kHz the telephone system reserves for speech. ADSL uses the frequencies above that band, leaving the voice band alone.",
+    how: "The copper pair can carry far more than the 4 kHz the telephone system reserves for speech. ADSL uses the frequencies above that band, and leaves the voice band free for calls.",
     series: 0,
   },
   {
@@ -665,7 +665,7 @@ export function formatRate(bps: number): string {
  * narrower than the downstream one, which is where the "asymmetric" comes from.
  */
 export const ADSL_BANDS = [
-  { name: "Voice", from: 0, to: 4_000, what: "The ordinary telephone call, untouched", series: 2 },
+  { name: "Voice", from: 0, to: 4_000, what: "The ordinary telephone call, unchanged", series: 2 },
   { name: "Upstream", from: 25_000, to: 138_000, what: "Data from you to the ISP", series: 3 },
   { name: "Downstream", from: 138_000, to: 1_104_000, what: "Data from the ISP to you", series: 0 },
 ];
@@ -821,7 +821,7 @@ export const VPN_FACTS = {
   why: [
     "A branch office can reach head office as though it were on the same LAN, without renting a private line between them",
     "Someone working from home gets an address on the office network and can use its internal servers",
-    "Everything inside the tunnel is encrypted, so the ISPs and routers carrying it learn nothing but that a tunnel exists",
+    "Everything inside the tunnel is encrypted, so the ISPs and routers carrying it can see only that a tunnel exists",
   ],
   how: [
     { step: "Encapsulate", detail: "The private packet, often with a private IP address, is placed inside an ordinary public packet." },
@@ -830,7 +830,7 @@ export const VPN_FACTS = {
     { step: "Unwrap", detail: "The far end decrypts it, takes the inner packet out, and delivers it on its own private network." },
   ],
   limit:
-    "It is virtual, not private: the traffic still crosses the same Internet, so a slow or congested path stays slow. What it buys is confidentiality and reachability, not capacity.",
+    "It is virtual: the traffic still crosses the same Internet, so a slow or busy path stays slow. A VPN gives you privacy and access to the private network, not extra speed.",
 };
 
 /** Whether an address is handed out for good or borrowed for a while. */
@@ -840,15 +840,15 @@ export const IP_ASSIGNMENT = [
     how: "Set by hand and kept until somebody changes it.",
     good: ["A server can always be found at the same address", "Needed by anything a domain name points at"],
     bad: ["Every machine has to be configured by an administrator", "Easy to create a clash by mistake"],
-    used: "Servers, routers, printers: anything that must sit still.",
+    used: "Servers, routers, printers: anything that must keep the same address.",
     series: 1,
   },
   {
     kind: "Dynamic",
     how: "Handed out automatically by a DHCP server and leased for a limited time.",
-    good: ["No configuration at all on the client", "Addresses are recycled, so a block goes further"],
-    bad: ["The address can change between sessions", "No good for something others must find by address"],
-    used: "Laptops, phones, and everything else that comes and goes.",
+    good: ["No configuration at all on the client", "Addresses are reused, so a block of addresses can serve more devices"],
+    bad: ["The address can change between sessions", "Not suitable for a device that others must find by its address"],
+    used: "Laptops, phones, and other devices that join and leave the network.",
     series: 2,
   },
 ];
@@ -862,7 +862,7 @@ export const PORT_RANGES = [
     name: "Well known",
     from: 0,
     to: 1023,
-    who: "Reserved for standard services, so a client knows where to knock without being told.",
+    who: "Reserved for standard services, so a client knows which port to use without being told.",
     example: "HTTP 80, DNS 53, SSH 22",
     series: 1,
   },
@@ -892,7 +892,7 @@ export type UrlPart = { part: string; text: string; what: string; series: number
 
 /** One address, split into the parts an examiner asks you to name. */
 export const URL_PARTS: UrlPart[] = [
-  { part: "Scheme", text: "https", what: "Which protocol to speak. http, https, ftp and mailto are the common ones.", series: 1 },
+  { part: "Scheme", text: "https", what: "Which protocol to use. http, https, ftp and mailto are the common ones.", series: 1 },
   { part: "Separator", text: "://", what: "Fixed punctuation between the scheme and the host.", series: 4 },
   { part: "Domain name", text: "www.example.com", what: "Which server to ask. DNS turns this into an IP address.", series: 0 },
   { part: "Port", text: ":80", what: "Which process on that server. Left out when it is the protocol's default.", series: 3 },
@@ -911,7 +911,7 @@ export const APP_MODELS = [
   {
     name: "Client–server",
     how: "One machine holds the resource and waits; the others ask for it. The server never starts a conversation.",
-    good: ["The resource is in one place, so it is maintained and backed up once", "Central control of accounts and permissions", "Scales to very large numbers of clients"],
+    good: ["The resource is in one place, so it is maintained and backed up once", "Central control of accounts and permissions", "Works for very large numbers of clients"],
     bad: ["The server is a single point of failure", "Server hardware and administration cost money", "Heavy load falls on one machine"],
     example: "The web, email, DNS: everything in this competency so far.",
     series: 1,
@@ -919,8 +919,8 @@ export const APP_MODELS = [
   {
     name: "Peer-to-peer",
     how: "Every machine is both client and server. Each peer offers resources to the others and takes resources from them, with no central machine in charge.",
-    good: ["No dedicated server to buy or run", "Simple and cheap for a handful of machines", "No single point of failure, since the network survives losing any one peer"],
-    bad: ["No central control of security or accounts", "Files end up scattered, so backing up is hard", "Performance falls away as the number of peers grows"],
+    good: ["No dedicated server to buy or run", "Simple and cheap for a handful of machines", "No single point of failure, since the network keeps working if any one peer fails"],
+    bad: ["No central control of security or accounts", "Files are spread over many machines, so backing up is hard", "Performance gets worse as the number of peers grows"],
     example: "A small office sharing a printer and a folder; file-sharing networks.",
     series: 3,
   },

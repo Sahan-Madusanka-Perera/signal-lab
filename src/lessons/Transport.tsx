@@ -62,9 +62,10 @@ function WhySection() {
             <p className="tnum mt-0.5 font-mono text-sm text-ink">to: 192.168.1.42 : 443</p>
           </div>
           <p className="mt-3 max-w-[58ch] text-sm text-ink-2">
-            A port is a numbered doorway into the machine. Each running process is attached to one, so the pair
-            of address and port identifies exactly one endpoint anywhere on the Internet. Port 443 means the
-            browser's secure connection, and the operating system hands it straight there.
+            A port is a number that identifies one program on the machine. Each running process uses
+            its own port, so an address and a port together identify exactly one endpoint anywhere on the
+            Internet. Port 443 means the browser's secure connection, so the operating system passes the data
+            straight to the browser.
           </p>
           <p className="mt-2 text-sm font-medium text-ok">The data reaches the right process.</p>
         </Panel>
@@ -97,8 +98,8 @@ function PortSection() {
   return (
     <Section
       id="ports"
-      title="One address, many doorways"
-      lead="Ports are just numbers, sixteen bits wide, so there are 65 536 of them per machine. The low ones are reserved for well-known services so that a client knows where to knock without being told; the high ones are handed out to clients as temporary numbers for the duration of a conversation."
+      title="One address, many ports"
+      lead="Ports are just numbers, sixteen bits wide, so there are 65 536 of them per machine. The low ones are reserved for well-known services, so a client knows which port to use without being told. The high ones are given to clients as temporary numbers, for as long as a conversation lasts."
     >
       <Panel
         title="Demultiplexing at the receiver"
@@ -293,8 +294,8 @@ function PortSection() {
           <p className="mt-3 max-w-[74ch] text-sm text-ink-2">
             This is why a conversation has two different kinds of port number at its two ends. Your browser is
             given a temporary number from the dynamic range and connects <em>to</em> the server's well-known 80 or
-            443, so the server knows where to listen, and your machine knows which of its own windows the reply
-            belongs to.
+            443, so the server knows where to listen, and your machine knows which of its own
+            programs the reply belongs to.
           </p>
         </div>
       </Panel>
@@ -340,7 +341,7 @@ function CompareSection() {
     <Section
       id="compare"
       title="Two transport protocols, opposite priorities"
-      lead="Both TCP and UDP sit directly on top of IP and both use port numbers. Everything else about them differs, because they answer different questions: TCP asks how to make an unreliable network look reliable, and UDP asks how little it can get away with doing."
+      lead="Both TCP and UDP sit directly on top of IP and both use port numbers. Everything else about them differs, because they answer different questions: TCP tries to make an unreliable network behave reliably. UDP tries to do as little extra work as possible."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         {(["tcp", "udp"] as Transport[]).map((k) => {
@@ -394,10 +395,10 @@ function CompareSection() {
       </div>
 
       <Callout kind="exam" title="How to choose between them">
-        Ask what a lost packet costs. In a file or a web page a missing byte corrupts the whole thing, so the
-        retransmission TCP provides is worth the delay. In a live voice call a packet that arrives late is
-        useless anyway, and you would rather have a moment of crackle than a growing delay, so UDP wins. The rule of
-        thumb: <strong>TCP when correctness matters, UDP when timeliness matters.</strong>
+        Ask what happens if a packet is lost. In a file or a web page one missing byte damages the whole
+        thing, so the retransmission TCP provides is worth the delay. In a live voice call a packet that arrives
+        late is useless anyway, and a short crackle is better than a growing delay, so UDP is the better choice.
+        The simple rule: <strong>TCP when every byte must be correct, UDP when speed matters most.</strong>
       </Callout>
     </Section>
   );
@@ -490,7 +491,7 @@ function RaceSection() {
     <Section
       id="race"
       title="The same lossy network, two different outcomes"
-      lead="Turn the loss up and watch what each protocol does about it. UDP sends each datagram once and moves on, so what is lost stays lost. TCP waits for an acknowledgement, notices what never arrived, and sends it again, so everything gets through eventually. That word is the whole trade-off."
+      lead="Increase the loss and see what each protocol does about it. UDP sends each datagram once and moves on, so what is lost stays lost. TCP waits for an acknowledgement, notices what never arrived, and sends it again, so everything arrives in the end. The cost is the extra time this takes."
     >
       <Panel
         title="Delivery race"
@@ -643,7 +644,7 @@ function RaceSection() {
               label="UDP delivered"
               value={`${udpDelivered} / ${TOTAL}`}
               tone={udpDelivered === TOTAL ? "ok" : "bad"}
-              sub={udpLostCount ? `${udpLostCount} lost for good` : "nothing lost yet"}
+              sub={udpLostCount ? `${udpLostCount} lost and never sent again` : "nothing lost yet"}
             />
             <Readout
               label="TCP delivered"
@@ -657,7 +658,7 @@ function RaceSection() {
         <p className="mt-3 max-w-[74ch] rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm text-ink-2">
           {loss === 0
             ? "With a perfect network the two behave identically, and UDP gets there with less work, because it never had to wait for an acknowledgement it did not need."
-            : `At ${Math.round(loss * 100)} % loss, UDP simply ends up with holes in the data: whatever the network dropped is gone, and the application never finds out. TCP loses nothing, but every retransmission costs a timeout, so the same eight pieces take noticeably longer to arrive. Neither is better; they are different bargains.`}
+            : `At ${Math.round(loss * 100)} % loss, UDP ends up with gaps in the data: whatever the network dropped is gone, and the application never finds out. TCP loses nothing, but every retransmission means waiting for a timeout, so the same eight pieces take noticeably longer to arrive. Neither is better: each one gives up something to gain something else.`}
         </p>
       </Panel>
 
@@ -746,6 +747,6 @@ const QUESTIONS: Question[] = [
       { label: "It chooses a route that never fails" },
     ],
     explain:
-      "TCP cannot change what IP does: routers still drop packets. What it adds is bookkeeping: the receiver acknowledges the segments it got, and the sender retransmits anything left unacknowledged, then puts everything back into the original order before handing it to the application.",
+      "TCP cannot change what IP does: routers still drop packets. What it adds is careful record-keeping: the receiver acknowledges the segments it got, and the sender retransmits anything left unacknowledged, then puts everything back into the original order before handing it to the application.",
   },
 ];

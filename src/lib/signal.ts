@@ -403,13 +403,13 @@ export const MODULATION: Record<Modulation, { name: string; long: string; varies
     name: "AM",
     long: "Amplitude Modulation",
     varies: "amplitude",
-    note: "The carrier's height follows the message. Frequency and phase are untouched.",
+    note: "The carrier's height follows the message. Frequency and phase do not change.",
   },
   fm: {
     name: "FM",
     long: "Frequency Modulation",
     varies: "frequency",
-    note: "The carrier bunches up on message peaks and stretches out in the troughs. Height stays constant.",
+    note: "The cycles of the carrier get closer together at the message peaks and further apart in the troughs. Height stays constant.",
   },
   pm: {
     name: "PM",
@@ -625,7 +625,7 @@ export const TRANSMISSION_MODES: Record<
   },
   half: {
     name: "Half duplex",
-    how: "Both devices can send, but only one at a time. The line has to be turned round between turns.",
+    how: "Both devices can send, but only one at a time. The direction has to be switched each time the other device wants to send.",
     capacity: "The whole channel goes to whichever device is currently sending.",
     examples: ["Walkie-talkies", "A hub-based Ethernet segment", "CB radio"],
     series: 0,
@@ -663,12 +663,12 @@ export const MULTIPLEXING: Record<
     name: "TDM",
     long: "Time Division Multiplexing",
     divides: "time",
-    how: "Transmission time is cut into slots and each channel is given its own slot in turn. One complete round of slots is a frame, and the frames repeat.",
+    how: "Transmission time is divided into slots and each channel is given its own slot in turn. One complete round of slots is a frame, and the frames repeat.",
     used: "Digital telephone trunks, where 24 or 30 voice channels share one line.",
     key: [
-      { term: "Time slot", what: "The share of time one channel gets to transmit in." },
+      { term: "Time slot", what: "The part of the time in which one channel can send." },
       { term: "Frame", what: "One complete set of slots: one slot per input channel." },
-      { term: "Round robin", what: "Slots are handed out in sequence, then the cycle repeats." },
+      { term: "Round robin", what: "Slots are given to the channels one after another, then the cycle repeats." },
       { term: "Guard time", what: "A small unused gap between slots so a timing error cannot overlap two channels." },
       { term: "Synchronisation", what: "Both ends must agree where each slot begins, or every channel is read wrongly." },
     ],
@@ -681,8 +681,8 @@ export const MULTIPLEXING: Record<
     used: "Radio and television broadcasting, and the upstream/downstream split in ADSL.",
     key: [
       { term: "Carrier", what: "The frequency a channel's data is modulated onto." },
-      { term: "Band", what: "The slice of the spectrum reserved for one channel." },
-      { term: "Guard band", what: "An unused strip of spectrum between bands, so neighbours do not interfere." },
+      { term: "Band", what: "The part of the frequency range reserved for one channel." },
+      { term: "Guard band", what: "An unused range of frequencies between bands, so neighbouring channels do not interfere." },
     ],
   },
   wdm: {
@@ -700,18 +700,18 @@ export const MULTIPLEXING: Record<
     name: "CDM",
     long: "Code Division Multiplexing",
     divides: "code",
-    how: "Every channel is given a unique code and all of them transmit over the whole band at the same time. A receiver that knows a code can pull that channel out and treat the rest as noise.",
+    how: "Every channel is given a unique code and all of them transmit over the whole band at the same time. A receiver that knows a code can separate that channel from the others and treat the rest as noise.",
     used: "Mobile telephone networks (CDMA) and GPS.",
     key: [
       { term: "Chip code", what: "The unique pattern each channel's bits are multiplied by." },
-      { term: "Orthogonal", what: "Codes are chosen so that any two of them cancel out, and that is what keeps the channels separable." },
+      { term: "Orthogonal", what: "Codes are chosen so that any two of them cancel out, and that is what lets the channels be separated." },
     ],
   },
 };
 
 export const MUX_PROS = [
   "One expensive medium carries many conversations, so the cost per channel falls",
-  "The capacity of a link that would otherwise sit idle is actually used",
+  "Capacity that would otherwise not be used is put to work",
   "The network can grow by adding channels rather than cable",
 ];
 

@@ -57,10 +57,10 @@ function IspSection() {
   return (
     <Section
       id="isp"
-      title="You cannot join the Internet; you join somebody who is already on it"
-      lead="There is no central Internet to plug into. It is thousands of separate networks that have agreed to carry each other's traffic, and an Internet Service Provider is simply one of those networks that will sell you a connection to itself. Everything reachable from them becomes reachable from you."
+      title="You do not join the Internet directly; you connect to a network that is already part of it"
+      lead="There is no central Internet to plug into. It is thousands of separate networks that have agreed to carry each other's traffic, and an Internet Service Provider is one of those networks. It sells you a connection to its network, and then you can reach everything the ISP can reach."
     >
-      <Panel title="Your house, and everything above it" subtitle="Traffic climbs until it finds a network that knows the way down to the destination.">
+      <Panel title="Your house, and everything above it" subtitle="Traffic goes up through larger networks until it reaches one that knows the way down to the destination.">
         <Scope height={216}>
           <ScopeCanvas
             label="A home network connected to a local ISP, which connects to a regional provider and then to the Internet backbone, with a packet travelling up and across to a distant web server"
@@ -185,12 +185,12 @@ function AccessSection() {
   return (
     <Section
       id="access"
-      title="Down the same copper pair the telephone uses"
-      lead="Almost every home already had a pair of copper wires running to the exchange, for the telephone. Both ways of reaching an ISP over that pair use it differently: a dial-up modem pretends to be a telephone call, while DSL discovers that the wire was always capable of far more than the 4 kHz a voice needs."
+      title="Using the same copper wires as the telephone"
+      lead="Almost every home already had a pair of copper wires running to the exchange, for the telephone. Both ways of reaching an ISP over that pair use it differently: a dial-up modem sends data as if it were a telephone call, while DSL uses the fact that the wire can carry much more than the 4 kHz a voice needs."
     >
       <Panel
         title="How the line is used"
-        subtitle="The telephone system reserves only the bottom 4 kHz for speech. Everything above it was going to waste."
+        subtitle="The telephone system reserves only the bottom 4 kHz for speech. Everything above it was not being used."
         actions={
           <Segmented
             label="Connection"
@@ -205,7 +205,7 @@ function AccessSection() {
             label={
               linkId === "dialup"
                 ? "A dial-up modem uses only the voice band from 300 Hz to 3.4 kHz, the same band a telephone call occupies"
-                : "ADSL leaves the voice band alone and uses a narrow upstream band and a much wider downstream band above it"
+                : "ADSL does not use the voice band. It uses a narrow upstream band and a much wider downstream band above it"
             }
             deps={[linkId]}
             bounds={{ x0: 0, x1: 1.2e6, y0: 0, y1: 1 }}
@@ -265,7 +265,7 @@ function AccessSection() {
                 plot.text(
                   plot.sx(3_400) + 8,
                   plot.top + 12 + rowH,
-                  "everything above 4 kHz goes to waste",
+                  "everything above 4 kHz is unused",
                   palette.inkFaint,
                   { size: 9 },
                 );
@@ -292,7 +292,7 @@ function AccessSection() {
 
       <Panel
         title="The same file, over each connection"
-        subtitle="Transfer time is simply size ÷ rate, the arithmetic the paper asks for."
+        subtitle="Transfer time is size ÷ rate. Exam questions ask for this calculation."
         actions={
           <Segmented
             label="File"
@@ -361,7 +361,7 @@ function AccessSection() {
           <div>
             <p className="text-sm font-semibold text-ink">Why ADSL is asymmetric</p>
             <p className="mt-1 max-w-[52ch] text-sm text-ink-2">
-              A home connection spends its life receiving: pages, video, updates. What it sends is mostly
+              A home connection mostly receives data: pages, video, updates. What it sends is mostly
               requests, which are tiny. Giving the downstream direction the wider band matches how the line is
               actually used, and a narrower upstream band also interferes less with the neighbouring pairs in
               the same cable.
@@ -380,8 +380,8 @@ function AccessSection() {
           </p>
           <p className="mt-2 max-w-[52ch] text-sm text-ink-2">
             A dial-up modem does this inside the voice band, so the exchange cannot tell the difference between
-            your data and a conversation. That is exactly why the line is busy while you are online, and why the
-            ceiling is 56 kbps: it is all the voice band can carry.
+            your data and a conversation. That is why the line is busy while you are online, and why
+            the maximum speed is 56 kbps: that is all the voice band can carry.
           </p>
         </Panel>
 
@@ -391,7 +391,7 @@ function AccessSection() {
               "Far higher speed: megabits rather than kilobits",
               "Always on: no dialling, no connection delay, no per-minute charge",
               "The telephone still works, because voice and data use different frequencies",
-              "Independent services: losing the data service does not take the telephone with it",
+              "Separate services: if the data service stops working, the telephone still works",
               "Each subscriber has their own line to the exchange, rather than a shared medium",
             ].map((t) => (
               <li key={t} className="flex gap-2">
@@ -415,7 +415,7 @@ function HomeSection() {
     <Section
       id="home"
       title="One public address for the whole house"
-      lead="Your ISP gives you a single public IP address. Nearly every home has more devices than that, and IPv4 addresses ran short long ago, so the router hands each device an address from a private range that is meaningless outside your house, and does the translating itself."
+      lead="Your ISP gives you a single public IP address. Nearly every home has more devices than that, and IPv4 addresses ran out long ago. So the router gives each device an address from a private range, which has no meaning outside your house, and the router translates between the two."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="Public address" subtitle="Unique across the whole Internet.">
@@ -456,8 +456,8 @@ function HomeSection() {
             ))}
           </div>
           <p className="mt-3 max-w-[46ch] text-sm text-ink-2">
-            Handed out by the router over DHCP. No router on the Internet will forward a packet addressed to one
-            of these, which is why they can be used by everybody simultaneously.
+            Given out by the router using DHCP. No router on the Internet will forward a packet
+            addressed to one of these, which is why everybody can use them at the same time.
           </p>
         </Panel>
       </div>
@@ -526,11 +526,11 @@ function NatSection() {
     <Section
       id="nat"
       title="Network Address Translation"
-      lead="A packet leaving your house cannot carry 192.168.1.10 as its source, because no reply could ever find its way back. So the router rewrites the source address to its own public one on the way out, and rewrites it back on the way in. The table it keeps to remember which reply belongs to which device is the whole of NAT."
+      lead="A packet leaving your house cannot carry 192.168.1.10 as its source, because no reply could ever find its way back. So the router rewrites the source address to its own public one on the way out, and rewrites it back on the way in. NAT is this rewriting, together with a table the router keeps to remember which reply belongs to which device."
     >
       <Panel
         title="Translation lab"
-        subtitle="Send a request from a device and watch the header being rewritten in both directions."
+        subtitle="Send a request from a device and see the header being changed in both directions."
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Toggle checked={showHeaders} onChange={setShowHeaders} label="Show headers" />
@@ -826,15 +826,15 @@ function NatSection() {
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Callout kind="exam" title="What NAT is for">
           NAT lets a whole network share one public IP address by rewriting the address information in packet
-          headers as they pass through the router. It was introduced because IPv4 addresses are scarce, and it
-          has a useful side effect: an outside machine cannot start a conversation with a device inside, because
+          headers as they pass through the router. It was introduced because IPv4 addresses are scarce, and
+          it has a useful extra benefit: an outside machine cannot start a conversation with a device inside, because
           it has no address that reaches one.
         </Callout>
 
-        <Panel title="The cost of translating">
+        <Panel title="The disadvantages of NAT">
           <p className="max-w-[52ch] text-sm text-ink-2">
-            Because there is no way in from outside without a rule set up by hand, running a server at home is
-            awkward: the router must be told to forward a particular port to a particular machine. NAT also
+            Because there is no way in from outside without a rule set up by hand, running a server
+            at home is difficult: the router must be told to forward a particular port to a particular machine. NAT also
             breaks the original idea that any host could address any other, which is one of the arguments for
             moving to IPv6, where there are enough addresses that nobody needs to share.
           </p>
@@ -872,12 +872,12 @@ function ProxySection() {
   return (
     <Section
       id="proxy"
-      title="A stand-in that fetches on your behalf"
+      title="A server that makes requests for you"
       lead="A proxy server sits between the client machines and the Internet. Instead of connecting to a site directly, a computer asks the proxy, and the proxy makes the request for it. Every reply passes back through the same place, which is what makes caching, filtering and a single point of contact possible at once."
     >
       <Panel
         title="Cache hit or cache miss"
-        subtitle="Request the same page twice and watch where the second request stops."
+        subtitle="Request the same page twice and see where the second request is answered."
         actions={
           <Button size="sm" onClick={emptyCache} disabled={!cache.length}>
             Empty the cache
@@ -1037,7 +1037,7 @@ function ProxySection() {
 
       <Callout kind="note" title="NAT and a proxy are not the same thing">
         Both let many machines share one public address, but they work at different levels. NAT rewrites address
-        fields in the packet header and has no idea what the packet contains. A proxy is an application-layer
+        fields in the packet header and does not look at what the packet contains. A proxy is an application-layer
         program: it understands the requests it is passing on, which is what lets it cache a page, refuse a site
         or keep a log, and also why it must be told about each kind of traffic it handles.
       </Callout>
@@ -1084,7 +1084,7 @@ const QUESTIONS: Question[] = [
       { label: "It encrypts everything that is sent" },
     ],
     explain:
-      "ADSL uses frequencies above the voice band, so speech and data travel on the same pair without interfering. It is also always on and far faster. Dial-up occupies the voice band itself, which is exactly why the line is busy while you are online.",
+      "ADSL uses frequencies above the voice band, so speech and data travel on the same pair without interfering. It is also always on and far faster. Dial-up uses the voice band itself, which is exactly why the line is busy while you are online.",
   },
   {
     id: "i4",
@@ -1108,7 +1108,7 @@ const QUESTIONS: Question[] = [
       { label: "It forwards the private address unchanged, since routers ignore it" },
     ],
     explain:
-      "A packet with a private source address could never be replied to, because no router on the Internet will carry one. NAT rewrites the source to the router's own public address and remembers the mapping, keyed by port number, so it can rewrite the reply back on the way in.",
+      "A packet with a private source address could never be replied to, because no router on the Internet will carry one. NAT rewrites the source to the router's own public address and remembers the mapping, using the port number, so it can rewrite the reply back on the way in.",
   },
   {
     id: "i6",

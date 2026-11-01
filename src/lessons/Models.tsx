@@ -17,6 +17,7 @@ import {
   Slider,
 } from "../components/ui";
 import { useReducedMotion } from "../lib/theme";
+import { ExampleSection } from "./ModelsExample";
 import {
   ENCAP_STEPS,
   FLOW,
@@ -35,6 +36,7 @@ export function ModelsLesson() {
     <>
       <WhySection />
       <StackSection />
+      <ExampleSection />
       <UnitsSection />
       <FlowSection />
       <DevicesSection />
@@ -56,14 +58,14 @@ const BENEFITS = [
   },
   {
     t: "A layer can be replaced without touching the others",
-    d: "Move a laptop from Ethernet to Wi-Fi and everything above the bottom layer carries on unchanged. The browser never finds out.",
+    d: "Move a laptop from Ethernet to Wi-Fi and everything above the bottom layer keeps working without any change. The browser does not even notice.",
   },
   {
-    t: "Each layer talks only to its opposite number",
-    d: "The transport layer at one end is answered by the transport layer at the other. What happens below is somebody else's problem.",
+    t: "Each layer talks only to the same layer at the other end",
+    d: "The transport layer at one end is answered by the transport layer at the other. It does not need to know what happens in the layers below.",
   },
   {
-    t: "Different manufacturers can interoperate",
+    t: "Equipment from different manufacturers can work together",
     d: "Agreeing on the boundaries between layers is what lets a router from one company carry traffic from a program written by another.",
   },
 ];
@@ -72,21 +74,21 @@ function WhySection() {
   return (
     <Section
       id="why"
-      title="Nobody could write this as one program"
-      lead="Every level so far has solved one piece of the problem: signals, frames, addresses, ports, names. A reference model is the map that says how those pieces stack up: what each one is responsible for, and where one ends and the next begins. Two such models matter for the paper, and they describe the same journey at different resolutions."
+      title="This is too much for one program"
+      lead="Every level so far has solved one piece of the problem: signals, frames, addresses, ports, names. A reference model shows how those pieces fit together: what each one is responsible for, and where one ends and the next begins. You need to know two such models for the exam. They describe the same journey in different amounts of detail."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
         <Panel title="Without layers">
           <p className="max-w-[52ch] text-sm text-ink-2">
             One program would have to know how to encode a bit as a voltage, share a cable, find a route across
-            the world, recover from loss <em>and</em> render a web page. Change the cable and you rewrite the
-            browser.
+            the world, recover from loss <em>and</em> display a web page. If you changed the cable,
+            you would have to rewrite the browser.
           </p>
           <div className="mt-3 rounded-lg border border-line bg-surface-2 p-4">
             <div className="grid place-items-center rounded-md border border-dashed border-line-strong px-3 py-6 text-center">
               <p className="text-sm font-semibold text-ink">Everything, all at once</p>
               <p className="mt-1 max-w-[30ch] text-2xs text-ink-3">
-                Nothing can be changed in isolation, and nothing can be reused.
+                Nothing can be changed on its own, and nothing can be reused.
               </p>
             </div>
           </div>
@@ -95,7 +97,7 @@ function WhySection() {
         <Panel title="With layers">
           <p className="max-w-[52ch] text-sm text-ink-2">
             Each layer offers a service to the layer above and uses the service of the layer below. The
-            boundaries between them are agreed, so the inside of any one layer can be rebuilt freely.
+            boundaries between them are agreed, so any one layer can be changed inside without affecting the others.
           </p>
           <div className="mt-3 grid gap-1.5">
             {["Application", "Transport", "Internet", "Host to network"].map((l, i) => (
@@ -127,9 +129,10 @@ function WhySection() {
       </div>
 
       <Callout kind="note" title="A model is not a protocol">
-        Neither model is software you can install. They are descriptions, an agreed vocabulary for saying which
-        job belongs where. TCP/IP is the model the Internet was actually built on; OSI is the fuller reference
-        that examiners use to talk about layers that TCP/IP leaves inside the application.
+        Neither model is software you can install. They are descriptions: an agreed set of words for
+        saying which job belongs to which layer. TCP/IP is the model the Internet was actually built on. OSI is
+        a more detailed model, and examiners use it to talk about layers that TCP/IP includes inside the
+        application layer.
       </Callout>
     </Section>
   );
@@ -153,11 +156,11 @@ function StackSection() {
     <Section
       id="stack"
       title="Seven layers, or four"
-      lead="The OSI model splits the journey into seven layers; the TCP/IP model does the same job in four. They are not rivals; TCP/IP simply draws fewer lines, folding OSI's top three layers into one application layer and its bottom two into one host-to-network layer. Select any layer to see what it does and what it lines up with."
+      lead="The OSI model splits the journey into seven layers; the TCP/IP model does the same job in four. They do not compete; TCP/IP just has fewer divisions. It combines OSI's top three layers into one application layer, and its bottom two into one host-to-network layer. Select any layer to see what it does and which layer it matches in the other model."
     >
       <Panel
         title="The two models, side by side"
-        subtitle="The height of each TCP/IP box shows how many OSI layers it absorbs."
+        subtitle="The height of each TCP/IP box shows how many OSI layers it covers."
       >
         <div className="grid grid-cols-2 gap-3">
           <div className="min-w-0">
@@ -236,7 +239,7 @@ function StackSection() {
         </div>
       </Panel>
 
-      <Panel title="What the models disagree about" bodyClassName="p-0">
+      <Panel title="How the two models differ" bodyClassName="p-0">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[520px] border-collapse text-left text-sm">
             <thead>
@@ -330,7 +333,7 @@ function UnitsSection() {
     <Section
       id="units"
       title="Data, segment, packet, frame, bits"
-      lead="The same information has a different name at every layer, because at every layer it is wrapped in one more header. That wrapping is called encapsulation, and the name of the unit tells you exactly how far down the stack it has travelled, which is why the paper asks for the names."
+      lead="The same information has a different name at every layer, because at every layer it is wrapped in one more header. That wrapping is called encapsulation, and the name of the unit tells you exactly how far down the stack it has travelled, which is why exam questions ask for the names."
     >
       <Panel
         title="Encapsulation, drawn to scale"
@@ -521,7 +524,7 @@ function UnitsSection() {
         <p className="mt-3 max-w-[74ch] rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm text-ink-2">
           {frame.padBytes > 0
             ? `Your ${payload} bytes produce a ${enc.frameBytes}-byte frame, and Ethernet will not send anything shorter, so ${frame.padBytes} bytes of padding are added to reach the minimum. Sending one keystroke costs the same as sending forty-six.`
-            : `Your ${payload} bytes travel inside a ${enc.frameBytes}-byte frame. The 58 bytes of headers and trailer are a fixed cost, so the longer the payload, the smaller a share of the wire they take.`}
+            : `Your ${payload} bytes travel inside a ${enc.frameBytes}-byte frame. The 58 bytes of headers and trailer are a fixed cost, so the longer the payload, the smaller the part of the frame they use.`}
         </p>
       </Panel>
 
@@ -560,11 +563,11 @@ function UnitsSection() {
       </Panel>
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 md:grid-cols-2">
-        <Callout kind="exam" title="Three names worth memorising">
+        <Callout kind="exam" title="Three names to learn">
           The network layer unit is a <strong>packet</strong>, the data link layer unit is a{" "}
           <strong>frame</strong>, and the physical layer deals in <strong>bits</strong>. Above them, the
           transport layer unit is a <strong>segment</strong> in TCP and a datagram in UDP. Those names are what
-          the paper asks for; the byte counts above are here to make the idea concrete, not to be learnt.
+          the exam asks for; the byte counts above are here to make the idea clear, and you do not need to learn them.
         </Callout>
 
         <Panel
@@ -576,7 +579,7 @@ function UnitsSection() {
               A one-byte keystroke gets a 20-byte TCP header and a 20-byte IP header, which is still only 41
               bytes, below Ethernet's 46-byte minimum payload, so five bytes of padding are added. With the
               14-byte Ethernet header and the 4-byte FCS the frame is 64 bytes, of which one byte is yours:
-              an efficiency of 1.6 %. At the other end of the slider, 1460 bytes of data ride in a 1518-byte
+              an efficiency of 1.6 %. At the other end of the slider, 1460 bytes of data travel in a 1518-byte
               frame, or 96.2 %.
             </p>
           </Reveal>
@@ -607,7 +610,7 @@ function FlowSection() {
     <Section
       id="flow"
       title="Down one stack, across, and up the other"
-      lead="Here is the whole model in motion. Data goes down the sender's stack, gaining a header at each layer; it crosses the medium as nothing but bits; then it climbs the receiver's stack, losing exactly the header its opposite number added. Each layer only ever reads what the matching layer at the far end wrote."
+      lead="Here is the whole model, animated. Data goes down the sender's stack and gets a new header at each layer. It crosses the medium as bits only. Then it goes up the receiver's stack, and each layer removes the header that the same layer at the sender added. Each layer only reads what the same layer at the other end wrote."
     >
       <Panel
         title={`Step ${step + 1} of ${FLOW.length}: ${cur.title}`}
@@ -834,7 +837,7 @@ function FlowSection() {
         <Callout kind="note" title="Two conversations at once">
           The dotted lines are the conversation each layer <em>thinks</em> it is having: TCP at one end appears
           to talk straight to TCP at the other. The solid path down, across and up is what physically happens.
-          Both descriptions are correct, and the model is what lets you use whichever is more useful.
+          Both descriptions are correct, and the model lets you use whichever one helps more.
         </Callout>
 
         <Panel title="The rule that decides what a device can do">
@@ -845,8 +848,8 @@ function FlowSection() {
             nothing else in common.
           </p>
           <p className="mt-2 max-w-[52ch] text-sm text-ink-2">
-            Learn the layer and the capability follows. The next section is every device in this competency,
-            placed on that ladder.
+            If you know the layer a device works at, you know what it can do. The next section
+            places every device in this competency on that ladder.
           </p>
         </Panel>
       </div>
@@ -867,7 +870,7 @@ function DevicesSection() {
     <Section
       id="devices"
       title="Every device, on the ladder"
-      lead="Networking hardware is easiest to remember by the layer it understands, because that is what sets the limit on what it can do. Reading nothing means you can only repeat a signal; reading MAC addresses means you can forward within a network; reading IP addresses means you can move between networks."
+      lead="Networking hardware is easiest to remember by the layer it understands, because the layer decides what it can do. A device that reads no addresses can only repeat a signal. One that reads MAC addresses can forward within a network. One that reads IP addresses can move data between networks."
     >
       <Panel
         title="Placed by layer"
@@ -981,7 +984,7 @@ function DevicesSection() {
             <h4 className="text-sm font-semibold text-ink">{device.name}</h4>
             <p className="mt-1 max-w-[62ch] text-sm text-ink-2">{device.what}</p>
             <p className="mt-2 max-w-[62ch] text-sm text-ink-2">
-              <span className="font-medium text-ink">What sets it apart: </span>
+              <span className="font-medium text-ink">What makes it different: </span>
               {device.key}
             </p>
           </div>
@@ -1022,7 +1025,7 @@ const QUESTIONS: Question[] = [
       { label: "Both have seven" },
     ],
     explain:
-      "OSI has seven: application, presentation, session, transport, network, data link and physical. TCP/IP has four: application, transport, Internet and host to network. TCP/IP covers the same ground with fewer boundaries.",
+      "OSI has seven: application, presentation, session, transport, network, data link and physical. TCP/IP has four: application, transport, Internet and host to network. TCP/IP does the same job with fewer layers.",
   },
   {
     id: "m2",
@@ -1094,6 +1097,30 @@ const QUESTIONS: Question[] = [
       { label: "A modem" },
     ],
     explain:
-      "A switch works at the data link layer, so it can read the destination MAC address and send the frame only to the port that address is on. A hub and a repeater work at the physical layer and can do nothing but copy the signal onward; a modem only changes the signal's form.",
+      "A switch works at the data link layer, so it can read the destination MAC address and send the frame only to the port that address is on. A hub and a repeater work at the physical layer and can only copy the signal on; a modem only changes the signal's form.",
+  },
+  {
+    id: "m8",
+    prompt: "Your request passes through a router on its way to a web server. What does the router replace?",
+    options: [
+      { label: "The destination IP address" },
+      { label: "The source and destination MAC addresses", correct: true },
+      { label: "The port numbers" },
+      { label: "Nothing; it passes the frame on untouched" },
+    ],
+    explain:
+      "A frame is only used for one hop. The router throws it away, reads the IP address in the packet inside, and builds a new frame with new MAC addresses for the next link. The destination IP address stays the same from end to end, and a router never reads the ports at all.",
+  },
+  {
+    id: "m9",
+    prompt: "On the receiving computer, what does the Internet layer hand up to the transport layer?",
+    options: [
+      { label: "A frame" },
+      { label: "A packet" },
+      { label: "A segment", correct: true },
+      { label: "Bits" },
+    ],
+    explain:
+      "The Internet layer receives a packet, checks that the destination IP address is its own, and removes the IP header. What is left, and what goes up to TCP, is the segment: the TCP header plus the data.",
   },
 ];

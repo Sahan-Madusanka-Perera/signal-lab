@@ -412,7 +412,7 @@ export function Callout({
   title?: ReactNode;
   children: ReactNode;
 }) {
-  const mark = { note: "Note", exam: "For the paper", warn: "Watch out" }[kind];
+  const mark = { note: "Note", exam: "For the exam", warn: "Watch out" }[kind];
   return (
     <aside
       className={clsx(

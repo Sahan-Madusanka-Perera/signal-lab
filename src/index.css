@@ -397,6 +397,24 @@
   to   { transform: translateX(400%); }
 }
 
+/* A header lifting off the unit it was wrapped around. */
+@keyframes peel-off {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Dashes running along a link while it carries bits. */
+@keyframes bitflow {
+  from { background-position: 0 0; }
+  to   { background-position: 9px 0; }
+}
+
+/* A strip of 0s and 1s scrolling past; the content is doubled so it loops. */
+@keyframes bitflow-text {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

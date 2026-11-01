@@ -55,11 +55,11 @@ function GuidedVsUnguided() {
     <Section
       id="guided"
       title="Two families of medium"
-      lead="Every transmission medium either confines the signal to a physical path or lets it spread out into the surroundings. That single distinction, guided or unguided, decides most of what follows: who can overhear it, how far it reaches, and how badly it degrades."
+      lead="Every transmission medium either keeps the signal inside a physical path, or lets it spread out into the space around it. This one difference, guided or unguided, decides most other things: who can listen in, how far the signal reaches, and how quickly it gets weaker."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-        <Panel title="Guided media: wires" subtitle="The signal is steered along a physical conductor or fibre.">
-          <Scope height={116} caption="The wave is confined: it can only go where the cable goes.">
+        <Panel title="Guided media: wires" subtitle="The signal is guided along a physical wire or fibre.">
+          <Scope height={116} caption="The wave stays inside the cable: it can only go where the cable goes.">
             <ScopeCanvas
               label="A signal confined inside a cable, travelling from left to right"
               animate
@@ -106,8 +106,8 @@ function GuidedVsUnguided() {
           </ul>
         </Panel>
 
-        <Panel title="Unguided media: free space" subtitle="The signal is radiated and spreads in every direction.">
-          <Scope height={116} caption="No physical path: anything in range receives it, wanted or not.">
+        <Panel title="Unguided media: free space" subtitle="The signal is sent out into the air and spreads in every direction.">
+          <Scope height={116} caption="No physical path: any device in range can receive it, even if it is not meant for that device.">
             <ScopeCanvas
               label="A signal radiating outwards in all directions from an antenna"
               animate
@@ -192,8 +192,8 @@ const MEDIA: MediumCard[] = [
     carries: "Electrical signals on copper",
     bandwidth: "Up to ~1 Gbit/s over 100 m",
     distance: "100 m per run",
-    strengths: ["Cheapest cable to buy and terminate", "Flexible and easy to install", "The twist itself cancels much of the interference"],
-    weaknesses: ["Attenuates quickly", "Picks up noise more than the alternatives", "Easily tapped"],
+    strengths: ["Cheapest cable to buy and to fit connectors to", "Flexible and easy to install", "Twisting the wires cancels much of the interference"],
+    weaknesses: ["The signal gets weaker quickly (high attenuation)", "Picks up more noise than the other cables", "Easy for someone to tap into"],
     series: 1,
   },
   {
@@ -204,7 +204,7 @@ const MEDIA: MediumCard[] = [
     bandwidth: "Similar to UTP",
     distance: "100 m per run",
     strengths: ["Screen keeps external noise out", "Useful near motors and heavy machinery"],
-    weaknesses: ["Costlier and stiffer than UTP", "Needs proper earthing to work"],
+    weaknesses: ["More expensive and less flexible than UTP", "Needs proper earthing to work"],
     series: 1,
   },
   {
@@ -214,7 +214,7 @@ const MEDIA: MediumCard[] = [
     carries: "Electrical signals on a central core inside a braided shield",
     bandwidth: "Higher than twisted pair",
     distance: "Hundreds of metres",
-    strengths: ["Good noise immunity from the braid", "Was the original bus cable for Ethernet", "Still used for cable television"],
+    strengths: ["The braid keeps out most noise", "Was the original bus cable for Ethernet", "Still used for cable television"],
     weaknesses: ["Bulky and harder to bend", "More expensive than twisted pair"],
     series: 3,
   },
@@ -225,8 +225,8 @@ const MEDIA: MediumCard[] = [
     carries: "Pulses of light inside a glass core",
     bandwidth: "Extremely high: tens of Gbit/s and beyond",
     distance: "Kilometres without a repeater",
-    strengths: ["Immune to electrical noise entirely", "Very low attenuation", "Very hard to tap without detection"],
-    weaknesses: ["Most expensive", "Fragile; splicing needs skill and equipment"],
+    strengths: ["Not affected by electrical noise at all", "Very low attenuation", "Very hard to tap without being noticed"],
+    weaknesses: ["Most expensive", "Breaks easily; joining two fibres needs skill and special equipment"],
     series: 2,
   },
   {
@@ -238,7 +238,7 @@ const MEDIA: MediumCard[] = [
     bandwidth: "Low, and shared between everyone in range",
     distance: "Metres to hundreds of kilometres",
     strengths: [
-      "Travel in all directions, so the antennas need no careful aiming",
+      "Travel in all directions, so the antennas do not need to point at each other",
       "Pass through walls and buildings",
       "Work indoors and outdoors, and while moving",
     ],
@@ -259,7 +259,7 @@ const MEDIA: MediumCard[] = [
     distance: "Tens of kilometres per hop, line of sight",
     strengths: [
       "More bandwidth than radio waves",
-      "Less prone to interference than radio",
+      "Less affected by interference than radio",
       "Pass through the atmosphere into space without being reflected",
     ],
     weaknesses: [
@@ -277,7 +277,7 @@ const MEDIA: MediumCard[] = [
     band: "Microwave band, uplink and downlink on different frequencies",
     bandwidth: "Moderate, shared",
     distance: "Intercontinental",
-    strengths: ["Covers oceans and remote regions", "One hop reaches an enormous area"],
+    strengths: ["Covers oceans and remote regions", "One satellite can cover a very large area"],
     weaknesses: ["Very high latency: the signal travels ~72 000 km", "Expensive", "Affected by heavy rain"],
     series: 4,
   },
@@ -297,7 +297,7 @@ const MEDIA: MediumCard[] = [
     weaknesses: [
       "Needs line of sight, and solid objects block it completely",
       "Short range only",
-      "Sunlight and strong room lighting degrade it",
+      "Sunlight and strong room lighting weaken it",
     ],
     series: 4,
   },
@@ -305,19 +305,19 @@ const MEDIA: MediumCard[] = [
     id: "visible",
     name: "Visible light",
     family: "unguided",
-    carries: "The light the eye can see, switched far too fast to notice",
+    carries: "The light the eye can see, switched on and off too fast for the eye to notice",
     band: "400 nm to 700 nm · 400 THz to 790 THz",
     bandwidth: "Very high",
     distance: "A room, within sight of the lamp",
     strengths: [
       "Enormous bandwidth, because the frequency is so high",
       "Re-uses lighting that is already installed: this is Li-Fi",
-      "Contained by walls, so it is hard to eavesdrop on from outside",
+      "Stopped by walls, so it is hard for someone outside to listen in",
     ],
     weaknesses: [
       "Blocked by any obstacle, and will not pass through walls",
       "Needs line of sight to the lamp",
-      "Competes with sunlight and other light sources",
+      "Sunlight and other lights can interfere with it",
     ],
     series: 4,
   },
@@ -331,7 +331,7 @@ function MediaCatalogue() {
     <Section
       id="cables"
       title="The media in detail"
-      lead="Pick one to see what it carries, how much it can carry, and what it costs you."
+      lead="Choose one to see what it carries, how much it can carry, and its strengths and weaknesses."
     >
       <Panel bodyClassName="p-0">
         <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[236px_minmax(0,1fr)]">
@@ -442,7 +442,7 @@ function SortingDrill() {
     <Section
       id="sort"
       title="Sorting drill"
-      lead="Classify each example. This is the single most commonly asked question on this competency level."
+      lead="Classify each example. This is the most common exam question on this level."
     >
       <Panel
         title="Guided or unguided?"
@@ -607,11 +607,11 @@ function ImpairmentLab() {
     <Section
       id="impair"
       title="What the medium does to your signal"
-      lead="A medium is never a perfect pipe. Five named effects appear in the syllabus, and each one damages the signal in a different way. Turn them up one at a time and watch which part of the picture suffers."
+      lead="No medium is perfect. The syllabus names five effects, and each one damages the signal in a different way. Increase them one at a time and see which part of the picture changes."
     >
       <Panel
         title="Impairment lab"
-        subtitle="The top trace is what the transmitter sent. The bottom trace is what arrives after the medium has had its way."
+        subtitle="The top trace is what the transmitter sent. The bottom trace is what arrives after passing through the medium."
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Segmented
@@ -736,7 +736,7 @@ function ImpairmentLab() {
               onChange={setNoise}
               accent="var(--s5)"
               readout={`${Math.round(noise * 100)}%`}
-              hint="Unwanted energy added by the surroundings: motors, other cables, lightning. A received signal that makes no sense."
+              hint="Unwanted energy added from outside: motors, other cables, lightning. Too much noise makes the signal impossible to read."
             />
             <ImpairmentSlider
               name="Distortion"
@@ -744,7 +744,7 @@ function ImpairmentLab() {
               onChange={setDistortion}
               accent="var(--s4)"
               readout={`${Math.round(distortion * 100)}%`}
-              hint="The cable's capacitance and inductance round off sharp edges, changing the shape of the signal."
+              hint="The cable's capacitance and inductance make sharp edges rounded, changing the shape of the signal."
             />
             <Button
               size="sm"
@@ -770,7 +770,7 @@ function ImpairmentLab() {
             step={0.5}
             readout={`${bandwidth.toFixed(1)} units`}
             accent="var(--s2)"
-            hint="The range of frequencies the medium will pass, measured in hertz. A narrow bandwidth cannot carry sharp edges, however clean the line is."
+            hint="The range of frequencies the medium will pass, measured in hertz. A narrow bandwidth cannot carry sharp edges, even on a line with no noise."
           />
           <Slider
             label="Cable length"
@@ -788,26 +788,28 @@ function ImpairmentLab() {
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
         <Callout kind="exam" title="Latency and bandwidth are not the same thing">
-          <strong>Bandwidth</strong> is a range of frequencies, measured in hertz: how much can be in flight at
-          once. <strong>Latency</strong> is a delay, measured in milliseconds: how long one unit takes to arrive.
-          A satellite link can have plenty of bandwidth and terrible latency; a short thin wire can have low
-          latency and almost no bandwidth. Widening the pipe does not shorten it.
+          <strong>Bandwidth</strong> is a range of frequencies, measured in hertz: how much the link
+          can carry at once. <strong>Latency</strong> is a delay, measured in milliseconds: how long one unit
+          takes to arrive. A satellite link can have a lot of bandwidth but a very long delay. A short, thin
+          wire can have a very short delay but almost no bandwidth. Making a pipe wider does not make it
+          shorter.
         </Callout>
         <Callout kind="warn" title="Noise and distortion are different faults">
           <strong>Distortion</strong> is the medium changing the shape of your own signal; nothing was added.
-          <strong> Noise</strong> is extra energy from outside being added on top. Distortion is predictable and
-          can often be equalised out; noise is random and cannot.
+          <strong> Noise</strong> is extra energy from outside being added on top. Distortion is
+          predictable, so it can often be corrected (this is called equalisation). Noise is random, so it cannot
+          be corrected.
         </Callout>
       </div>
 
-      <Panel title="Bandwidth is the promise; throughput is what you get">
+      <Panel title="Bandwidth is the maximum; throughput is what you actually get">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
           <div>
             <p className="max-w-[64ch] text-sm text-ink-2">
               <strong className="font-semibold text-ink">Throughput</strong> is the amount of data that actually
-              gets through in a given time, and it is measured, not advertised. Every impairment above eats into it:
-              noise forces retransmissions, a narrow bandwidth limits how fast symbols can be sent, and the
-              protocol's own headers take a share of whatever is left.
+              gets through in a given time. It is measured, not taken from an advertisement. Every
+              impairment above reduces it: noise means data has to be sent again, a narrow bandwidth limits how
+              fast symbols can be sent, and the protocol's own headers use part of what is left.
             </p>
             <p className="mt-2 max-w-[64ch] text-sm text-ink-2">
               A link sold as 100 Mbps might carry only 70 Mbps of your data. The 100 is the capacity of the
@@ -862,18 +864,18 @@ function verdict(
 ): string {
   if (!s.readable) {
     return carried === "digital"
-      ? "The received levels no longer sit clearly either side of the decision threshold. The receiver will read some bits wrongly. This is a bit error, and it is what parity in level 6.3 is designed to catch."
-      : "The original waveform can no longer be picked out of the damage. An analog receiver has no threshold to fall back on, so the error is passed straight through to whatever is listening.";
+      ? "The received levels are no longer clearly above or below the decision threshold. The receiver will read some bits wrongly. This is a bit error, and it is what parity in level 6.3 is designed to detect."
+      : "The original waveform can no longer be recognised. An analog receiver has no threshold to help it decide, so the error is passed on to whatever is listening.";
   }
   const worst = Math.max(s.attenuation, s.noise, s.distortion);
   if (worst < 0.05) return "A near-perfect medium: what arrives is what was sent. No real cable behaves like this.";
   if (worst === s.attenuation)
-    return "Attenuation dominates. The shape is intact but the wave is smaller. Put a repeater partway along the run and the signal is restored.";
+    return "Attenuation is the main problem. The shape is unchanged but the wave is smaller. Put a repeater part of the way along the cable and the signal is restored.";
   if (worst === s.noise)
-    return "Noise dominates. The signal is the right size but is riding on unwanted energy. Shielding, twisting the pair, or moving to fibre would help.";
+    return "Noise is the main problem. The signal is the right size, but unwanted energy has been added on top of it. Shielding, twisting the pair, or changing to fibre would help.";
   if (s.bandwidth < 4)
-    return "Bandwidth is the limit here: the medium simply cannot pass the sharp edges, so the corners have been rounded off before anything else happened.";
-  return "Distortion dominates. The medium has changed the shape of the signal; the edges are no longer square, so the receiver has less margin when it decides each bit.";
+    return "Bandwidth is the main limit here: the medium cannot carry the sharp edges, so the corners have been rounded off.";
+  return "Distortion is the main problem. The medium has changed the shape of the signal. The edges are no longer square, so it is harder for the receiver to decide each bit correctly.";
 }
 
 /* ================================================================== *
@@ -1084,9 +1086,9 @@ function ModesSection() {
       </Panel>
 
       <Callout kind="exam" title="Half duplex is not half speed">
-        Both half and full duplex allow two-way communication; the difference is <em>simultaneity</em>. In half
-        duplex the whole channel is given to whichever end is talking, and the line is turned round between
-        turns. A hub forces half duplex on everything plugged into it; a switch gives every port full duplex,
+        Both half and full duplex allow two-way communication. The difference is whether both ends can
+        send <em>at the same time</em>. In half duplex the whole channel is given to whichever end is talking,
+        and the direction is switched each time the other end wants to talk. A hub forces half duplex on everything plugged into it; a switch gives every port full duplex,
         which is one of the reasons switches replaced hubs.
       </Callout>
     </Section>
@@ -1111,7 +1113,7 @@ function MuxSection() {
     <Section
       id="mux"
       title="Several conversations down one wire"
-      lead="Laying a cable is expensive and one conversation rarely fills it. Multiplexing puts several channels onto the same medium at once: a multiplexer combines them at the sending end and a demultiplexer separates them again at the far end. What differs between the four techniques is which resource gets divided up."
+      lead="Putting in a cable is expensive, and one conversation rarely uses all of its capacity. Multiplexing puts several channels onto the same medium at once: a multiplexer combines them at the sending end and a demultiplexer separates them again at the far end. The four techniques differ in what they divide up between the channels."
     >
       <Panel
         title={info.long}
@@ -1261,7 +1263,7 @@ function MuxSection() {
                 plot.text(
                   x0 + span / 2,
                   midY + 40,
-                  kind === "fdm" ? "guard bands keep the neighbours apart" : "one fibre, several wavelengths at once",
+                  kind === "fdm" ? "guard bands keep neighbouring channels apart" : "one fibre, several wavelengths at once",
                   palette.inkFaint,
                   { size: 9, align: "center" },
                 );
@@ -1285,7 +1287,7 @@ function MuxSection() {
                   ctx.restore();
                   plot.text(x0 + 6 + i * 62, midY + 34, `code ${c.label}`, colour, { size: 9, weight: 700 });
                 });
-                plot.text(x0 + span / 2, midY - 34, "all channels, all the time, told apart by their code", palette.inkFaint, {
+                plot.text(x0 + span / 2, midY - 34, "all channels, all the time, separated by their code", palette.inkFaint, {
                   size: 9,
                   align: "center",
                 });
@@ -1301,7 +1303,7 @@ function MuxSection() {
 
         <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 border-t border-line pt-4 lg:grid-cols-[minmax(0,1fr)_260px]">
           <div>
-            <p className="text-2xs font-semibold text-ink-3">Terms this technique brings with it</p>
+            <p className="text-2xs font-semibold text-ink-3">Terms used with this technique</p>
             <ul className="mt-1.5 grid gap-1.5">
               {info.key.map((k) => (
                 <li key={k.term} className="flex gap-2 text-sm text-ink-2">
@@ -1344,7 +1346,7 @@ function MuxSection() {
         </Panel>
       </div>
 
-      <Callout kind="exam" title="Telling the four apart in one line each">
+      <Callout kind="exam" title="The four techniques, one line each">
         <strong>TDM</strong> divides time into slots. <strong>FDM</strong> divides the bandwidth into frequency
         bands. <strong>WDM</strong> is FDM in fibre, dividing light by wavelength. <strong>CDM</strong> divides
         nothing: every channel uses the whole medium at once and is separated by its code.
@@ -1418,7 +1420,7 @@ const QUESTIONS: Question[] = [
       { label: "Latency" },
     ],
     explain:
-      "Attenuation is loss of signal energy as it travels through the medium. The shape survives and only the size falls, so it can be repaired by amplifying or regenerating the signal at a repeater.",
+      "Attenuation is loss of signal energy as it travels through the medium. The shape stays the same and only the size gets smaller, so it can be repaired by amplifying or regenerating the signal at a repeater.",
   },
   {
     id: "m3",
@@ -1442,7 +1444,7 @@ const QUESTIONS: Question[] = [
       { label: "Because the signal travels faster than in copper" },
     ],
     explain:
-      "Interference works by inducing unwanted currents in a conductor. There is no conductor and no current in a fibre, only light in glass, so external electrical noise has nothing to couple into.",
+      "Interference works by inducing unwanted currents in a conductor. There is no conductor and no current in a fibre, only light in glass, so outside electrical noise has nothing to act on.",
   },
   {
     id: "m5",
@@ -1454,7 +1456,7 @@ const QUESTIONS: Question[] = [
       { label: "Latency" },
     ],
     explain:
-      "Distortion is the alteration of the properties of the signal by the medium itself: here the capacitance and inductance change the shape. Nothing was added from outside, which is what would make it noise.",
+      "Distortion is a change to the signal caused by the medium itself: here the capacitance and inductance change the shape. Nothing was added from outside, which is what would make it noise.",
   },
   {
     id: "m6",
@@ -1478,7 +1480,7 @@ const QUESTIONS: Question[] = [
       { label: "Multiplexed" },
     ],
     explain:
-      "Half duplex allows communication in both directions but not simultaneously; the line is turned round between turns. Simplex would mean one of the two could never reply at all, and full duplex, like a telephone call, would let both talk at once.",
+      "Half duplex allows communication in both directions but not at the same time; the direction is switched between turns. Simplex would mean one of the two could never reply at all, and full duplex, like a telephone call, would let both talk at once.",
   },
   {
     id: "m8",

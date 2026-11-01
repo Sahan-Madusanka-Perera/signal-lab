@@ -123,8 +123,8 @@ function ProtocolSection() {
   return (
     <Section
       id="protocol"
-      title="Encoding is an agreement, not a law of physics"
-      lead="A wire carries voltage. It has no idea what a 1 is. Before any data can cross it, both ends must agree on which signal element stands for which bit, and that agreement is what we call a protocol. Flip the agreement below and watch the same seven bits produce the opposite waveform."
+      title="Encoding is an agreement between the two ends"
+      lead="A wire carries voltage. It does not know what a 1 is. Before any data can cross it, both ends must agree on which signal element stands for which bit, and that agreement is what we call a protocol. Change the agreement below and see the same seven bits produce the opposite waveform."
     >
       <Panel
         title="The same bits, two agreements"
@@ -161,14 +161,14 @@ function ProtocolSection() {
         <p className="mt-3 max-w-[70ch] text-sm text-ink-2">
           Both waveforms are equally valid. A receiver using the wrong agreement reads{" "}
           <span className="tnum font-mono text-ink">{bits.map((b) => 1 - b).join("")}</span> instead of{" "}
-          <span className="tnum font-mono text-ink">{bits.join("")}</span>, every single bit inverted. This is
-          why the encoding scheme has to be settled in advance and built into both devices.
+          <span className="tnum font-mono text-ink">{bits.join("")}</span>, with every bit inverted.
+          This is why the encoding scheme has to be agreed in advance and built into both devices.
         </p>
       </Panel>
 
       <Callout kind="note" title="Three properties, three ways to signal">
-        Amplitude is the obvious choice (two voltage levels), but it is not the only one. The transmitter can
-        equally well hold the amplitude constant and change the <strong>frequency</strong>, or change the{" "}
+        Amplitude is the obvious choice (two voltage levels), but it is not the only one. The
+        transmitter can also keep the amplitude the same and change the <strong>frequency</strong>, or change the{" "}
         <strong>phase</strong>. All three appear later on this page.
       </Callout>
     </Section>
@@ -219,7 +219,7 @@ function EncodingLab() {
     <Section
       id="encoder"
       title="Encoding lab"
-      lead="Click any bit to flip it, or load a preset. Watch what each scheme does at the bit boundaries and in the middle of each bit, because that difference is the whole story."
+      lead="Click any bit to flip it, or load a preset. Look at what each scheme does at the bit boundaries and in the middle of each bit, because that is where the schemes are different."
     >
       <Panel
         title="Line coding"
@@ -321,10 +321,10 @@ function EncodingLab() {
             <Readout label="Signal elements per bit" value={baudPerBit(code)} tone="brand" />
             <Readout label="Level changes in this stream" value={transitions} sub={`over ${bits.length} bits`} />
             <Readout
-              label="Longest stretch with no change"
+              label="Longest run with no change"
               value={`${flat} bit${flat === 1 ? "" : "s"}`}
               tone={flat >= 4 ? "bad" : flat >= 3 ? "warn" : "ok"}
-              sub="the receiver's clock drifts here"
+              sub="the receiver's clock can lose time here"
             />
           </div>
         )}
@@ -332,7 +332,7 @@ function EncodingLab() {
 
       <Panel
         title="Return to Zero: the third level"
-        subtitle="RZ is not on the syllabus, but it is worth one look because it solves the flat-line problem a different way from Manchester, and seeing both makes clear what the flat line actually costs."
+        subtitle="RZ is not in the syllabus. It is shown here because it solves the flat-line problem in a different way from Manchester, and comparing the two helps explain why a flat line is a problem."
         actions={<Extra />}
       >
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.1fr_1fr] lg:items-start">
@@ -355,22 +355,22 @@ function EncodingLab() {
           </Scope>
           <div className="max-w-[62ch] text-sm text-ink-2">
             <p>
-              NRZ holds one of two levels for the whole bit. RZ adds a third level, zero, and uses it as a rest
-              position: a <strong className="font-semibold text-ink">positive pulse</strong> for a 1 and a{" "}
+              NRZ stays at one of two levels for the whole bit. RZ adds a third level, zero, where
+              the line rests: a <strong className="font-semibold text-ink">positive pulse</strong> for a 1 and a{" "}
               <strong className="font-semibold text-ink">negative pulse</strong> for a 0, each lasting half a
               bit, after which the line returns to zero and waits for the next one.
             </p>
             <p className="mt-2.5">
-              That return is the point. Every bit now contains a guaranteed edge, whatever the data, so a long
-              run of zeros no longer produces a flat line and the receiver always has something to time itself
-              against. RZ is <strong className="font-semibold text-ink">self-clocking</strong> for the same
-              reason Manchester is, and it pays the same price: two signal elements per bit, so twice the
-              bandwidth.
+              This return to zero is the important part. Every bit now always contains a change of
+              level, whatever the data, so a long run of zeros no longer produces a flat line, and the receiver
+              always has a change to check its timing against. RZ is <strong className="font-semibold text-ink">self-clocking</strong> for the same
+              reason Manchester is, and it has the same cost: two signal elements per bit, so
+              twice the bandwidth.
             </p>
             <p className="mt-2.5">
-              What it does not get for free is the third level. The transmitter has to generate it and the
-              receiver has to distinguish it reliably from noise, and that is the practical reason Manchester,
-              which needs only two levels, is the one that ended up in Ethernet.
+              But RZ needs a third level. The transmitter has to produce it and the receiver has
+              to tell it apart from noise reliably. That is the practical reason why Manchester, which needs
+              only two levels, was chosen for Ethernet.
             </p>
           </div>
         </div>
@@ -378,7 +378,7 @@ function EncodingLab() {
 
       <Panel
         title="The two Manchester conventions"
-        subtitle="Manchester was published twice with opposite polarity, and both names are in circulation. The waveforms are exact inverses of each other, so neither is 'wrong'; what is wrong is drawing one without saying which."
+        subtitle="Manchester was published twice with opposite polarity, and both versions are still used. The waveforms are exact opposites of each other, so neither is 'wrong'. The mistake is drawing one without saying which one it is."
       >
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
           {(Object.keys(MANCHESTER_CONVENTIONS) as ManchesterConvention[]).map((k) => {
@@ -414,9 +414,9 @@ function EncodingLab() {
         </div>
 
         <p className="mt-4 max-w-[70ch] text-sm text-ink-2">
-          Invert a Manchester signal on the wire and you have not corrupted it, you have simply turned one
-          convention into the other. That is exactly why a receiver cannot work it out for itself: the two devices
-          have to agree beforehand, the same agreement the voltage question at the top of this page needed.
+          If you invert a Manchester signal on the wire, it is not damaged: it simply becomes the
+          other convention. That is why a receiver cannot work out the convention by itself. The two devices
+          have to agree beforehand, just like the voltage agreement at the top of this page.
         </p>
       </Panel>
 
@@ -430,8 +430,8 @@ function EncodingLab() {
         </Callout>
         <Callout kind="warn" title="Try 'All zeros' with each scheme">
           With NRZ-L and NRZ-I a long run of zeros produces a flat line: nothing changes for eight whole bit
-          times, and a receiver has nothing to lock on to. With Manchester the same run still transitions in the
-          middle of every bit, and RZ still pulses in every bit. That is the problem the next two sections are
+          times, and a receiver has no changes to keep its timing correct. With Manchester the same
+          run still changes level in the middle of every bit, and RZ still pulses in every bit. That is the problem the next two sections are
           about.
         </Callout>
       </div>
@@ -450,10 +450,10 @@ function RateSection() {
     <Section
       id="rate"
       title="How fast the signal elements change"
-      lead="Bit rate and signal element rate are not the same number. Bit rate counts bits per second; the signal element rate, or baud rate, counts how many times per second the signal is allowed to change. Manchester buys its reliability by needing two signal elements for every one bit."
+      lead="Bit rate and signal element rate are not the same number. Bit rate counts bits per second; the signal element rate, or baud rate, counts how many times per second the signal is allowed to change. Manchester is more reliable, but the cost is that it needs two signal elements for every bit."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_1.15fr]">
-        <Panel title="Set a bit rate" subtitle="Then read off what each scheme demands of the medium.">
+        <Panel title="Set a bit rate" subtitle="Then see what signal element rate each scheme needs from the medium.">
           <Slider
             label="Bit rate"
             value={bitRate}
@@ -498,7 +498,7 @@ function RateSection() {
             <Formula note="One signal element per bit, so the two numbers are equal.">
               NRZ: baud rate = bit rate
             </Formula>
-            <Formula note="Two signal elements per bit, so the medium must support twice the rate of change. RZ splits the bit cell the same way and lands on the same figure.">
+            <Formula note="Two signal elements per bit, so the medium must support twice the rate of change. RZ splits the bit cell the same way, so it gives the same figure.">
               Manchester: baud rate = 2 × bit rate
             </Formula>
           </div>
@@ -506,7 +506,7 @@ function RateSection() {
 
         <Panel
           title="The same four bits, drawn to scale"
-          subtitle="Manchester packs twice as many signal elements into the same four bit times."
+          subtitle="Manchester fits twice as many signal elements into the same four bit times."
         >
           <Scope height={172}>
             <ScopeCanvas
@@ -544,8 +544,8 @@ function RateSection() {
             Both lanes deliver the same four bits in the same four bit times, so the{" "}
             <strong className="font-semibold text-ink">bit rate is identical</strong>. But Manchester changes
             level twice as often, so it needs a medium with{" "}
-            <strong className="font-semibold text-ink">twice the bandwidth</strong>. That is the price of the
-            guaranteed mid-bit transition.
+            <strong className="font-semibold text-ink">twice the bandwidth</strong>. That is the
+            cost of always having a transition in the middle of every bit.
           </p>
         </Panel>
       </div>
@@ -578,12 +578,12 @@ function SyncSection() {
   return (
     <Section
       id="sync"
-      title="Why the two ends must stay in step"
-      lead="The receiver cannot see the bit boundaries; it only sees a voltage. It has to run its own clock and sample the line at what it believes is the middle of each bit. If that clock runs even slightly fast or slow, the sampling points creep away from the bit centres and the data falls apart."
+      title="Why the two ends must stay in time with each other"
+      lead="The receiver cannot see the bit boundaries; it only sees a voltage. It has to run its own clock and sample the line at what it believes is the middle of each bit. If that clock runs even slightly fast or slow, the sampling points slowly move away from the bit centres, and bits start to be read wrongly."
     >
       <Panel
         title="Clock drift simulator"
-        subtitle="The green marks are the receiver's sampling instants. Drag the drift away from 1.00 and watch them slide."
+        subtitle="The green marks are the receiver's sampling instants. Move the drift away from 1.00 and see them move."
         actions={
           <Segmented
             label="Encoding"
@@ -645,7 +645,7 @@ function SyncSection() {
             />
             <div className="mt-2 flex flex-wrap gap-1.5">
               <Button size="sm" variant={drift === 1 ? "primary" : "secondary"} onClick={() => setDrift(1)}>
-                Perfectly in step
+                Perfectly in time
               </Button>
               <Button size="sm" onClick={() => setDrift(1.04)}>
                 4% fast
@@ -674,7 +674,7 @@ function SyncSection() {
               tone={errors === 0 ? "ok" : "bad"}
               sub={firstError >= 0 ? `first at bit ${firstError + 1}` : "all correct"}
             />
-            <Readout label="Bits lost off the end" value={missing} tone={missing > 0 ? "warn" : "neutral"} />
+            <Readout label="Bits missed at the end" value={missing} tone={missing > 0 ? "warn" : "neutral"} />
           </div>
         </div>
 
@@ -689,15 +689,15 @@ function SyncSection() {
       </Panel>
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
-        <Callout kind="note" title="How real receivers stay in step">
+        <Callout kind="note" title="How real receivers stay in time">
           Either a separate clock line is sent alongside the data (expensive, because it doubles the wiring) or
           the clock is <strong>recovered from the data itself</strong>. That only works if the signal changes
           often enough, which is precisely what Manchester guarantees.
         </Callout>
         <Callout kind="exam" title="The self-clocking argument">
           Manchester's mid-bit transition happens in <em>every</em> bit, so the receiver gets a timing reference
-          from every bit and can re-align continuously. It is called a <strong>self-clocking</strong> code. NRZ
-          has no such guarantee: send a long run of the same bit and the receiver is flying blind.
+          from every bit and can correct its timing on every bit. It is called a <strong>self-clocking</strong> code. NRZ
+          has no such guarantee: send a long run of the same bit and the receiver has nothing to check its timing against.
         </Callout>
       </div>
     </Section>
@@ -706,16 +706,16 @@ function SyncSection() {
 
 function syncVerdict(drift: number, code: LineCode, errors: number, firstError: number): string {
   if (errors === 0 && Math.abs(drift - 1) < 0.001)
-    return "Both clocks agree, so every sample lands squarely in the middle of its bit cell and all twelve bits arrive intact.";
+    return "Both clocks agree, so every sample is taken in the middle of its bit cell and all twelve bits arrive intact.";
   if (errors === 0 && code === "rz")
     return `The receiver is off by ${Math.round(Math.abs(drift - 1) * 100)}%, but its sampling points are still landing inside the half-bit pulses, so every value still reads correctly.`;
   if (errors === 0)
     return code === "manchester"
       ? `The receiver is ${Math.abs(drift - 1) > 0 ? "off by " + Math.round(Math.abs(drift - 1) * 100) + "%" : "off"}, but Manchester's mid-bit transition lets it re-align on every single bit, so nothing is lost yet.`
-      : "The drift has not yet accumulated enough to push a sample out of its bit cell, but it is building up with every bit that passes.";
+      : "The clock error is not yet big enough to move a sample out of its bit cell, but it grows with every bit.";
   if (code === "rz")
-    return `The sampling points have slipped past the half-bit pulses into the resting half of the cell, where there is nothing to read. Bit ${firstError + 1} is the first casualty. A ? means the receiver found no pulse at all, which at least tells it something is wrong; ${errors} of ${12} bits are now missing or wrong.`;
-  return `The sampling points have slipped out of their bit cells. Bit ${firstError + 1} is the first casualty, and because the error accumulates, every bit after it is suspect too. ${errors} of ${12} bits are wrong.`;
+    return `The sampling points have moved past the half-bit pulses into the half of the cell where the line rests at zero, so there is nothing to read. Bit ${firstError + 1} is the first bit read wrongly. A ? means the receiver found no pulse at all, which at least tells it something is wrong; ${errors} of ${12} bits are now missing or wrong.`;
+  return `The sampling points have moved out of their bit cells. Bit ${firstError + 1} is the first bit read wrongly, and because the error keeps growing, every bit after it may be wrong too. ${errors} of ${12} bits are wrong.`;
 }
 
 /* ================================================================== *
@@ -733,11 +733,11 @@ function KeyingSection() {
     <Section
       id="keying"
       title="Using frequency and phase instead"
-      lead="Two voltage levels is the simplest agreement, but any property of a wave can carry the bits. Keep the carrier running and modify one of its three properties in step with the data, and that gives the three shift keying schemes."
+      lead="Two voltage levels is the simplest agreement, but any property of a wave can carry the bits. Keep sending a carrier wave and change one of its three properties to match the data. That gives the three shift keying schemes."
     >
       <Panel
         title="Shift keying"
-        subtitle={`${KEYING[kind].long}: the carrier's ${KEYING[kind].varies} changes with each bit; the other two properties are left alone.`}
+        subtitle={`${KEYING[kind].long}: the carrier's ${KEYING[kind].varies} changes with each bit; the other two properties stay the same.`}
         actions={
           <Segmented
             label="Keying scheme"
@@ -810,9 +810,9 @@ function KeyingSection() {
           ))}
         </div>
 
-        <Callout kind="note" title="Which one survives noise best?">
+        <Callout kind="note" title="Which one copes with noise best?">
           <span className="text-ink-2">
-            Noise mostly adds and subtracts <em>amplitude</em>, so ASK is the most fragile of the three: a noisy
+            Noise mostly adds and subtracts <em>amplitude</em>, so ASK is the most easily affected of the three: a noisy
             line can push a 0 up to look like a 1. FSK and PSK ignore amplitude entirely, which is why real modems
             use them. You will meet these again in the next competency level.
           </span>
@@ -859,7 +859,7 @@ function ParitySection() {
     <Section
       id="parity"
       title="Catching a flipped bit with one extra bit"
-      lead="Noise and drift both produce the same symptom: a bit arrives as the opposite of what was sent. Parity is the cheapest possible check. Add one extra bit so that the number of 1s always comes out even (or always odd). If the count is wrong at the far end, something was corrupted."
+      lead="Noise and drift both produce the same symptom: a bit arrives as the opposite of what was sent. Parity is the simplest possible check. Add one extra bit so that the number of 1s always comes out even (or always odd). If the count is wrong at the receiver, something was damaged on the way."
     >
       <Panel
         title="Parity workbench"
@@ -991,14 +991,14 @@ function ParitySection() {
                 {!detected && actuallyCorrupt && (
                   <>
                     {flipCount} bits were flipped, and the count of ones is still {kind}. The check{" "}
-                    <strong>passes even though the data is wrong</strong>. This is the fundamental limit of a
+                    <strong>passes even though the data is wrong</strong>. This is the main limit of a
                     single parity bit: it catches any odd number of errors, and misses every even number.
                   </>
                 )}
                 {!detected && !actuallyCorrupt && (
                   <>
                     Nothing was corrupted, the count of ones is {kind} as agreed, and the check passes. The
-                    receiver strips the parity bit and hands the seven data bits to the application.
+                    receiver removes the parity bit and passes the seven data bits to the application.
                   </>
                 )}
               </p>
@@ -1078,7 +1078,7 @@ function ParitySection() {
         ]}
       />
 
-      <Panel title="One bit is not much to go on" subtitle="Where the idea goes next.">
+      <Panel title="One bit cannot tell you much" subtitle="Stronger checks that use the same idea.">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
           <div>
             <p className="max-w-[56ch] text-sm text-ink-2">
@@ -1091,9 +1091,9 @@ function ParitySection() {
           </div>
           <div>
             <p className="max-w-[56ch] text-sm text-ink-2">
-              Push the idea further and you get a{" "}
-              <strong className="font-semibold text-ink">hash</strong>: a fixed-length fingerprint of any amount
-              of data, built so that changing a single character changes the answer completely. That makes it
+              Take the idea further and you get a{" "}
+              <strong className="font-semibold text-ink">hash</strong>: a fixed-length summary,
+              like a fingerprint, of any amount of data, designed so that changing a single character changes the answer completely. That makes it
                 useful for far more than transmission errors: it is what a digital signature actually signs, in
               level 6.11.
             </p>
@@ -1201,7 +1201,7 @@ const QUESTIONS: Question[] = [
       { label: "An error has been detected but cannot be located" },
     ],
     explain:
-      "Six ones is an even count, so the check passes and no error is flagged. But parity only catches an odd number of flipped bits: if two bits were flipped, the count stays even and the corruption slips through undetected.",
+      "Six ones is an even count, so the check passes and no error is flagged. But parity only catches an odd number of flipped bits: if two bits were flipped, the count stays even and the error is not detected.",
   },
   {
     id: "e6",
@@ -1213,6 +1213,6 @@ const QUESTIONS: Question[] = [
       { label: "Its propagation speed" },
     ],
     explain:
-      "FSK holds amplitude and phase steady and switches between two frequencies, one for a 1 and another for a 0. Because it ignores amplitude, it is far less vulnerable to noise than ASK.",
+      "FSK holds amplitude and phase steady and switches between two frequencies, one for a 1 and another for a 0. Because it ignores amplitude, it is much less affected by noise than ASK.",
   },
 ];

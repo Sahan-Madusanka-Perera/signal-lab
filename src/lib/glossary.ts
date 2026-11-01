@@ -82,14 +82,14 @@ export const GLOSSARY: GlossaryEntry[] = [
   /* ---- 6.2 Media ---- */
   {
     term: "Guided media",
-    definition: "A medium that confines the signal to a physical path, such as twisted pair, coaxial cable or optical fibre. Also called bounded media.",
+    definition: "A medium that keeps the signal on a physical path, such as twisted pair, coaxial cable or optical fibre. Also called bounded media.",
     lessonId: "media",
     sectionId: "guided",
     aka: ["bounded media"],
   },
   {
     term: "Unguided media",
-    definition: "A medium that radiates the signal into free space with no physical path steering it, such as radio, microwave, infrared or visible light. Also called unbounded media.",
+    definition: "A medium that radiates the signal into free space with no physical path guiding it, such as radio, microwave, infrared or visible light. Also called unbounded media.",
     lessonId: "media",
     sectionId: "guided",
     aka: ["unbounded media", "wireless"],
@@ -103,14 +103,14 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Coaxial cable",
-    definition: "A copper core surrounded by insulation and a braided shield, which gives it better noise immunity than twisted pair.",
+    definition: "A copper core surrounded by insulation and a braided shield, which protects it from noise better than twisted pair.",
     lessonId: "media",
     sectionId: "cables",
     aka: ["coax"],
   },
   {
     term: "Optical fibre",
-    definition: "A glass core that carries pulses of light, giving very high bandwidth, very low attenuation and complete immunity to electrical noise.",
+    definition: "A glass core that carries pulses of light, giving very high bandwidth, very low attenuation, and no effect from electrical noise.",
     lessonId: "media",
     sectionId: "cables",
     aka: ["fiber", "fibre optic"],
@@ -130,7 +130,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Throughput",
-    definition: "The amount of data actually delivered per second, which is usually less than the bandwidth the medium promises.",
+    definition: "The amount of data actually delivered per second, which is usually less than the maximum the medium can carry.",
     lessonId: "media",
     sectionId: "impair",
   },
@@ -213,14 +213,14 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Synchronisation",
-    definition: "Keeping the sender's and the receiver's clocks in step, so the receiver samples each bit in the middle of its own bit time.",
+    definition: "Keeping the sender's and the receiver's clocks in time with each other, so the receiver samples each bit in the middle of its own bit time.",
     lessonId: "encoding",
     sectionId: "sync",
     aka: ["clock drift"],
   },
   {
     term: "Parity bit",
-    definition: "One extra bit added to make the number of ones in the group even or odd, so a single flipped bit can be detected.",
+    definition: "One extra bit added to make the number of ones in the group even or odd, so a single changed (flipped) bit can be detected.",
     lessonId: "encoding",
     sectionId: "parity",
     aka: ["even parity", "odd parity", "error detection"],
@@ -328,7 +328,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Collision",
-    definition: "Two devices transmitting on the shared medium at the same time, so both signals are spoiled and both must be sent again.",
+    definition: "Two devices transmitting on the shared medium at the same time, so both signals are damaged and both must be sent again.",
     lessonId: "topologies",
     sectionId: "collision",
   },
@@ -336,7 +336,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   /* ---- 6.6 MAC ---- */
   {
     term: "MAC address",
-    definition: "A 48-bit address burned into a network interface that identifies it on the local network, written as twelve hexadecimal digits.",
+    definition: "A 48-bit address stored permanently in a network interface that identifies it on the local network, written as twelve hexadecimal digits.",
     lessonId: "mac",
     sectionId: "mac",
     aka: ["physical address", "hardware address"],
@@ -402,7 +402,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Subnet mask",
-    definition: "Thirty-two bits laid alongside an address, a one wherever the bit belongs to the network and a zero wherever it belongs to the host.",
+    definition: "Thirty-two bits placed under an address, a one wherever the bit belongs to the network and a zero wherever it belongs to the host.",
     lessonId: "internet",
     sectionId: "subnet",
     aka: ["network mask", "netmask"],
@@ -441,7 +441,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Gateway",
-    definition: "A device sitting in two networks that passes traffic between them, translating between their different addressing or protocols where needed.",
+    definition: "A device that is part of two networks and passes traffic between them, translating between their different addressing or protocols where needed.",
     lessonId: "internet",
     sectionId: "gateway",
   },
@@ -466,7 +466,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "LAN, MAN and WAN",
-    definition: "Labels for how much ground a network covers: one site, one city, and one country or more.",
+    definition: "Names for how large an area a network covers: one site, one city, and one country or more.",
     lessonId: "internet",
     sectionId: "scale",
     aka: ["LAN", "MAN", "WAN", "PAN"],
@@ -548,7 +548,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "TCP/IP model",
-    definition: "A four-layer reference model: application, transport, Internet and host to network. It does the same job as OSI with fewer lines drawn.",
+    definition: "A four-layer reference model: application, transport, Internet and host to network. It does the same job as OSI with fewer layers.",
     lessonId: "models",
     sectionId: "stack",
   },
@@ -615,7 +615,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Digital signature",
-    definition: "A digest of the message scrambled with the sender's private key, which anyone can check with the public key to prove who sent it and that it is unchanged.",
+    definition: "A digest of the message encrypted with the sender's private key, which anyone can check with the public key to prove who sent it and that it is unchanged.",
     lessonId: "security",
     sectionId: "sign",
   },
@@ -640,7 +640,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Phishing",
-    definition: "A message that impersonates someone trusted to trick the reader into giving up credentials. It attacks the person, not the machine.",
+    definition: "A message that pretends to be from someone trusted, to trick the reader into giving away passwords or other login details. It attacks the person, not the machine.",
     lessonId: "security",
     sectionId: "threats",
   },
@@ -687,7 +687,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: "Proxy server",
-    definition: "A server that fetches pages on behalf of clients and caches them, so a repeated request is served without going out to the Internet again.",
+    definition: "A server that requests pages for its clients and caches them, so a repeated request is served without going out to the Internet again.",
     lessonId: "isp",
     sectionId: "proxy",
     aka: ["cache"],

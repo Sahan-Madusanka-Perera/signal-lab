@@ -49,7 +49,7 @@ export const LESSONS: LessonMeta[] = [
     id: "media",
     code: "6.2",
     title: "Signal transmission media",
-    tagline: "Guided and unguided media, the impairments that spoil a signal, and how one medium carries many conversations.",
+    tagline: "Guided and unguided media, the problems that weaken or change a signal, and how one medium carries many conversations.",
     periods: 4,
     questions: 8,
     outcomes: [
@@ -79,7 +79,7 @@ export const LESSONS: LessonMeta[] = [
     id: "encoding",
     code: "6.3",
     title: "Encoding digital data",
-    tagline: "Turning bits into signal elements, keeping two clocks in step, and catching a flipped bit.",
+    tagline: "Turning bits into signal elements, keeping the sender and receiver in time, and finding a bit that changed by mistake.",
     periods: 4,
     questions: 6,
     outcomes: [
@@ -110,7 +110,7 @@ export const LESSONS: LessonMeta[] = [
     id: "pstn",
     code: "6.4",
     title: "PSTN and modems",
-    tagline: "Sending data down a line built for the human voice.",
+    tagline: "Sending data along a telephone line that was made for the human voice.",
     periods: 4,
     questions: 6,
     outcomes: [
@@ -136,7 +136,7 @@ export const LESSONS: LessonMeta[] = [
     id: "topologies",
     code: "6.5",
     title: "Connecting many devices",
-    tagline: "Why all-to-all fails, what a bus costs you, and what a switch actually does.",
+    tagline: "Why connecting every device to every other device does not work, the problems with a bus, and what a switch does.",
     periods: 4,
     questions: 7,
     outcomes: [
@@ -164,7 +164,7 @@ export const LESSONS: LessonMeta[] = [
     id: "mac",
     code: "6.6",
     title: "Media Access Control",
-    tagline: "Naming every device, wrapping data in frames, and taking turns on a shared cable.",
+    tagline: "Giving every device an address, putting data into frames, and taking turns on a shared cable.",
     periods: 4,
     questions: 6,
     outcomes: [
@@ -231,7 +231,7 @@ export const LESSONS: LessonMeta[] = [
     id: "transport",
     code: "6.8",
     title: "Transport protocols",
-    tagline: "Getting data to the right program on the machine, reliably or quickly. Pick one.",
+    tagline: "Getting data to the right program on a computer, either reliably (TCP) or quickly (UDP).",
     periods: 3,
     questions: 6,
     outcomes: [
@@ -258,7 +258,7 @@ export const LESSONS: LessonMeta[] = [
     id: "applications",
     code: "6.9",
     title: "Applications on the Internet",
-    tagline: "Human-friendly names, the request that fetches a web page, and who serves whom.",
+    tagline: "Names that people can remember, the request that gets a web page, and the client server model.",
     periods: 4,
     questions: 8,
     outcomes: [
@@ -288,9 +288,9 @@ export const LESSONS: LessonMeta[] = [
     id: "models",
     code: "6.10",
     title: "Reference models",
-    tagline: "The map of the whole stack: seven layers, or four, what each adds, and where every device sits.",
+    tagline: "All the layers: seven in OSI or four in TCP/IP, what each layer adds, and which layer each device works at.",
     periods: 4,
-    questions: 7,
+    questions: 9,
     outcomes: [
       "Describes the functions of layers of TCP/IP and OSI models",
       "Describes the data units in different layers (packet, frame and bit)",
@@ -307,6 +307,7 @@ export const LESSONS: LessonMeta[] = [
     sections: [
       { id: "why", label: "Why layers" },
       { id: "stack", label: "The two models" },
+      { id: "example", label: "A worked example" },
       { id: "units", label: "Data units" },
       { id: "flow", label: "Data flow" },
       { id: "devices", label: "Devices by layer" },
@@ -317,7 +318,7 @@ export const LESSONS: LessonMeta[] = [
     id: "security",
     code: "6.11",
     title: "Security of communication",
-    tagline: "Keeping a message private, proving who sent it, and what is trying to get in.",
+    tagline: "Keeping a message private, proving who sent it, and the threats that try to break in.",
     periods: 4,
     questions: 6,
     outcomes: [
@@ -345,7 +346,7 @@ export const LESSONS: LessonMeta[] = [
     id: "isp",
     code: "6.12",
     title: "ISPs and home networks",
-    tagline: "The last mile: modems, ADSL, and one public address shared by a whole house.",
+    tagline: "Connecting a home to the Internet: modems, ADSL, and one public IP address shared by every device in the house.",
     periods: 4,
     questions: 6,
     outcomes: [

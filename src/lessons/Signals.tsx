@@ -48,14 +48,14 @@ function WhatIsASignal() {
           Data communication means moving data between two devices over a transmission medium. The data
           itself cannot travel. What travels is a <strong className="font-semibold text-ink">signal</strong>:
           an electrical voltage, a current, or a light or radio wave whose value changes over time. Everything
-          in this competency is about shaping that changing value so the far end can work out what was sent.
+          in this competency is about controlling how that value changes, so the receiver can work out what was sent.
         </>
       }
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.15fr_1fr]">
         <Panel
           title="The five components of communication"
-          subtitle="Take any one away and no communication happens at all."
+          subtitle="If any one of them is missing, communication cannot happen."
         >
           <ModelDiagram />
         </Panel>
@@ -111,10 +111,11 @@ function WhatIsASignal() {
       </div>
 
       <Callout kind="exam" title="Every signal is a wave, but not every wave is a signal">
-        A wave is just energy travelling through something. Ripples on a pond are a wave, and they tell you
-        nothing. A wave becomes a <strong>signal</strong> only once someone deliberately varies it to carry
-        information, which is why the same radio wave is noise when it comes from a thunderstorm and a signal
-        when it comes from a transmitter. The wave is the carrier; the pattern you impose on it is the message.
+        A wave is just energy moving through something. Ripples on a pond are a wave, but they tell you
+        nothing. A wave becomes a <strong>signal</strong> only when someone changes it on purpose to carry
+        information. That is why the same radio wave is noise when it comes from a thunderstorm, but a signal
+        when it comes from a transmitter. The wave carries the message; the pattern you put onto the wave is the
+        message itself.
       </Callout>
     </Section>
   );
@@ -155,7 +156,7 @@ function ModelDiagram() {
         <div className="rounded-lg border border-dashed border-line-strong px-3 py-2">
           <p className="text-xs font-semibold text-ink">Message</p>
           <p className="mt-0.5 text-2xs text-ink-3">
-            The data itself: text, a number, a picture, a sound. It is what travels, not what sends.
+            The data itself: text, a number, a picture, a sound. It is the thing that is sent, not the thing that sends it.
           </p>
         </div>
         <div className="rounded-lg border border-dashed border-line-strong px-3 py-2">
@@ -220,7 +221,7 @@ function WaveLab() {
     <Section
       id="lab"
       title="The four properties, on one wave"
-      lead="Move a slider and watch which part of the picture responds. Amplitude changes the height, frequency changes how tightly the cycles pack in, and phase slides the whole wave sideways without changing its shape."
+      lead="Move a slider and watch which part of the picture responds. Amplitude changes the height, frequency changes how close together the cycles are, and phase moves the whole wave sideways without changing its shape."
     >
       <Panel
         title="Wave lab"
@@ -422,10 +423,10 @@ function WaveLab() {
       </Panel>
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-        <Callout kind="exam" title="The distinction examiners look for">
+        <Callout kind="exam" title="The difference examiners look for">
           <strong>Period</strong> is measured along a <em>time</em> axis at one point on the wire, and it is how
           long one cycle takes. <strong>Wavelength</strong> is measured along a <em>distance</em> axis at one
-          instant, and it is how far one cycle stretches down the cable. Switch the lab between the two axes and
+          instant, and it is the length of one cycle along the cable. Switch the lab between the two axes and
           notice that the picture is identical; only the horizontal units change.
         </Callout>
         <Callout kind="warn" title="Phase changes nothing about the shape">
@@ -450,7 +451,7 @@ function PhaseSection() {
     <Section
       id="phase"
       title="Phase, seen as rotation"
-      lead="A sine wave is the shadow of a point going round a circle at a steady rate. Phase is simply how far apart two such points are on that circle, so a 180° difference means one wave is at a crest exactly when the other is at a trough."
+      lead="Think of a sine wave as the height of a point moving round a circle at a steady speed. Phase is how far apart two such points are on that circle. So a 180° difference means one wave is at a crest exactly when the other is at a trough."
     >
       <Panel
         title="Two waves, one phase difference"
@@ -588,9 +589,9 @@ function PhaseSection() {
 
             <p className="mt-3 text-sm text-ink-2">
               {delta === 0
-                ? "In phase. The two waves are identical and reinforce each other completely."
+                ? "In phase. The two waves are identical, so added together they make one wave twice as tall."
                 : delta === 180
-                  ? "Exactly out of phase. Add these two together and they cancel to nothing."
+                  ? "Exactly out of phase. If you add these two together, they cancel each other out completely."
                   : `B is ${delta}° behind A, which is ${(delta / 360).toFixed(3).replace(/0+$/, "")} of a full cycle.`}
             </p>
           </div>
@@ -618,7 +619,7 @@ function AnalogVsDigital() {
     <Section
       id="compare"
       title="Analog and digital, side by side"
-      lead="Both are signals; the difference is how many values they are allowed to take. Raise the number of levels below and watch the digital version creep closer to the analog original. This is exactly what happens inside a modem when it digitises a voice."
+      lead="Both are signals; the difference is how many values they are allowed to take. Increase the number of levels below and see the digital version get closer to the analog original. This is what happens inside a modem when it turns a voice into digital data."
     >
       <Panel
         title="One source, two representations"
@@ -727,7 +728,7 @@ function PropagationSection() {
     <Section
       id="speed"
       title="Propagation speed ties the properties together"
-      lead="A signal does not arrive instantly. It travels through the medium at a fixed speed, and that speed depends on the medium, not on how loud or how fast the signal is. One equation links the three quantities, and every numerical problem in this level is a rearrangement of it."
+      lead="A signal does not arrive instantly. It travels through the medium at a fixed speed, and that speed depends on the medium, not on how loud or how fast the signal is. One equation links the three quantities, and every calculation in this level uses this equation, rearranged."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_1.1fr]">
         <div className="grid content-start gap-4">
@@ -740,7 +741,7 @@ function PropagationSection() {
             <Formula>T = 1 / f</Formula>
           </div>
 
-          <Panel title="Propagation speeds worth remembering" bodyClassName="p-0">
+          <Panel title="Propagation speeds to remember" bodyClassName="p-0">
             <ul className="divide-y divide-[var(--line)]">
               {[
                 ["Vacuum / free space", "3.0 × 10⁸ m/s", "the speed of light, c"],
@@ -762,7 +763,7 @@ function PropagationSection() {
 
         <Panel
           title="Solver"
-          subtitle="Pick the unknown, then set the two you know."
+          subtitle="Choose the value you want to find, then enter the two values you know."
           actions={
             <Segmented
               label="Solve for"
@@ -964,7 +965,7 @@ const QUESTIONS: Question[] = [
       { label: "20 m" },
       { label: "2 × 10¹⁶ m" },
     ],
-    explain: "λ = v / f = (2 × 10⁸) / (1 × 10⁸) = 2 m. Watch the powers of ten, which cancel here.",
+    explain: "λ = v / f = (2 × 10⁸) / (1 × 10⁸) = 2 m. Be careful with the powers of ten: here they cancel.",
   },
   {
     id: "s4",
@@ -988,7 +989,7 @@ const QUESTIONS: Question[] = [
       { label: "One travels twice as fast" },
     ],
     explain:
-      "Phase shifts a wave along the horizontal axis without changing height, rate or speed. Half a cycle of shift is 180°, so the crests of one line up with the troughs of the other, and adding them cancels them out.",
+      "Phase shifts a wave along the horizontal axis without changing height, rate or speed. Half a cycle of shift is 180°, so the crests of one are at the same place as the troughs of the other, and adding them cancels them out.",
   },
   {
     id: "s6",

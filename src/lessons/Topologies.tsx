@@ -122,7 +122,7 @@ function GrowthSection() {
     <Section
       id="growth"
       title="Why you cannot just connect everything to everything"
-      lead="Point-to-point works perfectly for two devices. The obvious next step is to run a cable between every pair, and it collapses almost immediately. Drag the slider and watch the cable count run away from you."
+      lead="Point-to-point works perfectly for two devices. The obvious next step is to run a cable between every pair, but this quickly becomes impossible. Move the slider and see how fast the number of cables grows."
     >
       <Panel
         title="All-to-all growth"
@@ -185,7 +185,7 @@ function GrowthSection() {
               <Readout label="Ports on every device" value={ports} sub="n − 1" />
             </div>
 
-            <Formula note="Doubling the hosts roughly quadruples the cabling.">
+            <Formula note="Doubling the number of hosts makes the cabling about four times larger.">
               links = n(n − 1) / 2
             </Formula>
 
@@ -208,7 +208,7 @@ function GrowthSection() {
         <p className="mt-4 max-w-[72ch] text-sm text-ink-2">
           A classroom of thirty machines would need{" "}
           <strong className="font-semibold text-ink">{meshLinks(30)} cables</strong> and twenty-nine network ports
-          in the back of every single computer. It is not merely expensive; it is physically impossible to build.
+          in the back of every single computer. It is not just expensive; it is impossible to build.
           Every topology that follows exists to avoid this.
         </p>
       </Panel>
@@ -228,12 +228,12 @@ const TOPO_INFO: Record<
 > = {
   bus: {
     name: "Bus",
-    how: "One shared backbone cable with a terminator at each end. Every device taps onto the same cable.",
+    how: "One shared backbone cable with a terminator at each end. Every device connects to the same cable.",
     pros: ["Uses the least cable of any topology", "Simple and cheap to lay", "Easy to add another device"],
     cons: [
       "Only one device can transmit at a time: the media access problem",
-      "A break anywhere in the backbone takes down the whole network",
-      "Hard to fault-find, because everything shares one cable",
+      "A break anywhere in the backbone stops the whole network",
+      "Hard to find faults, because everything shares one cable",
     ],
     links: (n) => `${n} taps on 1 cable`,
   },
@@ -242,7 +242,7 @@ const TOPO_INFO: Record<
     how: "Every device has its own cable running back to a central hub or switch.",
     pros: [
       "One failed cable affects only that one device",
-      "Easy to add, remove and fault-find",
+      "Easy to add and remove devices, and to find faults",
       "With a switch, several conversations run at once",
     ],
     cons: ["Needs more cable than a bus", "The central device is a single point of failure"],
@@ -251,7 +251,7 @@ const TOPO_INFO: Record<
   ring: {
     name: "Ring",
     how: "Each device connects to exactly two neighbours, forming a closed loop. Data passes through every device in between.",
-    pros: ["No central device needed", "Orderly access, with no collisions", "Performs predictably under heavy load"],
+    pros: ["No central device needed", "Orderly access, with no collisions", "Works predictably even when traffic is heavy"],
     cons: [
       "One broken link can break the whole ring",
       "Data may pass through many machines to reach its destination",
@@ -262,22 +262,22 @@ const TOPO_INFO: Record<
   mesh: {
     name: "Mesh",
     how: "Devices are joined point-to-point. In a full mesh every host connects directly to every other host.",
-    pros: ["Extremely resilient, with many alternative paths", "No contention between pairs", "Traffic is private to each link"],
+    pros: ["Very reliable, with many alternative paths", "Pairs never have to wait for each other", "Traffic is private to each link"],
     cons: ["Cabling grows as n(n − 1)/2", "Every host needs many ports", "Expensive to build and to maintain"],
     links: (n) => `${meshLinks(n)} cables`,
   },
   tree: {
     name: "Tree",
-    how: "Stars stacked into a hierarchy. A root device feeds branch devices, and the hosts hang off the branches, which is the shape almost every real building network takes.",
+    how: "Stars arranged in levels (a hierarchy). A root device connects to branch devices, and the hosts connect to the branches. Almost every real building network has this shape.",
     pros: [
-      "Scales easily: add another branch rather than rewiring",
-      "Groups can be managed, and faults isolated, one branch at a time",
+      "Grows easily: add another branch instead of rewiring",
+      "Each branch can be managed on its own, and a fault stays within one branch",
       "Traffic within a branch never reaches the rest of the network",
     ],
     cons: [
       "If the root fails, the branches are cut off from each other",
       "More cable and more devices than a single star",
-      "Traffic between distant branches must climb the whole way up and back down",
+      "Traffic between distant branches must go all the way up to the root and back down",
     ],
     links: (n) => `${n} + 3 cables`,
   },
@@ -286,13 +286,13 @@ const TOPO_INFO: Record<
     how: "Any two or more topologies joined together, here two stars linked by a bus backbone. Real networks are almost always hybrids, because different parts of a site have different needs.",
     pros: [
       "Each part of the site can use whichever layout suits it",
-      "Grows by bolting on another section, not by redesigning",
-      "A fault is usually confined to the section it happened in",
+      "Grows by adding another section, not by redesigning",
+      "A fault usually stays in the section where it happened",
     ],
     cons: [
-      "The most complex to design, document and fault-find",
-      "The links joining the sections are critical points",
-      "Costly, because it needs the equipment of every topology it mixes",
+      "The most complex to design, document and find faults in",
+      "If a link joining two sections fails, those sections are cut off",
+      "Expensive, because it needs the equipment of every topology it combines",
     ],
     links: (n) => `${n} + 2 cables`,
   },
@@ -308,7 +308,7 @@ function TopologyExplorer() {
     <Section
       id="topologies"
       title="Topology explorer"
-      lead="Six ways of wiring the same devices together: four basic layouts, and the two ways they get combined in practice. The orange dot is one message travelling from device 1 to device 4; watch how differently it gets there in each layout."
+      lead="Six ways of wiring the same devices together: four basic layouts, and the two ways they are combined in real networks. The orange dot is one message travelling from device 1 to device 4; see how it gets there in each layout."
     >
       <Panel
         title={`${info.name} topology`}
@@ -667,7 +667,7 @@ function drawTopology(
     plot.text(
       w / 2,
       h - 12,
-      tree ? "branch to branch means climbing to the root" : "the backbone joins the two stars",
+      tree ? "branch to branch goes up through the root" : "the backbone joins the two stars",
       palette.inkFaint,
       { size: 10, align: "center" },
     );
@@ -746,8 +746,8 @@ function CollisionSection() {
   return (
     <Section
       id="collision"
-      title="The price of sharing one cable"
-      lead="A bus is beautifully simple until two devices talk at once. Their signals overlap on the shared medium and both are destroyed, which is a collision. Press two send buttons in quick succession and watch it happen."
+      title="The problem with sharing one cable"
+      lead="A bus is very simple, but there is a problem when two devices send at the same time. Their signals overlap on the shared medium and both are destroyed. This is called a collision. Press two send buttons quickly, one after the other, and see what happens."
     >
       <Panel
         title="Media access on a bus"
@@ -898,7 +898,7 @@ function CollisionSection() {
             <p className="mt-2.5 max-w-[64ch] text-2xs text-ink-3">
               {csma
                 ? "With carrier sense on, the second transmission is held back until the bus is quiet, so the collision never happens. This is the idea behind CSMA, the access method real Ethernet buses used."
-                : "With no access control, any two overlapping transmissions destroy each other. Both senders must detect the collision, back off for a random time and try again."}
+                : "With no access control, any two overlapping transmissions destroy each other. Both senders must detect the collision, wait for a random time and try again."}
             </p>
           </div>
 
@@ -909,9 +909,9 @@ function CollisionSection() {
         </div>
       </Panel>
 
-      <Callout kind="exam" title="The bus's defining weakness">
+      <Callout kind="exam" title="The main weakness of a bus">
         Every device shares one medium, so only one may transmit at a time. Controlling who gets to use the bus,
-        the <strong>media access problem</strong>, is the price of the bus's simplicity. A star built around a{" "}
+        the <strong>media access problem</strong>, is the cost of the bus being so simple. A star built around a{" "}
         <em>switch</em> avoids it entirely, because each device has a link of its own.
       </Callout>
     </Section>
@@ -928,24 +928,24 @@ function HubVsSwitch() {
 
   const rows = [
     ["What it does with an incoming frame", "Copies it to every other port", "Sends it only to the destination's port"],
-    ["Does it learn addresses?", "No, it has no idea who is where", "Yes, it builds a table of which device is on which port"],
+    ["Does it learn addresses?", "No, it does not know which device is on which port", "Yes, it builds a table of which device is on which port"],
     ["Simultaneous conversations", "None, since the whole hub is one shared medium", "Many, as long as the pairs differ"],
     ["Collisions", "Yes, all ports share one collision domain", "No, each port is its own collision domain"],
     ["Privacy", "Every device receives every frame", "Only the intended recipient receives it"],
-    ["Cost and intelligence", "Cheap, dumb, obsolete", "Costlier, but standard everywhere today"],
+    ["Cost and intelligence", "Cheap and simple, but no longer used", "More expensive, but used everywhere today"],
   ];
 
   return (
     <Section
       id="hubswitch"
       title="Hub or switch: the same wiring, very different behaviour"
-      lead="Both sit at the centre of a star and both tidy up the cabling. The difference is what happens to a frame once it arrives. Send a frame below and watch where it goes."
+      lead="Both sit at the centre of a star and both make the cabling simpler. The difference is what happens to a frame once it arrives. Send a frame below and watch where it goes."
     >
       <Panel
-        title={device === "hub" ? "Hub: floods every port" : "Switch: forwards to one port"}
+        title={device === "hub" ? "Hub: copies to every port" : "Switch: forwards to one port"}
         subtitle={
           device === "hub"
-            ? "A hub is an electrical repeater. It has no idea who is connected where, so it copies the frame to every other port and lets the devices sort it out."
+            ? "A hub is an electrical repeater. It does not know which device is connected to which port, so it copies the frame to every other port and lets each device decide whether to keep it."
             : "A switch reads the destination address, looks it up in the table it has learnt, and sends the frame out of that one port only."
         }
         actions={
@@ -1096,7 +1096,7 @@ function HubVsSwitch() {
               )}
             >
               {device === "hub"
-                ? "Bandwidth is shared by everyone, and any device could read traffic meant for another. A hub is effectively a bus with tidier cabling."
+                ? "Bandwidth is shared by everyone, and any device could read traffic meant for another. A hub works like a bus, just with neater cabling."
                 : "Each link is separate, so several pairs can talk at the same time and no device sees traffic that is not addressed to it."}
             </div>
           </div>
@@ -1156,7 +1156,7 @@ const QUESTIONS: Question[] = [
       { label: "64" },
     ],
     explain:
-      "Use n(n − 1)/2 = (8 × 7)/2 = 28. Each of the eight devices would also need seven separate network ports, which is why full mesh is impractical for anything but a handful of critical links.",
+      "Use n(n − 1)/2 = (8 × 7)/2 = 28. Each of the eight devices would also need seven separate network ports, which is why full mesh is only practical for a few very important links.",
   },
   {
     id: "t2",
@@ -1168,7 +1168,7 @@ const QUESTIONS: Question[] = [
       { label: "It requires a hub at the centre" },
     ],
     explain:
-      "Every device taps the same backbone cable, so two simultaneous transmissions collide and destroy each other. Controlling who may use the medium, the media access problem, is the cost of the bus's simplicity.",
+      "Every device is connected to the same backbone cable, so two simultaneous transmissions collide and destroy each other. Controlling who may use the medium, the media access problem, is the cost of the bus being so simple.",
   },
   {
     id: "t3",
@@ -1216,7 +1216,7 @@ const QUESTIONS: Question[] = [
       { label: "Mesh" },
     ],
     explain:
-      "In a star, every device has one cable running back to a central hub or switch. A single damaged cable therefore isolates only that device, but the central device is a single point of failure for the whole network.",
+      "In a star, every device has one cable running back to a central hub or switch. A single damaged cable therefore cuts off only that device, but the central device is a single point of failure for the whole network.",
   },
   {
     id: "t7",
